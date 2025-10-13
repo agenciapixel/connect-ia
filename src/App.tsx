@@ -24,22 +24,56 @@ const App = () => (
         <Routes>
           <Route path="/auth" element={<Auth />} />
           <Route
-            path="/*"
+            path="/"
             element={
               <ProtectedRoute>
                 <AppLayout>
-                  <Routes>
-                    <Route path="/" element={<Dashboard />} />
-                    <Route path="/inbox" element={<Inbox />} />
-                    <Route path="/contacts" element={<Contacts />} />
-                    <Route path="/campaigns" element={<Campaigns />} />
-                    <Route path="/prospects" element={<Prospects />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
+                  <Dashboard />
                 </AppLayout>
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/inbox"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <Inbox />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/contacts"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <Contacts />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/campaigns"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <Campaigns />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/prospects"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <Prospects />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
