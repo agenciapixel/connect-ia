@@ -1,4 +1,4 @@
-import { Home, MessageSquare, Users, Megaphone, MapPin, Settings } from "lucide-react";
+import { Home, MessageSquare, Users, Megaphone, MapPin, Settings, Bot } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -18,6 +18,7 @@ const menuItems = [
   { title: "Contatos", url: "/contacts", icon: Users },
   { title: "Campanhas", url: "/campaigns", icon: Megaphone },
   { title: "Prospecção", url: "/prospects", icon: MapPin },
+  { title: "Agentes IA", url: "/agents", icon: Bot },
   { title: "Configurações", url: "/settings", icon: Settings },
 ];
 
