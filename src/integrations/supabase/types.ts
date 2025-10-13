@@ -468,6 +468,30 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       prospects: {
         Row: {
           assigned_to: string | null
@@ -560,6 +584,27 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -589,6 +634,13 @@ export type Database = {
         Args: { "": unknown }
         Returns: unknown
       }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       is_org_member: {
         Args: { check_org_id: string }
         Returns: boolean
@@ -612,6 +664,7 @@ export type Database = {
     }
     Enums: {
       agent_type: "sdr" | "atendimento" | "suporte" | "vendas" | "outros"
+      app_role: "admin" | "member" | "viewer"
       campaign_status: "draft" | "scheduled" | "active" | "paused" | "completed"
       channel_type: "whatsapp" | "instagram" | "telegram" | "messenger"
       consent_status: "opt_in" | "opt_out" | "pending"
@@ -748,6 +801,7 @@ export const Constants = {
   public: {
     Enums: {
       agent_type: ["sdr", "atendimento", "suporte", "vendas", "outros"],
+      app_role: ["admin", "member", "viewer"],
       campaign_status: ["draft", "scheduled", "active", "paused", "completed"],
       channel_type: ["whatsapp", "instagram", "telegram", "messenger"],
       consent_status: ["opt_in", "opt_out", "pending"],
