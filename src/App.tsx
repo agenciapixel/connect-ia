@@ -10,6 +10,7 @@ import Inbox from "./pages/Inbox";
 import Contacts from "./pages/Contacts";
 import Campaigns from "./pages/Campaigns";
 import Prospects from "./pages/Prospects";
+import Settings from "./pages/Settings";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -79,8 +80,18 @@ const App = () => {
                   </AppLayout>
                 </ProtectedRoute>
               }
-            />
-            <Route path="*" element={<NotFound />} />
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <Settings />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
