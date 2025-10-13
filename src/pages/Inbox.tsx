@@ -1,18 +1,149 @@
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MessageSquare, Search, Clock, CheckCircle, User, Send } from "lucide-react";
+import { MessageSquare, Search, Clock, CheckCircle, User, Send, Bot, ArrowRight, ArrowLeft, Loader2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+
+interface AIAgent {
+  id: string;
+  name: string;
+  type: string;
+  status: string;
+}
 
 export default function Inbox() {
+  const [agents, setAgents] = useState<AIAgent[]>([]);
+  const [selectedAgent, setSelectedAgent] = useState<string>("");
+  const [transferring, setTransferring] = useState(false);
+  const [currentConversation, setCurrentConversation] = useState<any>(null);
+  const [isAIHandling, setIsAIHandling] = useState(false);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [newMessage, setNewMessage] = useState("");
+  const [sending, setSending] = useState(false);
+
   const conversations = [
-    { id: 1, name: "João Silva", message: "Olá! Gostaria de saber mais sobre o produto", time: "2 min", status: "new", unread: 3 },
-    { id: 2, name: "Maria Santos", message: "Obrigada pelo retorno rápido!", time: "15 min", status: "responded", unread: 0 },
-    { id: 3, name: "Carlos Oliveira", message: "Quando posso agendar uma reunião?", time: "1 h", status: "pending", unread: 1 },
-    { id: 4, name: "Ana Costa", message: "Perfeito! Vou aguardar o envio", time: "2 h", status: "responded", unread: 0 },
-    { id: 5, name: "Pedro Alves", message: "Preciso de ajuda urgente", time: "3 h", status: "pending", unread: 2 },
+    { id: 1, name: "João Silva", message: "Olá! Gostaria de saber mais sobre o produto", time: "2 min", status: "new", unread: 3, assignedToAI: false },
+    { id: 2, name: "Maria Santos", message: "Obrigada pelo retorno rápido!", time: "15 min", status: "responded", unread: 0, assignedToAI: false },
+    { id: 3, name: "Carlos Oliveira", message: "Quando posso agendar uma reunião?", time: "1 h", status: "pending", unread: 1, assignedToAI: false },
+    { id: 4, name: "Ana Costa", message: "Perfeito! Vou aguardar o envio", time: "2 h", status: "responded", unread: 0, assignedToAI: true, agentName: "Agente de Vendas" },
+    { id: 5, name: "Pedro Alves", message: "Preciso de ajuda urgente", time: "3 h", status: "pending", unread: 2, assignedToAI: false },
   ];
+
+  useEffect(() => {
+    loadAgents();
+  }, []);
+
+  const loadAgents = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('ai_agents')
+        .select('id, name, type, status')
+        .eq('status', 'ativo')
+        .order('name');
+
+      if (error) throw error;
+      setAgents(data || []);
+    } catch (error: any) {
+      console.error('Error loading agents:', error);
+    }
+  };
+
+  const handleTransferToAI = async () => {
+    if (!selectedAgent) {
+      toast.error("Selecione um agente");
+      return;
+    }
+
+    setTransferring(true);
+    try {
+      // Simular transferência - na produção, você salvaria no banco
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setIsAIHandling(true);
+      toast.success("Conversa transferida para o agente de IA!");
+      
+      // Mensagem automática do agente
+      const agent = agents.find(a => a.id === selectedAgent);
+      if (agent) {
+        const aiMessage = {
+          id: Date.now(),
+          sender: 'ai',
+          text: `Olá! Sou ${agent.name}, agente de ${agent.type}. Como posso ajudá-lo?`,
+          time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+          agentName: agent.name
+        };
+        setMessages(prev => [...prev, aiMessage]);
+      }
+    } catch (error: any) {
+      console.error('Error:', error);
+      toast.error("Erro ao transferir conversa");
+    } finally {
+      setTransferring(false);
+    }
+  };
+
+  const handleTransferToHuman = async () => {
+    setIsAIHandling(false);
+    toast.success("Conversa transferida para atendimento humano!");
+    
+    const systemMessage = {
+      id: Date.now(),
+      sender: 'system',
+      text: "Conversa transferida para atendimento humano",
+      time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+    };
+    setMessages(prev => [...prev, systemMessage]);
+  };
+
+  const handleSendMessage = async () => {
+    if (!newMessage.trim()) return;
+
+    setSending(true);
+    try {
+      const userMessage = {
+        id: Date.now(),
+        sender: isAIHandling ? 'user' : 'human',
+        text: newMessage,
+        time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+      };
+      
+      setMessages(prev => [...prev, userMessage]);
+      setNewMessage("");
+
+      // Se o agente de IA está atendendo, enviar para o agente
+      if (isAIHandling && selectedAgent) {
+        const { data, error } = await supabase.functions.invoke('ai-agent-chat', {
+          body: {
+            agentId: selectedAgent,
+            message: newMessage,
+            conversationId: currentConversation?.id
+          }
+        });
+
+        if (error) throw error;
+
+        const aiResponse = {
+          id: Date.now() + 1,
+          sender: 'ai',
+          text: data.response,
+          time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+          agentName: data.agentName
+        };
+        
+        setMessages(prev => [...prev, aiResponse]);
+      }
+    } catch (error: any) {
+      console.error('Error:', error);
+      toast.error("Erro ao enviar mensagem");
+    } finally {
+      setSending(false);
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     const config = {
@@ -56,8 +187,13 @@ export default function Inbox() {
                     key={conv.id}
                     className="flex items-start gap-3 p-4 rounded-lg border hover:bg-accent/50 cursor-pointer transition-all group"
                   >
-                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center text-white font-semibold">
+                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center text-white font-semibold relative">
                       {conv.name.charAt(0)}
+                      {conv.assignedToAI && (
+                        <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-purple-500 border-2 border-background flex items-center justify-center">
+                          <Bot className="h-3 w-3 text-white" />
+                        </div>
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
@@ -68,8 +204,14 @@ export default function Inbox() {
                         </span>
                       </div>
                       <p className="text-sm text-muted-foreground truncate">{conv.message}</p>
-                      <div className="flex items-center gap-2 mt-2">
+                      <div className="flex items-center gap-2 mt-2 flex-wrap">
                         {getStatusBadge(conv.status)}
+                        {conv.assignedToAI && (
+                          <Badge variant="secondary" className="bg-purple-500/10 text-purple-600 text-xs">
+                            <Bot className="h-3 w-3 mr-1" />
+                            {conv.agentName}
+                          </Badge>
+                        )}
                         {conv.unread > 0 && (
                           <Badge variant="destructive" className="h-5 px-2">
                             {conv.unread}
@@ -85,7 +227,7 @@ export default function Inbox() {
         </Card>
 
         <Card className="lg:col-span-2 border-2 hover:border-primary/30 transition-all shadow-lg">
-          <CardHeader className="border-b">
+          <CardHeader className="border-b space-y-4">
             <div className="flex items-center gap-3">
               <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center text-white font-semibold text-lg">
                 J
@@ -93,8 +235,17 @@ export default function Inbox() {
               <div className="flex-1">
                 <CardTitle>João Silva</CardTitle>
                 <CardDescription className="flex items-center gap-2">
-                  <span className="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  Online
+                  {isAIHandling ? (
+                    <>
+                      <Bot className="h-3 w-3 text-purple-500" />
+                      <span className="text-purple-500">Atendido por IA</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                      Online
+                    </>
+                  )}
                 </CardDescription>
               </div>
               <Button variant="outline" size="sm">
@@ -102,10 +253,55 @@ export default function Inbox() {
                 Ver Perfil
               </Button>
             </div>
+
+            {/* Transfer Controls */}
+            <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
+              {!isAIHandling ? (
+                <>
+                  <Select value={selectedAgent} onValueChange={setSelectedAgent}>
+                    <SelectTrigger className="flex-1">
+                      <SelectValue placeholder="Selecione um agente de IA" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {agents.map((agent) => (
+                        <SelectItem key={agent.id} value={agent.id}>
+                          <div className="flex items-center gap-2">
+                            <Bot className="h-4 w-4" />
+                            {agent.name} ({agent.type})
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button 
+                    onClick={handleTransferToAI}
+                    disabled={!selectedAgent || transferring}
+                    className="bg-gradient-to-r from-purple-500 to-purple-600"
+                  >
+                    {transferring ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : (
+                      <ArrowRight className="h-4 w-4 mr-2" />
+                    )}
+                    Transferir para IA
+                  </Button>
+                </>
+              ) : (
+                <Button 
+                  onClick={handleTransferToHuman}
+                  variant="outline"
+                  className="w-full border-orange-500/50 hover:bg-orange-500/10"
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Transferir para Humano
+                </Button>
+              )}
+            </div>
           </CardHeader>
           <CardContent className="p-6">
-            <ScrollArea className="h-[450px] mb-4">
+            <ScrollArea className="h-[400px] mb-4">
               <div className="space-y-4">
+                {/* Initial messages */}
                 <div className="flex items-start gap-3">
                   <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center text-white text-sm font-semibold">
                     J
@@ -118,24 +314,64 @@ export default function Inbox() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 justify-end">
-                  <div className="flex-1 max-w-md">
-                    <div className="bg-gradient-to-r from-primary to-primary-glow rounded-2xl rounded-tr-sm p-4 ml-auto">
-                      <p className="text-sm text-white">Olá João! Claro, ficarei feliz em ajudar. O que você gostaria de saber especificamente?</p>
-                    </div>
-                    <div className="flex items-center justify-end gap-1 mt-1 mr-2">
-                      <span className="text-xs text-muted-foreground">14:24</span>
-                      <CheckCircle className="h-3 w-3 text-emerald-500" />
-                    </div>
+                {/* Dynamic messages */}
+                {messages.map((msg) => (
+                  <div key={msg.id}>
+                    {msg.sender === 'system' ? (
+                      <div className="flex justify-center my-4">
+                        <Badge variant="secondary" className="bg-orange-500/10 text-orange-600">
+                          {msg.text}
+                        </Badge>
+                      </div>
+                    ) : msg.sender === 'ai' ? (
+                      <div className="flex items-start gap-3">
+                        <div className="h-8 w-8 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white">
+                          <Bot className="h-4 w-4" />
+                        </div>
+                        <div className="flex-1 max-w-md">
+                          <div className="bg-purple-500/10 border border-purple-500/20 rounded-2xl rounded-tl-sm p-4">
+                            <p className="text-xs font-semibold text-purple-600 mb-1">{msg.agentName}</p>
+                            <p className="text-sm">{msg.text}</p>
+                          </div>
+                          <span className="text-xs text-muted-foreground mt-1 ml-2">{msg.time}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-start gap-3 justify-end">
+                        <div className="flex-1 max-w-md">
+                          <div className="bg-gradient-to-r from-primary to-primary-glow rounded-2xl rounded-tr-sm p-4 ml-auto">
+                            <p className="text-sm text-white">{msg.text}</p>
+                          </div>
+                          <div className="flex items-center justify-end gap-1 mt-1 mr-2">
+                            <span className="text-xs text-muted-foreground">{msg.time}</span>
+                            <CheckCircle className="h-3 w-3 text-emerald-500" />
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
+                ))}
               </div>
             </ScrollArea>
 
             <div className="flex items-center gap-2 pt-4 border-t">
-              <Input placeholder="Digite sua mensagem..." className="flex-1" />
-              <Button className="bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 transition-opacity">
-                <Send className="h-4 w-4" />
+              <Input 
+                placeholder={isAIHandling ? "O agente de IA está respondendo..." : "Digite sua mensagem..."} 
+                className="flex-1"
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+              />
+              <Button 
+                onClick={handleSendMessage}
+                disabled={sending || !newMessage.trim()}
+                className="bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 transition-opacity"
+              >
+                {sending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
               </Button>
             </div>
           </CardContent>
