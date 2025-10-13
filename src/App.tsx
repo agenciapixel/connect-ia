@@ -12,6 +12,7 @@ import Campaigns from "./pages/Campaigns";
 import Prospects from "./pages/Prospects";
 import Settings from "./pages/Settings";
 import AgentsIA from "./pages/AgentsIA";
+import Integrations from "./pages/Integrations";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -98,6 +99,16 @@ const App = () => {
               <ProtectedRoute>
                 <AppLayout>
                   <AgentsIA />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/integrations"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <Integrations />
                 </AppLayout>
               </ProtectedRoute>
             }
