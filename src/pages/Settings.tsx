@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, Bell, Shield, Palette, Globe, Save } from "lucide-react";
+import { User, Bell, Shield, Palette, Globe, Save, Plug } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -55,6 +55,10 @@ export default function Settings() {
             <Button variant="ghost" className="w-full justify-start">
               <Globe className="mr-2 h-4 w-4" />
               Idioma e Região
+            </Button>
+            <Button variant="ghost" className="w-full justify-start">
+              <Plug className="mr-2 h-4 w-4" />
+              Integrações
             </Button>
           </CardContent>
         </Card>
@@ -210,6 +214,90 @@ export default function Settings() {
                     <SelectItem value="es">Español</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Integrations */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Plug className="h-5 w-5" />
+                Integrações
+              </CardTitle>
+              <CardDescription>Conecte aplicativos e serviços externos</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-4">
+                {/* WhatsApp Integration */}
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex items-center gap-4">
+                    <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center text-white font-bold">
+                      W
+                    </div>
+                    <div>
+                      <h4 className="font-medium">WhatsApp</h4>
+                      <p className="text-sm text-muted-foreground">Conecte sua conta do WhatsApp Business</p>
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm">Conectar</Button>
+                </div>
+
+                {/* Email Integration */}
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex items-center gap-4">
+                    <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold">
+                      @
+                    </div>
+                    <div>
+                      <h4 className="font-medium">Email</h4>
+                      <p className="text-sm text-muted-foreground">Configure provedores de email (SMTP)</p>
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm">Configurar</Button>
+                </div>
+
+                {/* SMS Integration */}
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex items-center gap-4">
+                    <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white font-bold">
+                      S
+                    </div>
+                    <div>
+                      <h4 className="font-medium">SMS</h4>
+                      <p className="text-sm text-muted-foreground">Integração com serviços de SMS (Twilio, etc)</p>
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm">Conectar</Button>
+                </div>
+
+                {/* Zapier Integration */}
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex items-center gap-4">
+                    <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white font-bold">
+                      Z
+                    </div>
+                    <div>
+                      <h4 className="font-medium">Zapier</h4>
+                      <p className="text-sm text-muted-foreground">Automatize fluxos de trabalho com Zapier</p>
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm">Conectar</Button>
+                </div>
+
+                {/* CRM Integration */}
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex items-center gap-4">
+                    <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center text-white font-bold">
+                      C
+                    </div>
+                    <div>
+                      <h4 className="font-medium">CRM</h4>
+                      <p className="text-sm text-muted-foreground">Conecte com seu CRM (HubSpot, Salesforce, etc)</p>
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm">Conectar</Button>
+                </div>
               </div>
             </CardContent>
           </Card>
