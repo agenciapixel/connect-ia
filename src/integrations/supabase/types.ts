@@ -14,6 +14,92 @@ export type Database = {
   }
   public: {
     Tables: {
+      agent_conversations: {
+        Row: {
+          agent_id: string | null
+          assigned_to_human: string | null
+          contact_id: string | null
+          created_at: string | null
+          id: string
+          status: string
+          transferred_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          agent_id?: string | null
+          assigned_to_human?: string | null
+          contact_id?: string | null
+          created_at?: string | null
+          id?: string
+          status?: string
+          transferred_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          agent_id?: string | null
+          assigned_to_human?: string | null
+          contact_id?: string | null
+          created_at?: string | null
+          id?: string
+          status?: string
+          transferred_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_conversations_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "ai_agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_agents: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          max_tokens: number | null
+          model: string
+          name: string
+          status: Database["public"]["Enums"]["agent_status"]
+          system_prompt: string
+          temperature: number | null
+          type: Database["public"]["Enums"]["agent_type"]
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          max_tokens?: number | null
+          model?: string
+          name: string
+          status?: Database["public"]["Enums"]["agent_status"]
+          system_prompt: string
+          temperature?: number | null
+          type: Database["public"]["Enums"]["agent_type"]
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          max_tokens?: number | null
+          model?: string
+          name?: string
+          status?: Database["public"]["Enums"]["agent_status"]
+          system_prompt?: string
+          temperature?: number | null
+          type?: Database["public"]["Enums"]["agent_type"]
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       campaign_messages: {
         Row: {
           attempt_count: number | null
@@ -663,6 +749,7 @@ export type Database = {
       }
     }
     Enums: {
+      agent_status: "ativo" | "inativo" | "treinamento"
       agent_type: "sdr" | "atendimento" | "suporte" | "vendas" | "outros"
       app_role: "admin" | "member" | "viewer"
       campaign_status: "draft" | "scheduled" | "active" | "paused" | "completed"
@@ -800,6 +887,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      agent_status: ["ativo", "inativo", "treinamento"],
       agent_type: ["sdr", "atendimento", "suporte", "vendas", "outros"],
       app_role: ["admin", "member", "viewer"],
       campaign_status: ["draft", "scheduled", "active", "paused", "completed"],
