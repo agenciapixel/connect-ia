@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Bot, Plus, Trash2, Edit, Loader2 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Bot, Plus, Trash2, Edit, Loader2, Sparkles, MessageSquare, FileText, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -32,6 +33,22 @@ const AgentsIA = () => {
   const [loading, setLoading] = useState(true);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editingAgent, setEditingAgent] = useState<AIAgent | null>(null);
+
+  // AI Tools states
+  const [messageDialogOpen, setMessageDialogOpen] = useState(false);
+  const [summarizeDialogOpen, setSummarizeDialogOpen] = useState(false);
+  const [optimizeDialogOpen, setOptimizeDialogOpen] = useState(false);
+  const [toolLoading, setToolLoading] = useState(false);
+  const [toolResult, setToolResult] = useState("");
+
+  // Message generation states
+  const [messageContext, setMessageContext] = useState("");
+  const [messageTone, setMessageTone] = useState("profissional");
+  const [messageObjective, setMessageObjective] = useState("engajamento");
+
+  // Summarize states
+  const [textToSummarize, setTextToSummarize] = useState("");
+  const [summaryFormat, setSummaryFormat] = useState("bullets");
 
   // Form state
   const [formData, setFormData] = useState({
@@ -172,6 +189,80 @@ const AgentsIA = () => {
     return variants[status];
   };
 
+  // AI Tools handlers
+  const handleGenerateMessage = async () => {
+    setToolLoading(true);
+    setToolResult("");
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-generate-message', {
+        body: { 
+          context: messageContext,
+          tone: messageTone,
+          objective: messageObjective
+        }
+      });
+
+      if (error) throw error;
+      setToolResult(data.message);
+      toast.success("Mensagem gerada com sucesso!");
+    } catch (error: any) {
+      toast.error(error.message || "Erro ao gerar mensagem");
+    } finally {
+      setToolLoading(false);
+    }
+  };
+
+  const handleSummarize = async () => {
+    setToolLoading(true);
+    setToolResult("");
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-summarize', {
+        body: { 
+          text: textToSummarize,
+          format: summaryFormat
+        }
+      });
+
+      if (error) throw error;
+      setToolResult(data.summary);
+      toast.success("Resumo criado com sucesso!");
+    } catch (error: any) {
+      toast.error(error.message || "Erro ao criar resumo");
+    } finally {
+      setToolLoading(false);
+    }
+  };
+
+  const handleOptimizeCampaign = async () => {
+    setToolLoading(true);
+    setToolResult("");
+    
+    try {
+      const campaignData = {
+        name: "Campanha de Lançamento",
+        channel: "WhatsApp",
+        status: "active",
+        sent: 1234,
+        deliveryRate: 97,
+        openRate: 45
+      };
+
+      const { data, error } = await supabase.functions.invoke('ai-optimize-campaign', {
+        body: { campaignData }
+      });
+
+      if (error) throw error;
+      setToolResult(data.recommendations);
+      toast.success("Análise concluída!");
+    } catch (error: any) {
+      toast.error(error.message || "Erro ao otimizar campanha");
+    } finally {
+      setToolLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -184,7 +275,24 @@ const AgentsIA = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 p-8">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
-        <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">
+            Agentes de IA
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            Crie agentes especializados e utilize ferramentas de IA
+          </p>
+        </div>
+
+        {/* Tabs */}
+        <Tabs defaultValue="agents" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 max-w-md">
+            <TabsTrigger value="agents">Meus Agentes</TabsTrigger>
+            <TabsTrigger value="tools">Ferramentas IA</TabsTrigger>
+          </TabsList>
+
+          {/* Agentes Tab */}
+          <TabsContent value="agents" className="space-y-6 mt-6">
           <div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">
               Agentes de IA

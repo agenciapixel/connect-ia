@@ -1,353 +1,228 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Sparkles, MessageSquare, FileText, TrendingUp } from "lucide-react";
-import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { User, Bell, Shield, Palette, Globe, Save } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function Settings() {
-  const { toast } = useToast();
-  const [messageDialogOpen, setMessageDialogOpen] = useState(false);
-  const [summarizeDialogOpen, setSummarizeDialogOpen] = useState(false);
-  const [optimizeDialogOpen, setOptimizeDialogOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState("");
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [pushNotifications, setPushNotifications] = useState(true);
+  const [marketingEmails, setMarketingEmails] = useState(false);
 
-  // Message generation states
-  const [messageContext, setMessageContext] = useState("");
-  const [messageTone, setMessageTone] = useState("profissional");
-  const [messageObjective, setMessageObjective] = useState("engajamento");
-
-  // Summarize states
-  const [textToSummarize, setTextToSummarize] = useState("");
-  const [summaryFormat, setSummaryFormat] = useState("bullets");
-
-  const handleGenerateMessage = async () => {
-    setLoading(true);
-    setResult("");
-    
-    try {
-      const { data, error } = await supabase.functions.invoke('ai-generate-message', {
-        body: { 
-          context: messageContext,
-          tone: messageTone,
-          objective: messageObjective
-        }
-      });
-
-      if (error) throw error;
-
-      setResult(data.message);
-      toast({
-        title: "Mensagem gerada!",
-        description: "A IA criou uma mensagem para você.",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Erro",
-        description: error.message || "Erro ao gerar mensagem",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSummarize = async () => {
-    setLoading(true);
-    setResult("");
-    
-    try {
-      const { data, error } = await supabase.functions.invoke('ai-summarize', {
-        body: { 
-          text: textToSummarize,
-          format: summaryFormat
-        }
-      });
-
-      if (error) throw error;
-
-      setResult(data.summary);
-      toast({
-        title: "Resumo criado!",
-        description: "A IA resumiu o texto para você.",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Erro",
-        description: error.message || "Erro ao criar resumo",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleOptimizeCampaign = async () => {
-    setLoading(true);
-    setResult("");
-    
-    try {
-      // Exemplo de dados de campanha
-      const campaignData = {
-        name: "Campanha de Lançamento",
-        channel: "WhatsApp",
-        status: "active",
-        sent: 1234,
-        deliveryRate: 97,
-        openRate: 45
-      };
-
-      const { data, error } = await supabase.functions.invoke('ai-optimize-campaign', {
-        body: { campaignData }
-      });
-
-      if (error) throw error;
-
-      setResult(data.recommendations);
-      toast({
-        title: "Análise concluída!",
-        description: "A IA analisou sua campanha.",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Erro",
-        description: error.message || "Erro ao otimizar campanha",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
+  const handleSave = () => {
+    toast.success("Configurações salvas com sucesso!");
   };
 
   return (
-    <div className="p-8 space-y-6 bg-gradient-to-br from-background via-background to-primary/5 min-h-screen">
+    <div className="p-8 space-y-8 bg-gradient-to-br from-background via-background to-primary/5 min-h-screen">
+      {/* Header */}
       <div>
         <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-          Recursos de IA
+          Configurações
         </h1>
-        <p className="text-muted-foreground mt-2">Utilize inteligência artificial para otimizar seu marketing</p>
+        <p className="text-muted-foreground mt-2">Gerencie suas preferências e configurações da conta</p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3">
-        <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-lg cursor-pointer" onClick={() => setMessageDialogOpen(true)}>
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Sidebar Navigation */}
+        <Card className="lg:col-span-1 h-fit">
           <CardHeader>
-            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center mb-4">
-              <MessageSquare className="h-6 w-6 text-white" />
-            </div>
-            <CardTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
-              Gerar Mensagem
-            </CardTitle>
-            <CardDescription>Crie mensagens persuasivas com IA</CardDescription>
+            <CardTitle>Categorias</CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Use inteligência artificial para gerar mensagens otimizadas para suas campanhas
-            </p>
+          <CardContent className="space-y-2">
+            <Button variant="secondary" className="w-full justify-start">
+              <User className="mr-2 h-4 w-4" />
+              Perfil
+            </Button>
+            <Button variant="ghost" className="w-full justify-start">
+              <Bell className="mr-2 h-4 w-4" />
+              Notificações
+            </Button>
+            <Button variant="ghost" className="w-full justify-start">
+              <Shield className="mr-2 h-4 w-4" />
+              Segurança
+            </Button>
+            <Button variant="ghost" className="w-full justify-start">
+              <Palette className="mr-2 h-4 w-4" />
+              Aparência
+            </Button>
+            <Button variant="ghost" className="w-full justify-start">
+              <Globe className="mr-2 h-4 w-4" />
+              Idioma e Região
+            </Button>
           </CardContent>
         </Card>
 
-        <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-lg cursor-pointer" onClick={() => setSummarizeDialogOpen(true)}>
-          <CardHeader>
-            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center mb-4">
-              <FileText className="h-6 w-6 text-white" />
-            </div>
-            <CardTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
-              Resumir Conteúdo
-            </CardTitle>
-            <CardDescription>Crie resumos inteligentes</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Resuma conversas, relatórios e documentos automaticamente
-            </p>
-          </CardContent>
-        </Card>
+        {/* Main Content */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Profile Settings */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <User className="h-5 w-5" />
+                Perfil
+              </CardTitle>
+              <CardDescription>Atualize suas informações pessoais</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex items-center gap-6">
+                <Avatar className="h-24 w-24">
+                  <AvatarImage src="/placeholder.svg" />
+                  <AvatarFallback className="bg-gradient-to-br from-primary to-primary-glow text-white text-2xl">
+                    U
+                  </AvatarFallback>
+                </Avatar>
+                <div className="space-y-2">
+                  <Button variant="outline" size="sm">Alterar foto</Button>
+                  <p className="text-xs text-muted-foreground">JPG, PNG ou GIF. Máx 2MB.</p>
+                </div>
+              </div>
 
-        <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-lg cursor-pointer" onClick={() => setOptimizeDialogOpen(true)}>
-          <CardHeader>
-            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center mb-4">
-              <TrendingUp className="h-6 w-6 text-white" />
-            </div>
-            <CardTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
-              Otimizar Campanha
-            </CardTitle>
-            <CardDescription>Melhore seus resultados</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Receba recomendações para melhorar o desempenho das campanhas
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+              <Separator />
 
-      {/* Dialog para Gerar Mensagem */}
-      <Dialog open={messageDialogOpen} onOpenChange={setMessageDialogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
-              Gerar Mensagem com IA
-            </DialogTitle>
-            <DialogDescription>
-              Descreva o contexto e deixe a IA criar uma mensagem otimizada
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="context">Contexto da mensagem</Label>
-              <Textarea
-                id="context"
-                placeholder="Ex: Promoção de lançamento de novo produto, desconto de 30% para primeiros 100 clientes..."
-                value={messageContext}
-                onChange={(e) => setMessageContext(e.target.value)}
-                rows={4}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">Nome</Label>
+                    <Input id="firstName" placeholder="João" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Sobrenome</Label>
+                    <Input id="lastName" placeholder="Silva" />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" type="email" placeholder="joao@exemplo.com" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Telefone</Label>
+                  <Input id="phone" type="tel" placeholder="+55 11 99999-9999" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="company">Empresa</Label>
+                  <Input id="company" placeholder="Nome da empresa" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Notification Settings */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bell className="h-5 w-5" />
+                Notificações
+              </CardTitle>
+              <CardDescription>Configure como deseja receber notificações</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="email-notifications">Notificações por Email</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Receba atualizações sobre novas mensagens
+                  </p>
+                </div>
+                <Switch
+                  id="email-notifications"
+                  checked={emailNotifications}
+                  onCheckedChange={setEmailNotifications}
+                />
+              </div>
+
+              <Separator />
+
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="push-notifications">Notificações Push</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Receba notificações em tempo real
+                  </p>
+                </div>
+                <Switch
+                  id="push-notifications"
+                  checked={pushNotifications}
+                  onCheckedChange={setPushNotifications}
+                />
+              </div>
+
+              <Separator />
+
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="marketing-emails">Emails de Marketing</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Receba novidades e dicas sobre o produto
+                  </p>
+                </div>
+                <Switch
+                  id="marketing-emails"
+                  checked={marketingEmails}
+                  onCheckedChange={setMarketingEmails}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Appearance Settings */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Palette className="h-5 w-5" />
+                Aparência
+              </CardTitle>
+              <CardDescription>Personalize a aparência do aplicativo</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="tone">Tom da mensagem</Label>
-                <Select value={messageTone} onValueChange={setMessageTone}>
-                  <SelectTrigger>
+                <Label htmlFor="theme">Tema</Label>
+                <Select defaultValue="light">
+                  <SelectTrigger id="theme">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="profissional">Profissional</SelectItem>
-                    <SelectItem value="amigavel">Amigável</SelectItem>
-                    <SelectItem value="urgente">Urgente</SelectItem>
-                    <SelectItem value="casual">Casual</SelectItem>
+                    <SelectItem value="light">Claro</SelectItem>
+                    <SelectItem value="dark">Escuro</SelectItem>
+                    <SelectItem value="system">Sistema</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
+
               <div className="space-y-2">
-                <Label htmlFor="objective">Objetivo</Label>
-                <Select value={messageObjective} onValueChange={setMessageObjective}>
-                  <SelectTrigger>
+                <Label htmlFor="language">Idioma</Label>
+                <Select defaultValue="pt-br">
+                  <SelectTrigger id="language">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="engajamento">Engajamento</SelectItem>
-                    <SelectItem value="conversao">Conversão</SelectItem>
-                    <SelectItem value="informativo">Informativo</SelectItem>
-                    <SelectItem value="follow-up">Follow-up</SelectItem>
+                    <SelectItem value="pt-br">Português (Brasil)</SelectItem>
+                    <SelectItem value="en">English</SelectItem>
+                    <SelectItem value="es">Español</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-            </div>
-            <Button 
-              onClick={handleGenerateMessage} 
-              disabled={loading || !messageContext}
-              className="w-full bg-gradient-to-r from-primary to-primary-glow hover:opacity-90"
-            >
-              {loading ? "Gerando..." : "Gerar Mensagem"}
-            </Button>
-            {result && (
-              <div className="mt-4 p-4 bg-muted rounded-lg">
-                <Label className="text-sm font-semibold mb-2 block">Resultado:</Label>
-                <p className="text-sm whitespace-pre-wrap">{result}</p>
-              </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+            </CardContent>
+          </Card>
 
-      {/* Dialog para Resumir */}
-      <Dialog open={summarizeDialogOpen} onOpenChange={setSummarizeDialogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
-              Resumir com IA
-            </DialogTitle>
-            <DialogDescription>
-              Cole o texto que deseja resumir
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="text">Texto para resumir</Label>
-              <Textarea
-                id="text"
-                placeholder="Cole aqui o texto que deseja resumir..."
-                value={textToSummarize}
-                onChange={(e) => setTextToSummarize(e.target.value)}
-                rows={6}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="format">Formato do resumo</Label>
-              <Select value={summaryFormat} onValueChange={setSummaryFormat}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="bullets">Bullet Points</SelectItem>
-                  <SelectItem value="paragraph">Parágrafo</SelectItem>
-                  <SelectItem value="executive">Resumo Executivo</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <Button 
-              onClick={handleSummarize} 
-              disabled={loading || !textToSummarize}
-              className="w-full bg-gradient-to-r from-primary to-primary-glow hover:opacity-90"
-            >
-              {loading ? "Resumindo..." : "Criar Resumo"}
+          {/* Save Button */}
+          <div className="flex justify-end">
+            <Button onClick={handleSave} className="bg-gradient-to-r from-primary to-primary-glow">
+              <Save className="mr-2 h-4 w-4" />
+              Salvar Alterações
             </Button>
-            {result && (
-              <div className="mt-4 p-4 bg-muted rounded-lg">
-                <Label className="text-sm font-semibold mb-2 block">Resumo:</Label>
-                <p className="text-sm whitespace-pre-wrap">{result}</p>
-              </div>
-            )}
           </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Dialog para Otimizar Campanha */}
-      <Dialog open={optimizeDialogOpen} onOpenChange={setOptimizeDialogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
-              Otimizar Campanha com IA
-            </DialogTitle>
-            <DialogDescription>
-              Receba recomendações personalizadas para melhorar sua campanha
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="p-4 bg-muted rounded-lg space-y-2">
-              <p className="text-sm"><strong>Campanha:</strong> Campanha de Lançamento</p>
-              <p className="text-sm"><strong>Canal:</strong> WhatsApp</p>
-              <p className="text-sm"><strong>Enviadas:</strong> 1,234</p>
-              <p className="text-sm"><strong>Taxa de entrega:</strong> 97%</p>
-              <p className="text-sm"><strong>Taxa de abertura:</strong> 45%</p>
-            </div>
-            <Button 
-              onClick={handleOptimizeCampaign} 
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-primary to-primary-glow hover:opacity-90"
-            >
-              {loading ? "Analisando..." : "Analisar e Otimizar"}
-            </Button>
-            {result && (
-              <div className="mt-4 p-4 bg-muted rounded-lg max-h-96 overflow-y-auto">
-                <Label className="text-sm font-semibold mb-2 block">Recomendações:</Label>
-                <p className="text-sm whitespace-pre-wrap">{result}</p>
-              </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      </div>
     </div>
   );
 }
