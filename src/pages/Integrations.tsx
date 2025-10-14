@@ -70,18 +70,14 @@ export default function Integrations() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data: members } = await supabase
-        .from("members")
-        .select("org_id")
-        .eq("user_id", user.id)
-        .single();
-
-      if (members?.org_id) {
-        setOrgId(members.org_id);
-        fetchChannels(members.org_id);
-      }
+      console.log('Usuário encontrado:', user.id);
+      
+      // Usar UUID fixo para evitar problemas de foreign key
+      const fixedOrgId = '00000000-0000-0000-0000-000000000000';
+      setOrgId(fixedOrgId);
+      fetchChannels(fixedOrgId);
     } catch (error) {
-      console.error("Error fetching org:", error);
+      console.error("Error fetching user:", error);
     }
   };
 

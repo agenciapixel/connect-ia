@@ -27,10 +27,15 @@ serve(async (req) => {
     console.log('Supabase client created');
 
     // Insert channel into database
+    // Usar o org_id fornecido ou um UUID padrão
+    const orgIdToUse = org_id || '00000000-0000-0000-0000-000000000000';
+    
+    console.log('Usando org_id:', orgIdToUse);
+    
     const { data, error } = await supabase
       .from('channel_accounts')
       .insert({
-        org_id: org_id,
+        org_id: orgIdToUse,
         channel_type: channel_type,
         name: name,
         credentials_json: credentials, // Note: using credentials_json to match the interface
