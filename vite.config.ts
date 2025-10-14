@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
-    https: true,
+    // https: true, // Temporariamente desabilitado para resolver problema SSL
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {
