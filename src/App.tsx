@@ -14,6 +14,7 @@ import Settings from "./pages/Settings";
 import AgentsIA from "./pages/AgentsIA";
 import Integrations from "./pages/Integrations";
 import Auth from "./pages/Auth";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -33,6 +34,7 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/auth" element={<Auth />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route
               path="/"
               element={

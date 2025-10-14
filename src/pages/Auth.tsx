@@ -225,6 +225,20 @@ export default function Auth() {
               </form>
             </TabsContent>
           </Tabs>
+          
+          <div className="mt-6 pt-4 border-t text-center">
+            <p className="text-sm text-muted-foreground">
+              Ao continuar, você concorda com nossa{" "}
+              <a 
+                href="/privacy-policy" 
+                className="text-primary hover:underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Política de Privacidade
+              </a>
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>
