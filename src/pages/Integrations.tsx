@@ -29,7 +29,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { InstagramSetup } from "@/components/InstagramSetup";
 import { WhatsAppSetup } from "@/components/WhatsAppSetup";
-import { MetaOAuthConnect } from "@/components/MetaOAuthConnect";
+import { MetaOAuthConnect } from "@/components/MetaOAuthConnectDirect";
 
 interface ChannelAccount {
   id: string;
