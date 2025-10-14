@@ -302,6 +302,14 @@ export function MetaOAuthConnect({ open, onOpenChange, channelType, onSuccess }:
       }
 
       // Conectar canal via Edge Function
+      console.log('Chamando Edge Function channel-connect...');
+      console.log('Dados sendo enviados:', {
+        channel_type: channelType,
+        name: `${page.name} - ${channelType}`,
+        credentials: credentials,
+        org_id: user.id,
+      });
+
       const { data, error } = await supabase.functions.invoke("channel-connect", {
         body: {
           channel_type: channelType,
@@ -311,7 +319,14 @@ export function MetaOAuthConnect({ open, onOpenChange, channelType, onSuccess }:
         },
       });
 
-      if (error) throw error;
+      console.log('Resposta da Edge Function:', { data, error });
+
+      if (error) {
+        console.error('Erro da Edge Function:', error);
+        throw new Error(`Edge Function error: ${error.message || 'Erro desconhecido'}`);
+      }
+
+      console.log('Edge Function executada com sucesso:', data);
 
       setStep('success');
       toast.success(`${config.title} conectado com sucesso!`);
