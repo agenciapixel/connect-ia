@@ -30,6 +30,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { InstagramSetup } from "@/components/InstagramSetup";
 import { WhatsAppSetup } from "@/components/WhatsAppSetup";
 import { MetaOAuthConnect } from "@/components/MetaOAuthConnect";
+import { ChannelSettingsModal } from "@/components/ChannelSettingsModal";
 
 interface ChannelAccount {
   id: string;
@@ -49,6 +50,8 @@ export default function Integrations() {
   const [whatsappSetupOpen, setWhatsappSetupOpen] = useState(false);
   const [metaOAuthOpen, setMetaOAuthOpen] = useState(false);
   const [metaOAuthType, setMetaOAuthType] = useState<"whatsapp" | "instagram" | "messenger">("whatsapp");
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
+  const [selectedChannel, setSelectedChannel] = useState<ChannelAccount | null>(null);
   const [selectedIntegration, setSelectedIntegration] = useState<{
     type: string;
     name: string;
@@ -112,10 +115,43 @@ export default function Integrations() {
     const isConnected = channels.some(ch => ch.channel_type === channelType);
     console.log(`Verificando conexão para ${channelType}:`, { 
       channels, 
-      isConnected,
+      isConnected, 
       channelTypes: channels.map(ch => ch.channel_type)
     });
     return isConnected;
+  };
+
+  const handleChannelSettings = (channel: ChannelAccount) => {
+    setSelectedChannel(channel);
+    setSettingsModalOpen(true);
+  };
+
+  const handleDisconnectChannel = async (channelId: string) => {
+    try {
+      console.log('Desconectando canal:', channelId);
+      
+      const { data, error } = await supabase.functions.invoke("disconnect-channel", {
+        body: { channel_id: channelId }
+      });
+
+      console.log('Resposta da Edge Function disconnect-channel:', { data, error });
+
+      if (error) {
+        console.error('Erro da Edge Function:', error);
+        throw new Error(`Erro ao desconectar canal: ${error.message || 'Erro desconhecido'}`);
+      }
+
+      toast.success("Canal desconectado com sucesso!");
+      
+      // Recarregar lista de canais
+      if (orgId) {
+        fetchChannels(orgId);
+      }
+      
+    } catch (error) {
+      console.error("Error disconnecting channel:", error);
+      toast.error("Erro ao desconectar canal");
+    }
   };
 
   const handleConnectClick = (type: string, name: string, icon: string) => {
@@ -839,14 +875,18 @@ export default function Integrations() {
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleChannelSettings(channel)}
+                        >
                           <Settings className="h-4 w-4 mr-2" />
                           Gerenciar
                         </Button>
                         <Button 
                           variant="destructive" 
                           size="sm"
-                          onClick={async () => await handleDisconnect(channel.id, channel.name)}
+                          onClick={() => handleDisconnectChannel(channel.id)}
                         >
                           Desconectar
                         </Button>
@@ -896,6 +936,13 @@ export default function Integrations() {
             fetchOrgAndChannels();
           }
         }}
+      />
+
+      <ChannelSettingsModal
+        open={settingsModalOpen}
+        onOpenChange={setSettingsModalOpen}
+        channel={selectedChannel}
+        onDisconnect={handleDisconnectChannel}
       />
 
       {/* Legacy Setup Dialogs (kept for fallback) */}
