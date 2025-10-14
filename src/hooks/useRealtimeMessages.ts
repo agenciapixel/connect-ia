@@ -13,11 +13,15 @@ import type { RealtimeChannel } from "@supabase/supabase-js";
 interface Message {
   id: string;
   conversation_id: string;
-  content: string;
+  body: string;
   direction: "inbound" | "outbound";
   created_at: string;
-  read: boolean;
-  [key: string]: any;
+  read_at: string | null;
+  sent_at: string | null;
+  delivered_at: string | null;
+  error_code: string | null;
+  media_url: string | null;
+  org_id: string;
 }
 
 interface UseRealtimeMessagesOptions {
@@ -75,7 +79,7 @@ export function useRealtimeMessages(
 
         // Calculate unread count
         const unread = (data || []).filter(
-          (msg) => msg.direction === "inbound" && !msg.read
+          (msg) => msg.direction === "inbound" && !msg.read_at
         ).length;
         setUnreadCount(unread);
 
@@ -114,7 +118,7 @@ export function useRealtimeMessages(
               });
 
               // Update unread count if it's an inbound message
-              if (newMessage.direction === "inbound" && !newMessage.read) {
+              if (newMessage.direction === "inbound" && !newMessage.read_at) {
                 setUnreadCount((prev) => prev + 1);
               }
             }
@@ -142,10 +146,10 @@ export function useRealtimeMessages(
 
               // Recalculate unread count
               setUnreadCount((prev) => {
-                const oldMessage = (payload.old as Message) || {};
-                const wasUnread = oldMessage.direction === "inbound" && !oldMessage.read;
+                const oldMessage = payload.old as Partial<Message>;
+                const wasUnread = oldMessage?.direction === "inbound" && !oldMessage?.read_at;
                 const isUnread =
-                  updatedMessage.direction === "inbound" && !updatedMessage.read;
+                  updatedMessage.direction === "inbound" && !updatedMessage.read_at;
 
                 if (wasUnread && !isUnread) return Math.max(0, prev - 1);
                 if (!wasUnread && isUnread) return prev + 1;
@@ -185,7 +189,7 @@ export function useRealtimeMessages(
 export async function markMessageAsRead(messageId: string): Promise<void> {
   const { error } = await supabase
     .from("messages")
-    .update({ read: true })
+    .update({ read_at: new Date().toISOString() })
     .eq("id", messageId);
 
   if (error) {
@@ -200,10 +204,10 @@ export async function markMessageAsRead(messageId: string): Promise<void> {
 export async function markConversationAsRead(conversationId: string): Promise<void> {
   const { error } = await supabase
     .from("messages")
-    .update({ read: true })
+    .update({ read_at: new Date().toISOString() })
     .eq("conversation_id", conversationId)
     .eq("direction", "inbound")
-    .eq("read", false);
+    .is("read_at", null);
 
   if (error) {
     console.error("Error marking conversation as read:", error);
