@@ -323,7 +323,11 @@ export default function Integrations() {
                   ) : (
                     <Button 
                       className="w-full"
-                      onClick={() => handleConnectClick("instagram", "Instagram", "instagram")}
+                      onClick={() => {
+                        console.log('Instagram button clicked directly');
+                        alert('Instagram button clicked!');
+                        handleConnectClick("instagram", "Instagram", "instagram");
+                      }}
                     >
                       Conectar
                     </Button>
@@ -617,7 +621,11 @@ export default function Integrations() {
                   ) : (
                     <Button 
                       className="w-full"
-                      onClick={() => handleConnectClick("whatsapp", "WhatsApp Business", "whatsapp")}
+                      onClick={() => {
+                        console.log('WhatsApp button clicked directly');
+                        alert('WhatsApp button clicked!');
+                        handleConnectClick("whatsapp", "WhatsApp Business", "whatsapp");
+                      }}
                     >
                       Conectar
                     </Button>
