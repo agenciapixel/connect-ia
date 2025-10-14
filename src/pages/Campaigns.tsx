@@ -6,14 +6,16 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Send, TrendingUp, MessageSquare, ArrowUp, ArrowDown, Loader2, Edit, Trash2, Play, Pause } from "lucide-react";
+import { Plus, Send, TrendingUp, MessageSquare, ArrowUp, ArrowDown, Loader2, Edit, Trash2, Play, Pause, Workflow } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import CampaignFlowEditor from "@/components/CampaignFlowEditor";
 
 export default function Campaigns() {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showFlowEditor, setShowFlowEditor] = useState(false);
   const [editingCampaign, setEditingCampaign] = useState<any>(null);
   const [formData, setFormData] = useState({
     name: "",
@@ -70,6 +72,12 @@ export default function Campaigns() {
       return;
     }
 
+    // Ao invés de salvar direto, abre o editor de fluxo
+    setShowCreateDialog(false);
+    setShowFlowEditor(true);
+  };
+
+  const handleSaveFlow = async (steps: any[]) => {
     setSaving(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -95,6 +103,7 @@ export default function Campaigns() {
           .update({
             name: formData.name,
             channel_type: formData.channel_type,
+            audience_query: { steps },
           })
           .eq("id", editingCampaign.id);
 
@@ -106,13 +115,14 @@ export default function Campaigns() {
           name: formData.name,
           channel_type: formData.channel_type,
           status: "draft",
+          audience_query: { steps },
         });
 
         if (error) throw error;
-        toast.success("Campanha criada!");
+        toast.success("Campanha criada com sucesso!");
       }
 
-      setShowCreateDialog(false);
+      setShowFlowEditor(false);
       setFormData({ name: "", channel_type: "whatsapp" });
       setEditingCampaign(null);
       refetch();
@@ -165,7 +175,7 @@ export default function Campaigns() {
       name: campaign.name,
       channel_type: campaign.channel_type,
     });
-    setShowCreateDialog(true);
+    setShowFlowEditor(true);
   };
 
   const getStatusBadge = (status: string) => {
@@ -184,6 +194,25 @@ export default function Campaigns() {
     { label: "Mensagens Enviadas", value: stats?.totalMessages.toString() || "0", icon: MessageSquare, change: 12 },
     { label: "Taxa de Abertura", value: `${stats?.openRate || 0}%`, icon: TrendingUp, change: 5 },
   ];
+
+  // Se o editor de fluxo estiver aberto, mostrar apenas ele
+  if (showFlowEditor) {
+    return (
+      <div className="p-8 bg-gradient-to-br from-background via-background to-primary/5 min-h-screen">
+        <CampaignFlowEditor
+          campaignName={formData.name}
+          channelType={formData.channel_type}
+          onSave={handleSaveFlow}
+          onCancel={() => {
+            setShowFlowEditor(false);
+            setEditingCampaign(null);
+            setFormData({ name: "", channel_type: "whatsapp" });
+          }}
+          initialSteps={editingCampaign?.audience_query?.steps || []}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="p-8 space-y-6 bg-gradient-to-br from-background via-background to-primary/5 min-h-screen">
@@ -282,8 +311,8 @@ export default function Campaigns() {
                       size="sm"
                       onClick={() => openEditDialog(campaign)}
                     >
-                      <Edit className="h-3 w-3 mr-1" />
-                      Editar
+                      <Workflow className="h-3 w-3 mr-1" />
+                      Editar Fluxo
                     </Button>
                     <Button
                       variant="outline"
@@ -305,12 +334,12 @@ export default function Campaigns() {
         )}
       </div>
 
-      {/* Dialog Criar/Editar Campanha */}
+      {/* Dialog Criar Campanha (apenas nome e canal) */}
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editingCampaign ? "Editar Campanha" : "Nova Campanha"}</DialogTitle>
-            <DialogDescription>Preencha os dados da campanha</DialogDescription>
+            <DialogTitle>Nova Campanha</DialogTitle>
+            <DialogDescription>Preencha os dados básicos para começar a criar o fluxo</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
@@ -346,18 +375,17 @@ export default function Campaigns() {
           <DialogFooter>
             <Button variant="outline" onClick={() => {
               setShowCreateDialog(false);
-              setEditingCampaign(null);
               setFormData({ name: "", channel_type: "whatsapp" });
             }}>
               Cancelar
             </Button>
             <Button
               onClick={handleCreateCampaign}
-              disabled={saving}
+              disabled={!formData.name}
               className="bg-gradient-to-r from-primary to-primary-glow"
             >
-              {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
-              {editingCampaign ? "Atualizar" : "Criar"}
+              <Workflow className="h-4 w-4 mr-2" />
+              Criar Fluxo
             </Button>
           </DialogFooter>
         </DialogContent>
