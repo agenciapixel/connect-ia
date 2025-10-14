@@ -155,13 +155,17 @@ export default function Integrations() {
   };
 
   const handleConnectClick = (type: string, name: string, icon: string) => {
+    console.log('=== handleConnectClick DEBUG ===');
     console.log('handleConnectClick called:', { type, name, icon });
+    console.log('metaOAuthOpen state:', metaOAuthOpen);
+    console.log('metaOAuthType state:', metaOAuthType);
     
     // Use new OAuth flow for Meta platforms (WhatsApp, Instagram, Messenger)
     if (type === "instagram" || type === "whatsapp" || type === "messenger") {
       console.log('Opening Meta OAuth for:', type);
       setMetaOAuthType(type as "whatsapp" | "instagram" | "messenger");
       setMetaOAuthOpen(true);
+      console.log('Meta OAuth state updated');
       return;
     }
 
@@ -170,12 +174,14 @@ export default function Integrations() {
       console.log('Opening Meta OAuth for Facebook (as Instagram):', type);
       setMetaOAuthType("instagram");
       setMetaOAuthOpen(true);
+      console.log('Facebook OAuth state updated');
       return;
     }
 
     // For other integrations, show a message that they're not implemented yet
     console.log('Integration not implemented yet:', type);
     toast.info(`${name} ainda não está disponível. Em breve!`);
+    console.log('=== END DEBUG ===');
   };
 
   const handleConnect = async () => {
@@ -932,9 +938,13 @@ export default function Integrations() {
       </Tabs>
 
       {/* Meta OAuth Connect (Simplified Flow) */}
+      {console.log('=== MetaOAuthConnect Render ===', { metaOAuthOpen, metaOAuthType })}
       <MetaOAuthConnect
         open={metaOAuthOpen}
-        onOpenChange={setMetaOAuthOpen}
+        onOpenChange={(open) => {
+          console.log('MetaOAuthConnect onOpenChange called:', open);
+          setMetaOAuthOpen(open);
+        }}
         channelType={metaOAuthType}
         onSuccess={() => {
           console.log('Meta OAuth success callback triggered');
