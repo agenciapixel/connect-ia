@@ -155,17 +155,27 @@ export default function Integrations() {
   };
 
   const handleConnectClick = (type: string, name: string, icon: string) => {
+    console.log('handleConnectClick called:', { type, name, icon });
+    
     // Use new OAuth flow for Meta platforms (WhatsApp, Instagram, Messenger)
     if (type === "instagram" || type === "whatsapp" || type === "messenger") {
+      console.log('Opening Meta OAuth for:', type);
       setMetaOAuthType(type as "whatsapp" | "instagram" | "messenger");
       setMetaOAuthOpen(true);
       return;
     }
 
-    // For other integrations, use the generic dialog
-    setSelectedIntegration({ type, name, icon });
-    setCredentials({ api_key: "", api_secret: "", access_token: "", phone_number: "" });
-    setConnectDialogOpen(true);
+    // For Facebook, treat as Instagram (same OAuth flow)
+    if (type === "facebook") {
+      console.log('Opening Meta OAuth for Facebook (as Instagram):', type);
+      setMetaOAuthType("instagram");
+      setMetaOAuthOpen(true);
+      return;
+    }
+
+    // For other integrations, show a message that they're not implemented yet
+    console.log('Integration not implemented yet:', type);
+    toast.info(`${name} ainda não está disponível. Em breve!`);
   };
 
   const handleConnect = async () => {
