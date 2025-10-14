@@ -326,7 +326,12 @@ export default function Integrations() {
                       onClick={() => {
                         console.log('Instagram button clicked directly');
                         alert('Instagram button clicked!');
-                        handleConnectClick("instagram", "Instagram", "instagram");
+                        try {
+                          handleConnectClick("instagram", "Instagram", "instagram");
+                        } catch (error) {
+                          console.error('Error in handleConnectClick:', error);
+                          alert('Erro na função handleConnectClick: ' + error.message);
+                        }
                       }}
                     >
                       Conectar
@@ -624,7 +629,12 @@ export default function Integrations() {
                       onClick={() => {
                         console.log('WhatsApp button clicked directly');
                         alert('WhatsApp button clicked!');
-                        handleConnectClick("whatsapp", "WhatsApp Business", "whatsapp");
+                        try {
+                          handleConnectClick("whatsapp", "WhatsApp Business", "whatsapp");
+                        } catch (error) {
+                          console.error('Error in handleConnectClick:', error);
+                          alert('Erro na função handleConnectClick: ' + error.message);
+                        }
                       }}
                     >
                       Conectar
