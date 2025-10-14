@@ -88,13 +88,19 @@ export default function Integrations() {
   const fetchChannels = async (orgId: string) => {
     try {
       setLoading(true);
+      console.log('Buscando canais para orgId:', orgId);
+      
       const { data, error } = await supabase
         .from("channel_accounts")
         .select("*")
         .eq("org_id", orgId)
         .eq("status", "active");
 
+      console.log('Resposta da query channel_accounts:', { data, error });
+
       if (error) throw error;
+      
+      console.log('Canais encontrados:', data);
       setChannels(data || []);
     } catch (error) {
       console.error("Error fetching channels:", error);
@@ -105,7 +111,13 @@ export default function Integrations() {
   };
 
   const isChannelConnected = (channelType: string) => {
-    return channels.some(ch => ch.channel_type === channelType);
+    const isConnected = channels.some(ch => ch.channel_type === channelType);
+    console.log(`Verificando conexão para ${channelType}:`, { 
+      channels, 
+      isConnected,
+      channelTypes: channels.map(ch => ch.channel_type)
+    });
+    return isConnected;
   };
 
   const handleConnectClick = (type: string, name: string, icon: string) => {
@@ -877,7 +889,14 @@ export default function Integrations() {
         onOpenChange={setMetaOAuthOpen}
         channelType={metaOAuthType}
         onSuccess={() => {
-          if (orgId) fetchChannels(orgId);
+          console.log('Meta OAuth success callback triggered');
+          if (orgId) {
+            console.log('Recarregando canais após sucesso OAuth, orgId:', orgId);
+            fetchChannels(orgId);
+          } else {
+            console.log('OrgId não encontrado, buscando novamente');
+            fetchOrgAndChannels();
+          }
         }}
       />
 
