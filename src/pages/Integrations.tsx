@@ -86,18 +86,20 @@ export default function Integrations() {
       setLoading(true);
       console.log('Buscando canais para orgId:', orgId);
       
-      const { data, error } = await supabase
-        .from("channel_accounts")
-        .select("*")
-        .eq("org_id", orgId)
-        .eq("status", "active");
+      // Usar Edge Function para buscar canais
+      const { data, error } = await supabase.functions.invoke("get-channels", {
+        body: { org_id: orgId }
+      });
 
-      console.log('Resposta da query channel_accounts:', { data, error });
+      console.log('Resposta da Edge Function get-channels:', { data, error });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erro da Edge Function:', error);
+        throw new Error(`Erro ao buscar canais: ${error.message || 'Erro desconhecido'}`);
+      }
       
-      console.log('Canais encontrados:', data);
-      setChannels(data || []);
+      console.log('Canais encontrados:', data?.channels);
+      setChannels(data?.channels || []);
     } catch (error) {
       console.error("Error fetching channels:", error);
       toast.error("Erro ao carregar integrações");
