@@ -30,6 +30,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { InstagramSetup } from "@/components/InstagramSetup";
 import { WhatsAppSetup } from "@/components/WhatsAppSetup";
 import { MetaOAuthConnect } from "@/components/MetaOAuthConnect";
+import { WhatsAppQRConnect } from "@/components/WhatsAppQRConnect";
 import { ChannelSettingsModal } from "@/components/ChannelSettingsModal";
 
 interface ChannelAccount {
@@ -50,6 +51,7 @@ export default function Integrations() {
   const [whatsappSetupOpen, setWhatsappSetupOpen] = useState(false);
   const [metaOAuthOpen, setMetaOAuthOpen] = useState(false);
   const [metaOAuthType, setMetaOAuthType] = useState<"whatsapp" | "instagram" | "messenger">("whatsapp");
+  const [whatsappQROpen, setWhatsappQROpen] = useState(false);
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [selectedChannel, setSelectedChannel] = useState<ChannelAccount | null>(null);
   const [selectedIntegration, setSelectedIntegration] = useState<{
@@ -155,8 +157,14 @@ export default function Integrations() {
   };
 
   const handleConnectClick = (type: string, name: string, icon: string) => {
-    // Use new OAuth flow for Meta platforms (WhatsApp, Instagram, Messenger)
-    if (type === "instagram" || type === "whatsapp" || type === "messenger") {
+    // WhatsApp usa QR Code (mais simples)
+    if (type === "whatsapp") {
+      setWhatsappQROpen(true);
+      return;
+    }
+
+    // Use new OAuth flow for Meta platforms (Instagram, Messenger)
+    if (type === "instagram" || type === "messenger") {
       setMetaOAuthType(type as "whatsapp" | "instagram" | "messenger");
       setMetaOAuthOpen(true);
       return;
@@ -926,7 +934,21 @@ export default function Integrations() {
         </TabsContent>
       </Tabs>
 
-      {/* Meta OAuth Connect (Simplified Flow) */}
+      {/* WhatsApp QR Code Connect (Simple QR Code Flow) */}
+      <WhatsAppQRConnect
+        open={whatsappQROpen}
+        onOpenChange={setWhatsappQROpen}
+        onSuccess={() => {
+          console.log('WhatsApp QR connect success');
+          if (orgId) {
+            fetchChannels(orgId);
+          } else {
+            fetchOrgAndChannels();
+          }
+        }}
+      />
+
+      {/* Meta OAuth Connect (For Instagram & Messenger) */}
       <MetaOAuthConnect
         open={metaOAuthOpen}
         onOpenChange={setMetaOAuthOpen}
