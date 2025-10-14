@@ -171,15 +171,15 @@ export function WhatsAppSetup({ open, onOpenChange, onSuccess }: WhatsAppSetupPr
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="verifyToken">Verify Token</Label>
+                <Label htmlFor="verifyToken">Verify Token *</Label>
                 <Input
                   id="verifyToken"
+                  placeholder="Ex: meu_token_seguro_123"
                   value={formData.verifyToken}
-                  readOnly
-                  className="bg-muted"
+                  onChange={(e) => handleInputChange('verifyToken', e.target.value)}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Token usado na configuração do webhook (já configurado)
+                  Token personalizado para validação do webhook no Meta for Developers
                 </p>
               </div>
 
