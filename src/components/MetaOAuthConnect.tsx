@@ -15,9 +15,6 @@ interface MetaOAuthConnectProps {
 }
 
 export function MetaOAuthConnect({ open, onOpenChange, channelType, onSuccess }: MetaOAuthConnectProps) {
-  console.log('=== MetaOAuthConnect Component ===');
-  console.log('Props received:', { open, channelType });
-  
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<'auth' | 'select' | 'success'>('auth');
   const [pages, setPages] = useState<any[]>([]);

@@ -155,36 +155,22 @@ export default function Integrations() {
   };
 
   const handleConnectClick = (type: string, name: string, icon: string) => {
-    console.log('=== handleConnectClick DEBUG ===');
-    console.log('handleConnectClick called:', { type, name, icon });
-    console.log('metaOAuthOpen state:', metaOAuthOpen);
-    console.log('metaOAuthType state:', metaOAuthType);
-    
-    // Show alert to confirm function is being called
-    alert(`handleConnectClick chamado para: ${type} - ${name}`);
-    
     // Use new OAuth flow for Meta platforms (WhatsApp, Instagram, Messenger)
     if (type === "instagram" || type === "whatsapp" || type === "messenger") {
-      console.log('Opening Meta OAuth for:', type);
       setMetaOAuthType(type as "whatsapp" | "instagram" | "messenger");
       setMetaOAuthOpen(true);
-      console.log('Meta OAuth state updated');
       return;
     }
 
     // For Facebook, treat as Instagram (same OAuth flow)
     if (type === "facebook") {
-      console.log('Opening Meta OAuth for Facebook (as Instagram):', type);
       setMetaOAuthType("instagram");
       setMetaOAuthOpen(true);
-      console.log('Facebook OAuth state updated');
       return;
     }
 
     // For other integrations, show a message that they're not implemented yet
-    console.log('Integration not implemented yet:', type);
     toast.info(`${name} ainda não está disponível. Em breve!`);
-    console.log('=== END DEBUG ===');
   };
 
   const handleConnect = async () => {
@@ -249,24 +235,6 @@ export default function Integrations() {
         </TabsList>
 
         <TabsContent value="all" className="space-y-6">
-          {/* Debug Test Button */}
-          <div className="mb-4 p-4 border border-red-500 rounded-lg bg-red-50">
-            <h3 className="text-lg font-semibold text-red-700 mb-2">🔧 Debug Test</h3>
-            <Button 
-              onClick={() => {
-                console.log('=== DEBUG TEST BUTTON CLICKED ===');
-                console.log('Current metaOAuthOpen:', metaOAuthOpen);
-                console.log('Current metaOAuthType:', metaOAuthType);
-                setMetaOAuthType("instagram");
-                setMetaOAuthOpen(true);
-                console.log('After setting - metaOAuthOpen should be true');
-              }}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              Teste: Abrir Modal Instagram
-            </Button>
-          </div>
-
           {/* Social Media Integrations */}
           <div>
             <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
@@ -323,16 +291,7 @@ export default function Integrations() {
                   ) : (
                     <Button 
                       className="w-full"
-                      onClick={() => {
-                        console.log('Instagram button clicked directly');
-                        alert('Instagram button clicked!');
-                        try {
-                          handleConnectClick("instagram", "Instagram", "instagram");
-                        } catch (error) {
-                          console.error('Error in handleConnectClick:', error);
-                          alert('Erro na função handleConnectClick: ' + error.message);
-                        }
-                      }}
+                      onClick={() => handleConnectClick("instagram", "Instagram", "instagram")}
                     >
                       Conectar
                     </Button>
@@ -626,16 +585,7 @@ export default function Integrations() {
                   ) : (
                     <Button 
                       className="w-full"
-                      onClick={() => {
-                        console.log('WhatsApp button clicked directly');
-                        alert('WhatsApp button clicked!');
-                        try {
-                          handleConnectClick("whatsapp", "WhatsApp Business", "whatsapp");
-                        } catch (error) {
-                          console.error('Error in handleConnectClick:', error);
-                          alert('Erro na função handleConnectClick: ' + error.message);
-                        }
-                      }}
+                      onClick={() => handleConnectClick("whatsapp", "WhatsApp Business", "whatsapp")}
                     >
                       Conectar
                     </Button>
@@ -977,13 +927,9 @@ export default function Integrations() {
       </Tabs>
 
       {/* Meta OAuth Connect (Simplified Flow) */}
-      {console.log('=== MetaOAuthConnect Render ===', { metaOAuthOpen, metaOAuthType })}
       <MetaOAuthConnect
         open={metaOAuthOpen}
-        onOpenChange={(open) => {
-          console.log('MetaOAuthConnect onOpenChange called:', open);
-          setMetaOAuthOpen(open);
-        }}
+        onOpenChange={setMetaOAuthOpen}
         channelType={metaOAuthType}
         onSuccess={() => {
           console.log('Meta OAuth success callback triggered');
