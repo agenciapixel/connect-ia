@@ -91,6 +91,15 @@ export default function Integrations() {
       setLoading(true);
       console.log('Buscando canais para orgId:', orgId);
       
+      // Primeiro, tentar buscar diretamente da tabela para debug
+      const { data: directData, error: directError } = await supabase
+        .from('channel_accounts')
+        .select('*')
+        .eq('org_id', orgId)
+        .eq('status', 'active');
+      
+      console.log('Busca direta da tabela:', { directData, directError });
+      
       // Usar Edge Function para buscar canais
       const { data, error } = await supabase.functions.invoke("get-channels", {
         body: { org_id: orgId }
@@ -100,7 +109,9 @@ export default function Integrations() {
 
       if (error) {
         console.error('Erro da Edge Function:', error);
-        throw new Error(`Erro ao buscar canais: ${error.message || 'Erro desconhecido'}`);
+        // Se a Edge Function falhar, usar dados diretos
+        setChannels(directData || []);
+        return;
       }
       
       console.log('Canais encontrados:', data?.channels);
@@ -118,7 +129,8 @@ export default function Integrations() {
     console.log(`Verificando conexão para ${channelType}:`, { 
       channels, 
       isConnected, 
-      channelTypes: channels.map(ch => ch.channel_type)
+      channelTypes: channels.map(ch => ch.channel_type),
+      exactMatch: channels.find(ch => ch.channel_type === channelType)
     });
     return isConnected;
   };
