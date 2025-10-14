@@ -48,8 +48,27 @@ This project is integrated with [Lovable](https://lovable.dev), which allows AI-
 ### Working with Supabase
 - **Dashboard**: https://supabase.com/dashboard/project/bjsuujkbrhjhuyzydxbr
 - **Local development**: Use Supabase CLI for local database and functions
+- **Configuration**: Local Supabase settings are in `supabase/config.toml`
 - **Edge Functions**: Test locally before deploying
 - **Database changes**: Always create migrations, never edit types manually
+
+#### Supabase CLI Commands
+```bash
+# Start Supabase locally
+supabase start
+
+# Serve Edge Functions locally (with hot reload)
+supabase functions serve
+
+# Deploy a specific function
+supabase functions deploy <function-name>
+
+# View function logs
+supabase functions logs <function-name>
+
+# Generate TypeScript types from database schema
+npx supabase gen types typescript --project-id bjsuujkbrhjhuyzydxbr > src/integrations/supabase/types.ts
+```
 
 ### Code Organization Principles
 - Page components in `src/pages/` handle routing and main functionality
@@ -252,6 +271,25 @@ Maps to `./src/*`
 3. **Auth State**: Supabase auth listener + local component state
 4. **UI State**: Local component state (useState)
 
+### Custom Hooks
+
+The project includes several custom hooks in `src/hooks/`:
+
+- **`useRealtimeMessages`**: Subscribe to realtime message updates via Supabase Realtime
+  - Filter by conversationId or orgId
+  - Automatic UI updates when new messages arrive
+  - Unread message counter
+  - Works across all channel types
+
+- **`usePersistentAuth`**: Handle persistent authentication state
+  - Manages auth session persistence
+  - Automatic token refresh
+  - Auth state synchronization
+
+- **`use-toast`**: Toast notification hook (shadcn/ui)
+  - Display success/error/info messages
+  - Consistent notification styling
+
 ### Supabase Integration
 
 The Supabase client (`src/integrations/supabase/client.ts`) is configured with:
@@ -289,10 +327,16 @@ The Supabase client (`src/integrations/supabase/client.ts`) is configured with:
 
 5. **Working with Edge Functions**:
    - Edge Functions are located in `supabase/functions/`
-   - Each function is a Deno-based serverless function
+   - Each function has its own directory with an `index.ts` entry point
+   - Functions follow Deno runtime conventions (not Node.js)
    - Test locally using Supabase CLI: `supabase functions serve`
    - Deploy functions: `supabase functions deploy <function-name>`
    - Access environment variables: `Deno.env.get('VARIABLE_NAME')`
+   - Available functions:
+     - AI Tools: `ai-generate-message`, `ai-summarize`, `ai-optimize-campaign`, `ai-agent-chat`
+     - WhatsApp: `whatsapp-webhook`, `whatsapp-send-message`, `whatsapp-qr-connect`
+     - Instagram: `instagram-webhook`, `instagram-send-message`
+     - Common: `channel-connect`
 
 6. **Adding a new channel integration**:
    - Create webhook handler in `supabase/functions/`
@@ -357,10 +401,8 @@ Database migrations are stored in `supabase/migrations/` directory. When making 
    ```
 4. Never edit `types.ts` manually - it's auto-generated
 
-Recent migrations include:
-- WhatsApp integration indexes for performance optimization
-- Channel accounts table for multi-platform support
-- AI agents table for agent management
+Current migration:
+- `20241014_create_organizations.sql`: Core organization structure and multi-tenant setup
 
 ## Important Notes
 
