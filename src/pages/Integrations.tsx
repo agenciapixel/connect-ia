@@ -27,6 +27,8 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { InstagramSetup } from "@/components/InstagramSetup";
+import { WhatsAppSetup } from "@/components/WhatsAppSetup";
 
 interface ChannelAccount {
   id: string;
@@ -42,6 +44,8 @@ export default function Integrations() {
   const [loading, setLoading] = useState(true);
   const [orgId, setOrgId] = useState<string | null>(null);
   const [connectDialogOpen, setConnectDialogOpen] = useState(false);
+  const [instagramSetupOpen, setInstagramSetupOpen] = useState(false);
+  const [whatsappSetupOpen, setWhatsappSetupOpen] = useState(false);
   const [selectedIntegration, setSelectedIntegration] = useState<{
     type: string;
     name: string;
@@ -102,6 +106,17 @@ export default function Integrations() {
   };
 
   const handleConnectClick = (type: string, name: string, icon: string) => {
+    // Open specific setup dialogs for Instagram and WhatsApp
+    if (type === "instagram") {
+      setInstagramSetupOpen(true);
+      return;
+    }
+    if (type === "whatsapp") {
+      setWhatsappSetupOpen(true);
+      return;
+    }
+
+    // For other integrations, use the generic dialog
     setSelectedIntegration({ type, name, icon });
     setCredentials({ api_key: "", api_secret: "", access_token: "", phone_number: "" });
     setConnectDialogOpen(true);
@@ -855,6 +870,24 @@ export default function Integrations() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Instagram Setup Dialog */}
+      <InstagramSetup
+        open={instagramSetupOpen}
+        onOpenChange={setInstagramSetupOpen}
+        onSuccess={() => {
+          if (orgId) fetchChannels(orgId);
+        }}
+      />
+
+      {/* WhatsApp Setup Dialog */}
+      <WhatsAppSetup
+        open={whatsappSetupOpen}
+        onOpenChange={setWhatsappSetupOpen}
+        onSuccess={() => {
+          if (orgId) fetchChannels(orgId);
+        }}
+      />
 
       {/* Connect Dialog */}
       <Dialog open={connectDialogOpen} onOpenChange={setConnectDialogOpen}>
