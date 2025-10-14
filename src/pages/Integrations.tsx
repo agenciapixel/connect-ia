@@ -12,25 +12,141 @@ import {
   Phone, 
   Zap, 
   Users, 
-  CheckCircle2, 
-  XCircle,
+  CheckCircle2,
   Settings,
   ExternalLink,
-  Plug2
+  Plug2,
+  Instagram,
+  Facebook,
+  Twitter,
+  Linkedin,
+  Video,
+  Share2
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+
+interface ChannelAccount {
+  id: string;
+  name: string;
+  channel_type: string;
+  status: string;
+  credentials_json: any;
+  created_at: string;
+}
 
 export default function Integrations() {
-  const [whatsappEnabled, setWhatsappEnabled] = useState(false);
-  const [emailEnabled, setEmailEnabled] = useState(true);
+  const [channels, setChannels] = useState<ChannelAccount[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [orgId, setOrgId] = useState<string | null>(null);
+  const [connectDialogOpen, setConnectDialogOpen] = useState(false);
+  const [selectedIntegration, setSelectedIntegration] = useState<{
+    type: string;
+    name: string;
+    icon: string;
+  } | null>(null);
+  const [credentials, setCredentials] = useState({
+    api_key: "",
+    api_secret: "",
+    access_token: "",
+    phone_number: "",
+  });
 
-  const handleConnect = (integration: string) => {
-    toast.success(`Conectando ${integration}...`);
+  useEffect(() => {
+    fetchOrgAndChannels();
+  }, []);
+
+  const fetchOrgAndChannels = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: members } = await supabase
+        .from("members")
+        .select("org_id")
+        .eq("user_id", user.id)
+        .single();
+
+      if (members?.org_id) {
+        setOrgId(members.org_id);
+        fetchChannels(members.org_id);
+      }
+    } catch (error) {
+      console.error("Error fetching org:", error);
+    }
   };
 
-  const handleDisconnect = (integration: string) => {
-    toast.info(`${integration} desconectado`);
+  const fetchChannels = async (orgId: string) => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("channel_accounts")
+        .select("*")
+        .eq("org_id", orgId)
+        .eq("status", "active");
+
+      if (error) throw error;
+      setChannels(data || []);
+    } catch (error) {
+      console.error("Error fetching channels:", error);
+      toast.error("Erro ao carregar integrações");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const isChannelConnected = (channelType: string) => {
+    return channels.some(ch => ch.channel_type === channelType);
+  };
+
+  const handleConnectClick = (type: string, name: string, icon: string) => {
+    setSelectedIntegration({ type, name, icon });
+    setCredentials({ api_key: "", api_secret: "", access_token: "", phone_number: "" });
+    setConnectDialogOpen(true);
+  };
+
+  const handleConnect = async () => {
+    if (!orgId || !selectedIntegration) return;
+
+    try {
+      const { error } = await supabase
+        .from("channel_accounts")
+        .insert([{
+          org_id: orgId,
+          channel_type: selectedIntegration.type as any,
+          name: selectedIntegration.name,
+          credentials_json: credentials as any,
+          status: "active",
+        }]);
+
+      if (error) throw error;
+
+      toast.success(`${selectedIntegration.name} conectado com sucesso!`);
+      setConnectDialogOpen(false);
+      if (orgId) fetchChannels(orgId);
+    } catch (error) {
+      console.error("Error connecting:", error);
+      toast.error("Erro ao conectar integração");
+    }
+  };
+
+  const handleDisconnect = async (channelId: string, name: string) => {
+    try {
+      const { error } = await supabase
+        .from("channel_accounts")
+        .update({ status: "inactive" })
+        .eq("id", channelId);
+
+      if (error) throw error;
+
+      toast.success(`${name} desconectado`);
+      if (orgId) fetchChannels(orgId);
+    } catch (error) {
+      console.error("Error disconnecting:", error);
+      toast.error("Erro ao desconectar");
+    }
   };
 
   return (
@@ -53,6 +169,300 @@ export default function Integrations() {
         </TabsList>
 
         <TabsContent value="all" className="space-y-6">
+          {/* Social Media Integrations */}
+          <div>
+            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+              <Share2 className="h-6 w-6 text-primary" />
+              Redes Sociais
+            </h2>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {/* Instagram */}
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 flex items-center justify-center">
+                        <Instagram className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <CardTitle className="flex items-center gap-2">
+                          Instagram
+                          {isChannelConnected("instagram") && (
+                            <Badge variant="secondary" className="bg-green-500/10 text-green-700">
+                              <CheckCircle2 className="h-3 w-3 mr-1" />
+                              Conectado
+                            </Badge>
+                          )}
+                          {!isChannelConnected("instagram") && <Badge variant="outline">Disponível</Badge>}
+                        </CardTitle>
+                        <CardDescription>Instagram Business API</CardDescription>
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Gerencie mensagens diretas e comentários
+                  </p>
+                  <Separator />
+                  {isChannelConnected("instagram") ? (
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" className="flex-1">
+                        <Settings className="h-4 w-4 mr-2" />
+                        Configurar
+                      </Button>
+                      <Button 
+                        variant="destructive" 
+                        size="sm"
+                        onClick={async () => {
+                          const channel = channels.find(ch => ch.channel_type === "instagram");
+                          if (channel) await handleDisconnect(channel.id, "Instagram");
+                        }}
+                      >
+                        Desconectar
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button 
+                      className="w-full"
+                      onClick={() => handleConnectClick("instagram", "Instagram", "instagram")}
+                    >
+                      Conectar
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Facebook */}
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center">
+                        <Facebook className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <CardTitle className="flex items-center gap-2">
+                          Facebook
+                          {isChannelConnected("facebook") && (
+                            <Badge variant="secondary" className="bg-green-500/10 text-green-700">
+                              <CheckCircle2 className="h-3 w-3 mr-1" />
+                              Conectado
+                            </Badge>
+                          )}
+                          {!isChannelConnected("facebook") && <Badge variant="outline">Disponível</Badge>}
+                        </CardTitle>
+                        <CardDescription>Facebook Messenger & Pages</CardDescription>
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Integre Messenger e páginas do Facebook
+                  </p>
+                  <Separator />
+                  {isChannelConnected("facebook") ? (
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" className="flex-1">
+                        <Settings className="h-4 w-4 mr-2" />
+                        Configurar
+                      </Button>
+                      <Button 
+                        variant="destructive" 
+                        size="sm"
+                        onClick={async () => {
+                          const channel = channels.find(ch => ch.channel_type === "facebook");
+                          if (channel) await handleDisconnect(channel.id, "Facebook");
+                        }}
+                      >
+                        Desconectar
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button 
+                      className="w-full"
+                      onClick={() => handleConnectClick("facebook", "Facebook", "facebook")}
+                    >
+                      Conectar
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Twitter/X */}
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center">
+                        <Twitter className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <CardTitle className="flex items-center gap-2">
+                          X (Twitter)
+                          {isChannelConnected("twitter") && (
+                            <Badge variant="secondary" className="bg-green-500/10 text-green-700">
+                              <CheckCircle2 className="h-3 w-3 mr-1" />
+                              Conectado
+                            </Badge>
+                          )}
+                          {!isChannelConnected("twitter") && <Badge variant="outline">Disponível</Badge>}
+                        </CardTitle>
+                        <CardDescription>X (Twitter) API v2</CardDescription>
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Gerencie tweets e mensagens diretas
+                  </p>
+                  <Separator />
+                  {isChannelConnected("twitter") ? (
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" className="flex-1">
+                        <Settings className="h-4 w-4 mr-2" />
+                        Configurar
+                      </Button>
+                      <Button 
+                        variant="destructive" 
+                        size="sm"
+                        onClick={async () => {
+                          const channel = channels.find(ch => ch.channel_type === "twitter");
+                          if (channel) await handleDisconnect(channel.id, "X (Twitter)");
+                        }}
+                      >
+                        Desconectar
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button 
+                      className="w-full"
+                      onClick={() => handleConnectClick("twitter", "X (Twitter)", "twitter")}
+                    >
+                      Conectar
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* LinkedIn */}
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-blue-700 to-blue-800 flex items-center justify-center">
+                        <Linkedin className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <CardTitle className="flex items-center gap-2">
+                          LinkedIn
+                          {isChannelConnected("linkedin") && (
+                            <Badge variant="secondary" className="bg-green-500/10 text-green-700">
+                              <CheckCircle2 className="h-3 w-3 mr-1" />
+                              Conectado
+                            </Badge>
+                          )}
+                          {!isChannelConnected("linkedin") && <Badge variant="outline">Disponível</Badge>}
+                        </CardTitle>
+                        <CardDescription>LinkedIn API</CardDescription>
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Publique e gerencie mensagens profissionais
+                  </p>
+                  <Separator />
+                  {isChannelConnected("linkedin") ? (
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" className="flex-1">
+                        <Settings className="h-4 w-4 mr-2" />
+                        Configurar
+                      </Button>
+                      <Button 
+                        variant="destructive" 
+                        size="sm"
+                        onClick={async () => {
+                          const channel = channels.find(ch => ch.channel_type === "linkedin");
+                          if (channel) await handleDisconnect(channel.id, "LinkedIn");
+                        }}
+                      >
+                        Desconectar
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button 
+                      className="w-full"
+                      onClick={() => handleConnectClick("linkedin", "LinkedIn", "linkedin")}
+                    >
+                      Conectar
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* TikTok */}
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-slate-900 via-pink-600 to-teal-400 flex items-center justify-center">
+                        <Video className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <CardTitle className="flex items-center gap-2">
+                          TikTok
+                          {isChannelConnected("tiktok") && (
+                            <Badge variant="secondary" className="bg-green-500/10 text-green-700">
+                              <CheckCircle2 className="h-3 w-3 mr-1" />
+                              Conectado
+                            </Badge>
+                          )}
+                          {!isChannelConnected("tiktok") && <Badge variant="outline">Disponível</Badge>}
+                        </CardTitle>
+                        <CardDescription>TikTok for Business</CardDescription>
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Gerencie conteúdo e mensagens
+                  </p>
+                  <Separator />
+                  {isChannelConnected("tiktok") ? (
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" className="flex-1">
+                        <Settings className="h-4 w-4 mr-2" />
+                        Configurar
+                      </Button>
+                      <Button 
+                        variant="destructive" 
+                        size="sm"
+                        onClick={async () => {
+                          const channel = channels.find(ch => ch.channel_type === "tiktok");
+                          if (channel) await handleDisconnect(channel.id, "TikTok");
+                        }}
+                      >
+                        Desconectar
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button 
+                      className="w-full"
+                      onClick={() => handleConnectClick("tiktok", "TikTok", "tiktok")}
+                    >
+                      Conectar
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
           {/* Messaging Integrations */}
           <div>
             <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
@@ -71,10 +481,13 @@ export default function Integrations() {
                       <div>
                         <CardTitle className="flex items-center gap-2">
                           WhatsApp Business
-                          <Badge variant="secondary" className="bg-green-500/10 text-green-700">
-                            <CheckCircle2 className="h-3 w-3 mr-1" />
-                            Conectado
-                          </Badge>
+                          {isChannelConnected("whatsapp") && (
+                            <Badge variant="secondary" className="bg-green-500/10 text-green-700">
+                              <CheckCircle2 className="h-3 w-3 mr-1" />
+                              Conectado
+                            </Badge>
+                          )}
+                          {!isChannelConnected("whatsapp") && <Badge variant="outline">Disponível</Badge>}
                         </CardTitle>
                         <CardDescription>API oficial do WhatsApp Business</CardDescription>
                       </div>
@@ -86,33 +499,31 @@ export default function Integrations() {
                     Envie e receba mensagens do WhatsApp diretamente na plataforma
                   </p>
                   <Separator />
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="whatsapp-status">Status</Label>
-                      <Switch
-                        id="whatsapp-status"
-                        checked={whatsappEnabled}
-                        onCheckedChange={setWhatsappEnabled}
-                      />
+                  {isChannelConnected("whatsapp") ? (
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" className="flex-1">
+                        <Settings className="h-4 w-4 mr-2" />
+                        Configurar
+                      </Button>
+                      <Button 
+                        variant="destructive" 
+                        size="sm"
+                        onClick={async () => {
+                          const channel = channels.find(ch => ch.channel_type === "whatsapp");
+                          if (channel) await handleDisconnect(channel.id, "WhatsApp");
+                        }}
+                      >
+                        Desconectar
+                      </Button>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="whatsapp-phone">Número do telefone</Label>
-                      <Input id="whatsapp-phone" placeholder="+55 11 99999-9999" />
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" className="flex-1">
-                      <Settings className="h-4 w-4 mr-2" />
-                      Configurar
-                    </Button>
+                  ) : (
                     <Button 
-                      variant="destructive" 
-                      size="sm"
-                      onClick={() => handleDisconnect("WhatsApp")}
+                      className="w-full"
+                      onClick={() => handleConnectClick("whatsapp", "WhatsApp Business", "whatsapp")}
                     >
-                      Desconectar
+                      Conectar
                     </Button>
-                  </div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -127,7 +538,13 @@ export default function Integrations() {
                       <div>
                         <CardTitle className="flex items-center gap-2">
                           SMS
-                          <Badge variant="outline">Disponível</Badge>
+                          {isChannelConnected("sms") && (
+                            <Badge variant="secondary" className="bg-green-500/10 text-green-700">
+                              <CheckCircle2 className="h-3 w-3 mr-1" />
+                              Conectado
+                            </Badge>
+                          )}
+                          {!isChannelConnected("sms") && <Badge variant="outline">Disponível</Badge>}
                         </CardTitle>
                         <CardDescription>Twilio, MessageBird e outros</CardDescription>
                       </div>
@@ -139,21 +556,31 @@ export default function Integrations() {
                     Integre com provedores de SMS para campanhas globais
                   </p>
                   <Separator />
-                  <div className="space-y-2">
-                    <Label>Provedores suportados</Label>
-                    <ul className="text-sm text-muted-foreground space-y-1">
-                      <li>• Twilio</li>
-                      <li>• MessageBird</li>
-                      <li>• Amazon SNS</li>
-                    </ul>
-                  </div>
-                  <Button 
-                    className="w-full" 
-                    variant="default"
-                    onClick={() => handleConnect("SMS")}
-                  >
-                    Conectar
-                  </Button>
+                  {isChannelConnected("sms") ? (
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" className="flex-1">
+                        <Settings className="h-4 w-4 mr-2" />
+                        Configurar
+                      </Button>
+                      <Button 
+                        variant="destructive" 
+                        size="sm"
+                        onClick={async () => {
+                          const channel = channels.find(ch => ch.channel_type === "sms");
+                          if (channel) await handleDisconnect(channel.id, "SMS");
+                        }}
+                      >
+                        Desconectar
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button 
+                      className="w-full"
+                      onClick={() => handleConnectClick("sms", "SMS", "sms")}
+                    >
+                      Conectar
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -177,10 +604,13 @@ export default function Integrations() {
                       <div>
                         <CardTitle className="flex items-center gap-2">
                           Email (SMTP)
-                          <Badge variant="secondary" className="bg-green-500/10 text-green-700">
-                            <CheckCircle2 className="h-3 w-3 mr-1" />
-                            Conectado
-                          </Badge>
+                          {isChannelConnected("email") && (
+                            <Badge variant="secondary" className="bg-green-500/10 text-green-700">
+                              <CheckCircle2 className="h-3 w-3 mr-1" />
+                              Conectado
+                            </Badge>
+                          )}
+                          {!isChannelConnected("email") && <Badge variant="outline">Disponível</Badge>}
                         </CardTitle>
                         <CardDescription>Gmail, Outlook, SMTP customizado</CardDescription>
                       </div>
@@ -192,29 +622,31 @@ export default function Integrations() {
                     Configure seu servidor SMTP para envio de emails
                   </p>
                   <Separator />
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="email-status">Status</Label>
-                      <Switch
-                        id="email-status"
-                        checked={emailEnabled}
-                        onCheckedChange={setEmailEnabled}
-                      />
+                  {isChannelConnected("email") ? (
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" className="flex-1">
+                        <Settings className="h-4 w-4 mr-2" />
+                        Configurar
+                      </Button>
+                      <Button 
+                        variant="destructive" 
+                        size="sm"
+                        onClick={async () => {
+                          const channel = channels.find(ch => ch.channel_type === "email");
+                          if (channel) await handleDisconnect(channel.id, "Email");
+                        }}
+                      >
+                        Desconectar
+                      </Button>
                     </div>
-                    <div className="space-y-2">
-                      <Label>Servidor SMTP</Label>
-                      <p className="text-sm text-muted-foreground">smtp.gmail.com:587</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" className="flex-1">
-                      <Settings className="h-4 w-4 mr-2" />
-                      Configurar
+                  ) : (
+                    <Button 
+                      className="w-full"
+                      onClick={() => handleConnectClick("email", "Email (SMTP)", "email")}
+                    >
+                      Conectar
                     </Button>
-                    <Button variant="destructive" size="sm">
-                      Desconectar
-                    </Button>
-                  </div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -252,7 +684,7 @@ export default function Integrations() {
                   </div>
                   <Button 
                     className="w-full"
-                    onClick={() => handleConnect("CRM")}
+                    onClick={() => handleConnectClick("crm", "CRM", "crm")}
                   >
                     Conectar
                   </Button>
@@ -299,7 +731,7 @@ export default function Integrations() {
                   <div className="flex gap-2">
                     <Button 
                       className="flex-1"
-                      onClick={() => handleConnect("Zapier")}
+                      onClick={() => handleConnectClick("zapier", "Zapier", "zapier")}
                     >
                       Conectar
                     </Button>
@@ -341,7 +773,7 @@ export default function Integrations() {
                   <div className="flex gap-2">
                     <Button 
                       className="flex-1"
-                      onClick={() => handleConnect("Make")}
+                      onClick={() => handleConnectClick("make", "Make", "make")}
                     >
                       Conectar
                     </Button>
@@ -362,33 +794,42 @@ export default function Integrations() {
               <CardDescription>Gerenciar suas integrações ativas</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center text-white font-bold">
-                      W
+              {loading ? (
+                <p className="text-sm text-muted-foreground">Carregando...</p>
+              ) : channels.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Nenhuma integração conectada ainda</p>
+              ) : (
+                <div className="space-y-4">
+                  {channels.map((channel) => (
+                    <div key={channel.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-white font-bold">
+                          {channel.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <h4 className="font-medium">{channel.name}</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Conectado em {new Date(channel.created_at).toLocaleDateString('pt-BR')}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm">
+                          <Settings className="h-4 w-4 mr-2" />
+                          Gerenciar
+                        </Button>
+                        <Button 
+                          variant="destructive" 
+                          size="sm"
+                          onClick={async () => await handleDisconnect(channel.id, channel.name)}
+                        >
+                          Desconectar
+                        </Button>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-medium">WhatsApp Business</h4>
-                      <p className="text-sm text-muted-foreground">Conectado há 5 dias</p>
-                    </div>
-                  </div>
-                  <Button variant="outline" size="sm">Gerenciar</Button>
+                  ))}
                 </div>
-
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-xl">
-                      @
-                    </div>
-                    <div>
-                      <h4 className="font-medium">Email (SMTP)</h4>
-                      <p className="text-sm text-muted-foreground">Conectado há 12 dias</p>
-                    </div>
-                  </div>
-                  <Button variant="outline" size="sm">Gerenciar</Button>
-                </div>
-              </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -404,7 +845,7 @@ export default function Integrations() {
                 <CardContent>
                   <Button 
                     className="w-full"
-                    onClick={() => handleConnect(integration)}
+                    onClick={() => handleConnectClick(integration.toLowerCase(), integration, integration.toLowerCase())}
                   >
                     Conectar
                   </Button>
@@ -414,6 +855,67 @@ export default function Integrations() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Connect Dialog */}
+      <Dialog open={connectDialogOpen} onOpenChange={setConnectDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Conectar {selectedIntegration?.name}</DialogTitle>
+            <DialogDescription>
+              Insira as credenciais para conectar sua conta
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="api_key">API Key</Label>
+              <Input
+                id="api_key"
+                placeholder="Sua API Key"
+                value={credentials.api_key}
+                onChange={(e) => setCredentials({ ...credentials, api_key: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="api_secret">API Secret (opcional)</Label>
+              <Input
+                id="api_secret"
+                type="password"
+                placeholder="Seu API Secret"
+                value={credentials.api_secret}
+                onChange={(e) => setCredentials({ ...credentials, api_secret: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="access_token">Access Token (opcional)</Label>
+              <Input
+                id="access_token"
+                placeholder="Seu Access Token"
+                value={credentials.access_token}
+                onChange={(e) => setCredentials({ ...credentials, access_token: e.target.value })}
+              />
+            </div>
+            {(selectedIntegration?.type === "whatsapp" || selectedIntegration?.type === "sms") && (
+              <div className="space-y-2">
+                <Label htmlFor="phone_number">Número de Telefone</Label>
+                <Input
+                  id="phone_number"
+                  placeholder="+55 11 99999-9999"
+                  value={credentials.phone_number}
+                  onChange={(e) => setCredentials({ ...credentials, phone_number: e.target.value })}
+                />
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConnectDialogOpen(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleConnect}>
+              Conectar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
