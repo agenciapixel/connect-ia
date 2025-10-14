@@ -14,7 +14,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
+import { usePersistentAuth } from "@/hooks/usePersistentAuth";
 import { toast } from "sonner";
 
 const menuItems = [
@@ -31,13 +31,15 @@ const menuItems = [
 export function AppSidebar() {
   const { state } = useSidebar();
   const navigate = useNavigate();
+  const { logout, isRemembered } = usePersistentAuth();
 
   const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      toast.error("Erro ao sair: " + error.message);
-    } else {
+    try {
+      await logout();
+      toast.success(isRemembered ? "Logout realizado. Você permanecerá logado neste dispositivo." : "Logout realizado com sucesso.");
       navigate("/auth");
+    } catch (error) {
+      toast.error("Erro ao sair: " + (error as Error).message);
     }
   };
 

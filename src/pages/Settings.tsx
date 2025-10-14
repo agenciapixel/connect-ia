@@ -5,17 +5,20 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, Bell, Save, Loader2 } from "lucide-react";
+import { User, Bell, Save, Loader2, Shield } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { usePersistentAuth } from "@/hooks/usePersistentAuth";
 
 export default function Settings() {
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(true);
   const [marketingEmails, setMarketingEmails] = useState(false);
   const [saving, setSaving] = useState(false);
+  
+  const { clearRememberMe, isRemembered } = usePersistentAuth();
   
   const [profileData, setProfileData] = useState({
     full_name: "",
@@ -77,6 +80,11 @@ export default function Settings() {
     }
   };
 
+  const handleClearRememberMe = () => {
+    clearRememberMe();
+    toast.success("Configuração 'Permanecer logado' removida. Você precisará fazer login novamente na próxima vez.");
+  };
+
   return (
     <div className="p-8 space-y-8 bg-gradient-to-br from-background via-background to-primary/5 min-h-screen">
       {isLoading ? (
@@ -107,6 +115,10 @@ export default function Settings() {
             <Button variant="ghost" className="w-full justify-start">
               <Bell className="mr-2 h-4 w-4" />
               Notificações
+            </Button>
+            <Button variant="ghost" className="w-full justify-start">
+              <Shield className="mr-2 h-4 w-4" />
+              Sessão
             </Button>
           </CardContent>
         </Card>
@@ -205,6 +217,59 @@ export default function Settings() {
                   checked={marketingEmails}
                   onCheckedChange={setMarketingEmails}
                 />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Session Settings */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="h-5 w-5" />
+                Configurações de Sessão
+              </CardTitle>
+              <CardDescription>Gerencie suas preferências de login e segurança</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="remember-me-status">Permanecer Logado</Label>
+                  <p className="text-sm text-muted-foreground">
+                    {isRemembered 
+                      ? "Você está configurado para permanecer logado neste dispositivo" 
+                      : "Você precisará fazer login a cada sessão"
+                    }
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    isRemembered 
+                      ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
+                      : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+                  }`}>
+                    {isRemembered ? 'Ativo' : 'Inativo'}
+                  </span>
+                  {isRemembered && (
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleClearRememberMe}
+                    >
+                      Desativar
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className="space-y-2">
+                <Label>Informações de Segurança</Label>
+                <div className="text-sm text-muted-foreground space-y-1">
+                  <p>• Sua sessão é protegida por autenticação segura</p>
+                  <p>• Os dados são criptografados durante a transmissão</p>
+                  <p>• Você pode desativar "Permanecer logado" a qualquer momento</p>
+                </div>
               </div>
             </CardContent>
           </Card>

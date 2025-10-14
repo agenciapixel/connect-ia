@@ -178,7 +178,7 @@ export function MetaOAuthConnect({ open, onOpenChange, channelType, onSuccess }:
       });
     } else {
       // Fallback para popup manual
-      const redirectUri = `${window.location.origin}/integrations`;
+      const redirectUri = `${window.location.origin}`;
       const scope = config.permissions.join(",");
 
       // URL do OAuth do Facebook
