@@ -3,9 +3,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MessageSquare, Search, Clock, CheckCircle, User, Send, Bot, ArrowRight, ArrowLeft, Loader2 } from "lucide-react";
+import { MessageSquare, Search, Clock, CheckCircle, User, Send, Bot, ArrowRight, ArrowLeft, Loader2, Plus, Mail } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDistanceToNow } from "date-fns";
@@ -40,6 +42,12 @@ export default function Inbox() {
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showNewMessageDialog, setShowNewMessageDialog] = useState(false);
+  const [contactSearch, setContactSearch] = useState("");
+  const [newContactName, setNewContactName] = useState("");
+  const [newContactEmail, setNewContactEmail] = useState("");
+  const [selectedContactId, setSelectedContactId] = useState<string>("");
+  const [creatingConversation, setCreatingConversation] = useState(false);
 
   // Buscar conversas
   const { data: conversations = [], isLoading: loadingConversations, refetch: refetchConversations } = useQuery({
@@ -80,6 +88,27 @@ export default function Inbox() {
       return data;
     },
     enabled: !!selectedConversation?.id,
+  });
+
+  // Buscar contatos para nova mensagem
+  const { data: contacts = [], isLoading: loadingContacts } = useQuery({
+    queryKey: ["contacts", contactSearch],
+    queryFn: async () => {
+      let query = supabase
+        .from("contacts")
+        .select("id, full_name, email, phone_e164")
+        .order("full_name", { ascending: true })
+        .limit(10);
+
+      if (contactSearch) {
+        query = query.or(`full_name.ilike.%${contactSearch}%,email.ilike.%${contactSearch}%`);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data;
+    },
+    enabled: showNewMessageDialog,
   });
 
   useEffect(() => {
@@ -239,6 +268,90 @@ export default function Inbox() {
     return <Badge variant="secondary" className={className}>{label}</Badge>;
   };
 
+  const handleCreateNewConversation = async () => {
+    setCreatingConversation(true);
+    try {
+      // Buscar org_id do usuário
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Usuário não autenticado");
+        return;
+      }
+
+      const { data: member } = await supabase
+        .from("members")
+        .select("org_id")
+        .eq("user_id", user.id)
+        .single();
+
+      if (!member) {
+        toast.error("Organização não encontrada");
+        return;
+      }
+
+      let contactId = selectedContactId;
+
+      // Se não selecionou contato existente, criar novo
+      if (!contactId && (newContactName || newContactEmail)) {
+        const { data: newContact, error: contactError } = await supabase
+          .from("contacts")
+          .insert({
+            org_id: member.org_id,
+            full_name: newContactName || null,
+            email: newContactEmail || null,
+          })
+          .select()
+          .single();
+
+        if (contactError) throw contactError;
+        contactId = newContact.id;
+      }
+
+      if (!contactId) {
+        toast.error("Selecione ou crie um contato");
+        return;
+      }
+
+      // Criar nova conversa
+      const { data: newConversation, error: convError } = await supabase
+        .from("conversations")
+        .insert({
+          org_id: member.org_id,
+          contact_id: contactId,
+          status: "open",
+        })
+        .select(`
+          id,
+          contact_id,
+          status,
+          last_message_at,
+          contacts (
+            full_name,
+            email
+          )
+        `)
+        .single();
+
+      if (convError) throw convError;
+
+      toast.success("Nova conversa criada!");
+      setShowNewMessageDialog(false);
+      setSelectedContactId("");
+      setNewContactName("");
+      setNewContactEmail("");
+      setContactSearch("");
+      
+      // Atualizar lista e selecionar nova conversa
+      refetchConversations();
+      setSelectedConversation(newConversation as Conversation);
+    } catch (error: any) {
+      console.error("Error creating conversation:", error);
+      toast.error("Erro ao criar conversa");
+    } finally {
+      setCreatingConversation(false);
+    }
+  };
+
   const filteredConversations = conversations.filter(conv =>
     conv.contacts?.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     conv.contacts?.email?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -253,8 +366,11 @@ export default function Inbox() {
           </h1>
           <p className="text-muted-foreground mt-2">Gerencie todas as suas conversas em um só lugar</p>
         </div>
-        <Button className="bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 transition-opacity shadow-lg">
-          <Send className="mr-2 h-4 w-4" />
+        <Button 
+          onClick={() => setShowNewMessageDialog(true)}
+          className="bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 transition-opacity shadow-lg"
+        >
+          <Plus className="mr-2 h-4 w-4" />
           Nova Mensagem
         </Button>
       </div>
@@ -493,6 +609,141 @@ export default function Inbox() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Dialog Nova Mensagem */}
+      <Dialog open={showNewMessageDialog} onOpenChange={setShowNewMessageDialog}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Nova Mensagem</DialogTitle>
+            <DialogDescription>
+              Selecione um contato existente ou crie um novo para iniciar uma conversa.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            {/* Buscar contato existente */}
+            <div className="space-y-2">
+              <Label>Buscar Contato Existente</Label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar por nome ou email..."
+                  className="pl-9"
+                  value={contactSearch}
+                  onChange={(e) => setContactSearch(e.target.value)}
+                />
+              </div>
+
+              {contactSearch && (
+                <ScrollArea className="h-[150px] border rounded-md p-2">
+                  {loadingContacts ? (
+                    <div className="flex items-center justify-center py-4">
+                      <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                    </div>
+                  ) : contacts.length === 0 ? (
+                    <p className="text-sm text-muted-foreground text-center py-4">
+                      Nenhum contato encontrado
+                    </p>
+                  ) : (
+                    <div className="space-y-1">
+                      {contacts.map((contact) => (
+                        <div
+                          key={contact.id}
+                          onClick={() => {
+                            setSelectedContactId(contact.id);
+                            setNewContactName("");
+                            setNewContactEmail("");
+                          }}
+                          className={`p-3 rounded-lg border cursor-pointer transition-all hover:bg-accent ${
+                            selectedContactId === contact.id ? "bg-accent border-primary" : ""
+                          }`}
+                        >
+                          <p className="text-sm font-semibold">
+                            {contact.full_name || contact.email || "Sem nome"}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {contact.email || contact.phone_e164}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </ScrollArea>
+              )}
+            </div>
+
+            {/* Ou criar novo contato */}
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">Ou criar novo</span>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div className="space-y-2">
+                <Label htmlFor="name">Nome</Label>
+                <Input
+                  id="name"
+                  placeholder="Nome completo"
+                  value={newContactName}
+                  onChange={(e) => {
+                    setNewContactName(e.target.value);
+                    setSelectedContactId("");
+                  }}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="email@exemplo.com"
+                    className="pl-9"
+                    value={newContactEmail}
+                    onChange={(e) => {
+                      setNewContactEmail(e.target.value);
+                      setSelectedContactId("");
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowNewMessageDialog(false);
+                setSelectedContactId("");
+                setNewContactName("");
+                setNewContactEmail("");
+                setContactSearch("");
+              }}
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleCreateNewConversation}
+              disabled={creatingConversation || (!selectedContactId && !newContactName && !newContactEmail)}
+              className="bg-gradient-to-r from-primary to-primary-glow"
+            >
+              {creatingConversation ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : (
+                <Send className="h-4 w-4 mr-2" />
+              )}
+              Criar Conversa
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
