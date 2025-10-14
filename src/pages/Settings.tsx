@@ -4,30 +4,94 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, Bell, Shield, Palette, Globe, Save } from "lucide-react";
-import { useState } from "react";
+import { User, Bell, Save, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Settings() {
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(true);
   const [marketingEmails, setMarketingEmails] = useState(false);
+  const [saving, setSaving] = useState(false);
+  
+  const [profileData, setProfileData] = useState({
+    full_name: "",
+    avatar_url: "",
+  });
 
-  const handleSave = () => {
-    toast.success("Configurações salvas com sucesso!");
+  // Buscar dados do perfil
+  const { data: profile, isLoading, refetch } = useQuery({
+    queryKey: ["user-profile"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Usuário não autenticado");
+
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  useEffect(() => {
+    if (profile) {
+      setProfileData({
+        full_name: profile.full_name || "",
+        avatar_url: profile.avatar_url || "",
+      });
+    }
+  }, [profile]);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Usuário não autenticado");
+        return;
+      }
+
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          full_name: profileData.full_name,
+        })
+        .eq("id", user.id);
+
+      if (error) throw error;
+
+      toast.success("Configurações salvas com sucesso!");
+      refetch();
+    } catch (error: any) {
+      console.error("Error:", error);
+      toast.error("Erro ao salvar configurações");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
     <div className="p-8 space-y-8 bg-gradient-to-br from-background via-background to-primary/5 min-h-screen">
-      {/* Header */}
-      <div>
-        <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-          Configurações
-        </h1>
-        <p className="text-muted-foreground mt-2">Gerencie suas preferências e configurações da conta</p>
-      </div>
+      {isLoading ? (
+        <div className="flex items-center justify-center min-h-[400px]">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      ) : (
+        <>
+          {/* Header */}
+          <div>
+            <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              Configurações
+            </h1>
+            <p className="text-muted-foreground mt-2">Gerencie suas preferências e configurações da conta</p>
+          </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Sidebar Navigation */}
@@ -43,18 +107,6 @@ export default function Settings() {
             <Button variant="ghost" className="w-full justify-start">
               <Bell className="mr-2 h-4 w-4" />
               Notificações
-            </Button>
-            <Button variant="ghost" className="w-full justify-start">
-              <Shield className="mr-2 h-4 w-4" />
-              Segurança
-            </Button>
-            <Button variant="ghost" className="w-full justify-start">
-              <Palette className="mr-2 h-4 w-4" />
-              Aparência
-            </Button>
-            <Button variant="ghost" className="w-full justify-start">
-              <Globe className="mr-2 h-4 w-4" />
-              Idioma e Região
             </Button>
           </CardContent>
         </Card>
@@ -73,13 +125,12 @@ export default function Settings() {
             <CardContent className="space-y-6">
               <div className="flex items-center gap-6">
                 <Avatar className="h-24 w-24">
-                  <AvatarImage src="/placeholder.svg" />
+                  <AvatarImage src={profileData.avatar_url || "/placeholder.svg"} />
                   <AvatarFallback className="bg-gradient-to-br from-primary to-primary-glow text-white text-2xl">
-                    U
+                    {profileData.full_name?.charAt(0).toUpperCase() || "U"}
                   </AvatarFallback>
                 </Avatar>
                 <div className="space-y-2">
-                  <Button variant="outline" size="sm">Alterar foto</Button>
                   <p className="text-xs text-muted-foreground">JPG, PNG ou GIF. Máx 2MB.</p>
                 </div>
               </div>
@@ -87,30 +138,14 @@ export default function Settings() {
               <Separator />
 
               <div className="grid gap-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">Nome</Label>
-                    <Input id="firstName" placeholder="João" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Sobrenome</Label>
-                    <Input id="lastName" placeholder="Silva" />
-                  </div>
-                </div>
-
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="joao@exemplo.com" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Telefone</Label>
-                  <Input id="phone" type="tel" placeholder="+55 11 99999-9999" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="company">Empresa</Label>
-                  <Input id="company" placeholder="Nome da empresa" />
+                  <Label htmlFor="fullName">Nome Completo</Label>
+                  <Input 
+                    id="fullName" 
+                    placeholder="João Silva"
+                    value={profileData.full_name}
+                    onChange={(e) => setProfileData({ ...profileData, full_name: e.target.value })}
+                  />
                 </div>
               </div>
             </CardContent>
@@ -174,55 +209,25 @@ export default function Settings() {
             </CardContent>
           </Card>
 
-          {/* Appearance Settings */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Palette className="h-5 w-5" />
-                Aparência
-              </CardTitle>
-              <CardDescription>Personalize a aparência do aplicativo</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="theme">Tema</Label>
-                <Select defaultValue="light">
-                  <SelectTrigger id="theme">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="light">Claro</SelectItem>
-                    <SelectItem value="dark">Escuro</SelectItem>
-                    <SelectItem value="system">Sistema</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="language">Idioma</Label>
-                <Select defaultValue="pt-br">
-                  <SelectTrigger id="language">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pt-br">Português (Brasil)</SelectItem>
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="es">Español</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Save Button */}
           <div className="flex justify-end">
-            <Button onClick={handleSave} className="bg-gradient-to-r from-primary to-primary-glow">
-              <Save className="mr-2 h-4 w-4" />
+            <Button 
+              onClick={handleSave} 
+              disabled={saving}
+              className="bg-gradient-to-r from-primary to-primary-glow"
+            >
+              {saving ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="mr-2 h-4 w-4" />
+              )}
               Salvar Alterações
             </Button>
           </div>
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 }
