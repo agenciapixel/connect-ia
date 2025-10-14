@@ -8,6 +8,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { useQuery } from "@tanstack/react-query";
 
 interface AIAgent {
   id: string;
@@ -16,27 +19,79 @@ interface AIAgent {
   status: string;
 }
 
+interface Conversation {
+  id: string;
+  contact_id: string;
+  status: string;
+  last_message_at: string;
+  contacts: {
+    full_name: string;
+    email: string;
+  };
+  unreadCount?: number;
+}
+
 export default function Inbox() {
   const [agents, setAgents] = useState<AIAgent[]>([]);
   const [selectedAgent, setSelectedAgent] = useState<string>("");
   const [transferring, setTransferring] = useState(false);
-  const [currentConversation, setCurrentConversation] = useState<any>(null);
+  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [isAIHandling, setIsAIHandling] = useState(false);
-  const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const conversations = [
-    { id: 1, name: "João Silva", message: "Olá! Gostaria de saber mais sobre o produto", time: "2 min", status: "new", unread: 3, assignedToAI: false },
-    { id: 2, name: "Maria Santos", message: "Obrigada pelo retorno rápido!", time: "15 min", status: "responded", unread: 0, assignedToAI: false },
-    { id: 3, name: "Carlos Oliveira", message: "Quando posso agendar uma reunião?", time: "1 h", status: "pending", unread: 1, assignedToAI: false },
-    { id: 4, name: "Ana Costa", message: "Perfeito! Vou aguardar o envio", time: "2 h", status: "responded", unread: 0, assignedToAI: true, agentName: "Agente de Vendas" },
-    { id: 5, name: "Pedro Alves", message: "Preciso de ajuda urgente", time: "3 h", status: "pending", unread: 2, assignedToAI: false },
-  ];
+  // Buscar conversas
+  const { data: conversations = [], isLoading: loadingConversations, refetch: refetchConversations } = useQuery({
+    queryKey: ["inbox-conversations"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("conversations")
+        .select(`
+          id,
+          contact_id,
+          status,
+          last_message_at,
+          contacts (
+            full_name,
+            email
+          )
+        `)
+        .order("last_message_at", { ascending: false });
+
+      if (error) throw error;
+      return data as Conversation[];
+    },
+  });
+
+  // Buscar mensagens da conversa selecionada
+  const { data: messages = [], isLoading: loadingMessages, refetch: refetchMessages } = useQuery({
+    queryKey: ["conversation-messages", selectedConversation?.id],
+    queryFn: async () => {
+      if (!selectedConversation?.id) return [];
+      
+      const { data, error } = await supabase
+        .from("messages")
+        .select("*")
+        .eq("conversation_id", selectedConversation.id)
+        .order("created_at", { ascending: true });
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!selectedConversation?.id,
+  });
 
   useEffect(() => {
     loadAgents();
   }, []);
+
+  useEffect(() => {
+    // Selecionar primeira conversa automaticamente
+    if (conversations.length > 0 && !selectedConversation) {
+      setSelectedConversation(conversations[0]);
+    }
+  }, [conversations]);
 
   const loadAgents = async () => {
     try {
@@ -53,31 +108,43 @@ export default function Inbox() {
     }
   };
 
+  const handleSelectConversation = (conversation: Conversation) => {
+    setSelectedConversation(conversation);
+    setIsAIHandling(false);
+  };
+
   const handleTransferToAI = async () => {
-    if (!selectedAgent) {
+    if (!selectedAgent || !selectedConversation) {
       toast.error("Selecione um agente");
       return;
     }
 
     setTransferring(true);
     try {
-      // Simular transferência - na produção, você salvaria no banco
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const { error } = await supabase
+        .from("agent_conversations")
+        .insert({
+          agent_id: selectedAgent,
+          contact_id: selectedConversation.contact_id,
+          status: "active",
+        });
+
+      if (error) throw error;
       
       setIsAIHandling(true);
       toast.success("Conversa transferida para o agente de IA!");
       
-      // Mensagem automática do agente
+      // Enviar mensagem de boas-vindas do agente
       const agent = agents.find(a => a.id === selectedAgent);
       if (agent) {
-        const aiMessage = {
-          id: Date.now(),
-          sender: 'ai',
-          text: `Olá! Sou ${agent.name}, agente de ${agent.type}. Como posso ajudá-lo?`,
-          time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-          agentName: agent.name
-        };
-        setMessages(prev => [...prev, aiMessage]);
+        await supabase.from("messages").insert({
+          conversation_id: selectedConversation.id,
+          org_id: selectedConversation.contact_id,
+          direction: "outbound",
+          body: `Olá! Sou ${agent.name}, agente de ${agent.type}. Como posso ajudá-lo?`,
+        });
+        
+        refetchMessages();
       }
     } catch (error: any) {
       console.error('Error:', error);
@@ -88,54 +155,71 @@ export default function Inbox() {
   };
 
   const handleTransferToHuman = async () => {
-    setIsAIHandling(false);
-    toast.success("Conversa transferida para atendimento humano!");
+    if (!selectedConversation) return;
     
-    const systemMessage = {
-      id: Date.now(),
-      sender: 'system',
-      text: "Conversa transferida para atendimento humano",
-      time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-    };
-    setMessages(prev => [...prev, systemMessage]);
+    try {
+      const { error } = await supabase
+        .from("agent_conversations")
+        .update({ status: "transferred" })
+        .eq("contact_id", selectedConversation.contact_id);
+
+      if (error) throw error;
+
+      setIsAIHandling(false);
+      toast.success("Conversa transferida para atendimento humano!");
+      
+      await supabase.from("messages").insert({
+        conversation_id: selectedConversation.id,
+        org_id: selectedConversation.contact_id,
+        direction: "outbound",
+        body: "Conversa transferida para atendimento humano",
+      });
+      
+      refetchMessages();
+    } catch (error: any) {
+      console.error('Error:', error);
+      toast.error("Erro ao transferir conversa");
+    }
   };
 
   const handleSendMessage = async () => {
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() || !selectedConversation) return;
 
     setSending(true);
     try {
-      const userMessage = {
-        id: Date.now(),
-        sender: isAIHandling ? 'user' : 'human',
-        text: newMessage,
-        time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-      };
-      
-      setMessages(prev => [...prev, userMessage]);
-      setNewMessage("");
+      const { error } = await supabase.from("messages").insert({
+        conversation_id: selectedConversation.id,
+        org_id: selectedConversation.contact_id,
+        direction: "outbound",
+        body: newMessage,
+      });
 
-      // Se o agente de IA está atendendo, enviar para o agente
+      if (error) throw error;
+
+      setNewMessage("");
+      refetchMessages();
+      toast.success("Mensagem enviada!");
+
+      // Se o agente de IA está atendendo, chamar edge function
       if (isAIHandling && selectedAgent) {
-        const { data, error } = await supabase.functions.invoke('ai-agent-chat', {
+        const { data, error: aiError } = await supabase.functions.invoke('ai-agent-chat', {
           body: {
             agentId: selectedAgent,
             message: newMessage,
-            conversationId: currentConversation?.id
+            conversationId: selectedConversation.id
           }
         });
 
-        if (error) throw error;
-
-        const aiResponse = {
-          id: Date.now() + 1,
-          sender: 'ai',
-          text: data.response,
-          time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-          agentName: data.agentName
-        };
-        
-        setMessages(prev => [...prev, aiResponse]);
+        if (!aiError && data?.response) {
+          await supabase.from("messages").insert({
+            conversation_id: selectedConversation.id,
+            org_id: selectedConversation.contact_id,
+            direction: "inbound",
+            body: data.response,
+          });
+          
+          refetchMessages();
+        }
       }
     } catch (error: any) {
       console.error('Error:', error);
@@ -147,13 +231,18 @@ export default function Inbox() {
 
   const getStatusBadge = (status: string) => {
     const config = {
-      new: { label: "Nova", className: "bg-blue-500/10 text-blue-600 hover:bg-blue-500/20" },
+      open: { label: "Aberta", className: "bg-blue-500/10 text-blue-600 hover:bg-blue-500/20" },
       pending: { label: "Pendente", className: "bg-orange-500/10 text-orange-600 hover:bg-orange-500/20" },
-      responded: { label: "Respondida", className: "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20" },
+      closed: { label: "Fechada", className: "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20" },
     };
-    const { label, className } = config[status as keyof typeof config];
+    const { label, className } = config[status as keyof typeof config] || config.open;
     return <Badge variant="secondary" className={className}>{label}</Badge>;
   };
+
+  const filteredConversations = conversations.filter(conv =>
+    conv.contacts?.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    conv.contacts?.email?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="p-8 space-y-6 bg-gradient-to-br from-background via-background to-primary/5 min-h-screen">
@@ -173,54 +262,72 @@ export default function Inbox() {
       <div className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-1 border-2 hover:border-primary/30 transition-all shadow-lg">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg">Conversas</CardTitle>
+            <CardTitle className="text-lg">
+              Conversas {loadingConversations && <Loader2 className="inline h-4 w-4 animate-spin ml-2" />}
+            </CardTitle>
             <div className="relative mt-2">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Buscar conversas..." className="pl-9" />
+              <Input 
+                placeholder="Buscar conversas..." 
+                className="pl-9"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
           </CardHeader>
           <CardContent className="p-0">
             <ScrollArea className="h-[600px]">
               <div className="space-y-1 p-4">
-                {conversations.map((conv) => (
-                  <div
-                    key={conv.id}
-                    className="flex items-start gap-3 p-4 rounded-lg border hover:bg-accent/50 cursor-pointer transition-all group"
-                  >
-                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center text-white font-semibold relative">
-                      {conv.name.charAt(0)}
-                      {conv.assignedToAI && (
-                        <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-purple-500 border-2 border-background flex items-center justify-center">
-                          <Bot className="h-3 w-3 text-white" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <p className="text-sm font-semibold truncate">{conv.name}</p>
-                        <span className="text-xs text-muted-foreground flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {conv.time}
-                        </span>
-                      </div>
-                      <p className="text-sm text-muted-foreground truncate">{conv.message}</p>
-                      <div className="flex items-center gap-2 mt-2 flex-wrap">
-                        {getStatusBadge(conv.status)}
-                        {conv.assignedToAI && (
-                          <Badge variant="secondary" className="bg-purple-500/10 text-purple-600 text-xs">
-                            <Bot className="h-3 w-3 mr-1" />
-                            {conv.agentName}
-                          </Badge>
-                        )}
-                        {conv.unread > 0 && (
-                          <Badge variant="destructive" className="h-5 px-2">
-                            {conv.unread}
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
+                {loadingConversations ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
                   </div>
-                ))}
+                ) : filteredConversations.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <MessageSquare className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                    <p>Nenhuma conversa encontrada</p>
+                  </div>
+                ) : (
+                  filteredConversations.map((conv) => (
+                    <div
+                      key={conv.id}
+                      onClick={() => handleSelectConversation(conv)}
+                      className={`flex items-start gap-3 p-4 rounded-lg border hover:bg-accent/50 cursor-pointer transition-all group ${
+                        selectedConversation?.id === conv.id ? "bg-accent border-primary" : ""
+                      }`}
+                    >
+                      <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center text-white font-semibold relative">
+                        {(conv.contacts?.full_name || conv.contacts?.email || "?").charAt(0).toUpperCase()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <p className="text-sm font-semibold truncate">
+                            {conv.contacts?.full_name || conv.contacts?.email || "Sem nome"}
+                          </p>
+                          <span className="text-xs text-muted-foreground flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {conv.last_message_at 
+                              ? formatDistanceToNow(new Date(conv.last_message_at), { 
+                                  addSuffix: true, 
+                                  locale: ptBR 
+                                })
+                              : "Sem data"
+                            }
+                          </span>
+                        </div>
+                        <p className="text-sm text-muted-foreground truncate">{conv.contacts?.email}</p>
+                        <div className="flex items-center gap-2 mt-2 flex-wrap">
+                          {getStatusBadge(conv.status)}
+                          {conv.unreadCount && conv.unreadCount > 0 && (
+                            <Badge variant="destructive" className="h-5 px-2">
+                              {conv.unreadCount}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </ScrollArea>
           </CardContent>
@@ -228,31 +335,39 @@ export default function Inbox() {
 
         <Card className="lg:col-span-2 border-2 hover:border-primary/30 transition-all shadow-lg">
           <CardHeader className="border-b space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center text-white font-semibold text-lg">
-                J
+            {selectedConversation ? (
+              <div className="flex items-center gap-3">
+                <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center text-white font-semibold text-lg">
+                  {(selectedConversation.contacts?.full_name || selectedConversation.contacts?.email || "?").charAt(0).toUpperCase()}
+                </div>
+                <div className="flex-1">
+                  <CardTitle>
+                    {selectedConversation.contacts?.full_name || selectedConversation.contacts?.email || "Sem nome"}
+                  </CardTitle>
+                  <CardDescription className="flex items-center gap-2">
+                    {isAIHandling ? (
+                      <>
+                        <Bot className="h-3 w-3 text-purple-500" />
+                        <span className="text-purple-500">Atendido por IA</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        {selectedConversation.contacts?.email}
+                      </>
+                    )}
+                  </CardDescription>
+                </div>
+                <Button variant="outline" size="sm">
+                  <User className="mr-2 h-4 w-4" />
+                  Ver Perfil
+                </Button>
               </div>
-              <div className="flex-1">
-                <CardTitle>João Silva</CardTitle>
-                <CardDescription className="flex items-center gap-2">
-                  {isAIHandling ? (
-                    <>
-                      <Bot className="h-3 w-3 text-purple-500" />
-                      <span className="text-purple-500">Atendido por IA</span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                      Online
-                    </>
-                  )}
-                </CardDescription>
+            ) : (
+              <div className="text-center text-muted-foreground">
+                Selecione uma conversa
               </div>
-              <Button variant="outline" size="sm">
-                <User className="mr-2 h-4 w-4" />
-                Ver Perfil
-              </Button>
-            </div>
+            )}
 
             {/* Transfer Controls */}
             <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
@@ -301,56 +416,56 @@ export default function Inbox() {
           <CardContent className="p-6">
             <ScrollArea className="h-[400px] mb-4">
               <div className="space-y-4">
-                {/* Initial messages */}
-                <div className="flex items-start gap-3">
-                  <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center text-white text-sm font-semibold">
-                    J
+                {loadingMessages ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
                   </div>
-                  <div className="flex-1 max-w-md">
-                    <div className="bg-muted rounded-2xl rounded-tl-sm p-4">
-                      <p className="text-sm">Olá! Gostaria de saber mais sobre o produto</p>
+                ) : messages.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <MessageSquare className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                    <p>Nenhuma mensagem ainda</p>
+                  </div>
+                ) : (
+                  messages.map((msg) => (
+                    <div key={msg.id}>
+                      {msg.direction === 'inbound' ? (
+                        <div className="flex items-start gap-3">
+                          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center text-white text-sm font-semibold">
+                            {selectedConversation?.contacts?.full_name?.charAt(0).toUpperCase() || "?"}
+                          </div>
+                          <div className="flex-1 max-w-md">
+                            <div className="bg-muted rounded-2xl rounded-tl-sm p-4">
+                              <p className="text-sm">{msg.body}</p>
+                            </div>
+                            <span className="text-xs text-muted-foreground mt-1 ml-2">
+                              {new Date(msg.sent_at).toLocaleTimeString('pt-BR', { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                              })}
+                            </span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-start gap-3 justify-end">
+                          <div className="flex-1 max-w-md">
+                            <div className="bg-gradient-to-r from-primary to-primary-glow rounded-2xl rounded-tr-sm p-4 ml-auto">
+                              <p className="text-sm text-white">{msg.body}</p>
+                            </div>
+                            <div className="flex items-center justify-end gap-1 mt-1 mr-2">
+                              <span className="text-xs text-muted-foreground">
+                                {new Date(msg.sent_at).toLocaleTimeString('pt-BR', { 
+                                  hour: '2-digit', 
+                                  minute: '2-digit' 
+                                })}
+                              </span>
+                              {msg.delivered_at && <CheckCircle className="h-3 w-3 text-emerald-500" />}
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    <span className="text-xs text-muted-foreground mt-1 ml-2">14:23</span>
-                  </div>
-                </div>
-
-                {/* Dynamic messages */}
-                {messages.map((msg) => (
-                  <div key={msg.id}>
-                    {msg.sender === 'system' ? (
-                      <div className="flex justify-center my-4">
-                        <Badge variant="secondary" className="bg-orange-500/10 text-orange-600">
-                          {msg.text}
-                        </Badge>
-                      </div>
-                    ) : msg.sender === 'ai' ? (
-                      <div className="flex items-start gap-3">
-                        <div className="h-8 w-8 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white">
-                          <Bot className="h-4 w-4" />
-                        </div>
-                        <div className="flex-1 max-w-md">
-                          <div className="bg-purple-500/10 border border-purple-500/20 rounded-2xl rounded-tl-sm p-4">
-                            <p className="text-xs font-semibold text-purple-600 mb-1">{msg.agentName}</p>
-                            <p className="text-sm">{msg.text}</p>
-                          </div>
-                          <span className="text-xs text-muted-foreground mt-1 ml-2">{msg.time}</span>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="flex items-start gap-3 justify-end">
-                        <div className="flex-1 max-w-md">
-                          <div className="bg-gradient-to-r from-primary to-primary-glow rounded-2xl rounded-tr-sm p-4 ml-auto">
-                            <p className="text-sm text-white">{msg.text}</p>
-                          </div>
-                          <div className="flex items-center justify-end gap-1 mt-1 mr-2">
-                            <span className="text-xs text-muted-foreground">{msg.time}</span>
-                            <CheckCircle className="h-3 w-3 text-emerald-500" />
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </ScrollArea>
 
@@ -360,11 +475,12 @@ export default function Inbox() {
                 className="flex-1"
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
+                disabled={!selectedConversation || sending}
               />
               <Button 
                 onClick={handleSendMessage}
-                disabled={sending || !newMessage.trim()}
+                disabled={sending || !newMessage.trim() || !selectedConversation}
                 className="bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 transition-opacity"
               >
                 {sending ? (
