@@ -46,6 +46,7 @@ export default function Inbox() {
   const [contactSearch, setContactSearch] = useState("");
   const [newContactName, setNewContactName] = useState("");
   const [newContactEmail, setNewContactEmail] = useState("");
+  const [newContactPhone, setNewContactPhone] = useState("");
   const [selectedContactId, setSelectedContactId] = useState<string>("");
   const [creatingConversation, setCreatingConversation] = useState(false);
 
@@ -292,13 +293,14 @@ export default function Inbox() {
       let contactId = selectedContactId;
 
       // Se não selecionou contato existente, criar novo
-      if (!contactId && (newContactName || newContactEmail)) {
+      if (!contactId && (newContactName || newContactEmail || newContactPhone)) {
         const { data: newContact, error: contactError } = await supabase
           .from("contacts")
           .insert({
             org_id: member.org_id,
             full_name: newContactName || null,
             email: newContactEmail || null,
+            phone_e164: newContactPhone || null,
           })
           .select()
           .single();
@@ -339,6 +341,7 @@ export default function Inbox() {
       setSelectedContactId("");
       setNewContactName("");
       setNewContactEmail("");
+      setNewContactPhone("");
       setContactSearch("");
       
       // Atualizar lista e selecionar nova conversa
@@ -653,6 +656,7 @@ export default function Inbox() {
                             setSelectedContactId(contact.id);
                             setNewContactName("");
                             setNewContactEmail("");
+                            setNewContactPhone("");
                           }}
                           className={`p-3 rounded-lg border cursor-pointer transition-all hover:bg-accent ${
                             selectedContactId === contact.id ? "bg-accent border-primary" : ""
@@ -713,6 +717,20 @@ export default function Inbox() {
                   />
                 </div>
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="phone">Telefone</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  placeholder="+5511999999999"
+                  value={newContactPhone}
+                  onChange={(e) => {
+                    setNewContactPhone(e.target.value);
+                    setSelectedContactId("");
+                  }}
+                />
+              </div>
             </div>
           </div>
 
@@ -724,6 +742,7 @@ export default function Inbox() {
                 setSelectedContactId("");
                 setNewContactName("");
                 setNewContactEmail("");
+                setNewContactPhone("");
                 setContactSearch("");
               }}
             >
@@ -731,7 +750,7 @@ export default function Inbox() {
             </Button>
             <Button
               onClick={handleCreateNewConversation}
-              disabled={creatingConversation || (!selectedContactId && !newContactName && !newContactEmail)}
+              disabled={creatingConversation || (!selectedContactId && !newContactName && !newContactEmail && !newContactPhone)}
               className="bg-gradient-to-r from-primary to-primary-glow"
             >
               {creatingConversation ? (
