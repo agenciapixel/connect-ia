@@ -160,6 +160,9 @@ export default function Integrations() {
     console.log('metaOAuthOpen state:', metaOAuthOpen);
     console.log('metaOAuthType state:', metaOAuthType);
     
+    // Show alert to confirm function is being called
+    alert(`handleConnectClick chamado para: ${type} - ${name}`);
+    
     // Use new OAuth flow for Meta platforms (WhatsApp, Instagram, Messenger)
     if (type === "instagram" || type === "whatsapp" || type === "messenger") {
       console.log('Opening Meta OAuth for:', type);
