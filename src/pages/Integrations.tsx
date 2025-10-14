@@ -29,6 +29,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { InstagramSetup } from "@/components/InstagramSetup";
 import { WhatsAppSetup } from "@/components/WhatsAppSetup";
+import { MetaOAuthConnect } from "@/components/MetaOAuthConnect";
 
 interface ChannelAccount {
   id: string;
@@ -46,6 +47,8 @@ export default function Integrations() {
   const [connectDialogOpen, setConnectDialogOpen] = useState(false);
   const [instagramSetupOpen, setInstagramSetupOpen] = useState(false);
   const [whatsappSetupOpen, setWhatsappSetupOpen] = useState(false);
+  const [metaOAuthOpen, setMetaOAuthOpen] = useState(false);
+  const [metaOAuthType, setMetaOAuthType] = useState<"whatsapp" | "instagram" | "messenger">("whatsapp");
   const [selectedIntegration, setSelectedIntegration] = useState<{
     type: string;
     name: string;
@@ -106,13 +109,10 @@ export default function Integrations() {
   };
 
   const handleConnectClick = (type: string, name: string, icon: string) => {
-    // Open specific setup dialogs for Instagram and WhatsApp
-    if (type === "instagram") {
-      setInstagramSetupOpen(true);
-      return;
-    }
-    if (type === "whatsapp") {
-      setWhatsappSetupOpen(true);
+    // Use new OAuth flow for Meta platforms (WhatsApp, Instagram, Messenger)
+    if (type === "instagram" || type === "whatsapp" || type === "messenger") {
+      setMetaOAuthType(type as "whatsapp" | "instagram" | "messenger");
+      setMetaOAuthOpen(true);
       return;
     }
 
@@ -871,7 +871,17 @@ export default function Integrations() {
         </TabsContent>
       </Tabs>
 
-      {/* Instagram Setup Dialog */}
+      {/* Meta OAuth Connect (Simplified Flow) */}
+      <MetaOAuthConnect
+        open={metaOAuthOpen}
+        onOpenChange={setMetaOAuthOpen}
+        channelType={metaOAuthType}
+        onSuccess={() => {
+          if (orgId) fetchChannels(orgId);
+        }}
+      />
+
+      {/* Legacy Setup Dialogs (kept for fallback) */}
       <InstagramSetup
         open={instagramSetupOpen}
         onOpenChange={setInstagramSetupOpen}
@@ -880,7 +890,6 @@ export default function Integrations() {
         }}
       />
 
-      {/* WhatsApp Setup Dialog */}
       <WhatsAppSetup
         open={whatsappSetupOpen}
         onOpenChange={setWhatsappSetupOpen}
