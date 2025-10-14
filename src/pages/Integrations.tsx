@@ -246,6 +246,24 @@ export default function Integrations() {
         </TabsList>
 
         <TabsContent value="all" className="space-y-6">
+          {/* Debug Test Button */}
+          <div className="mb-4 p-4 border border-red-500 rounded-lg bg-red-50">
+            <h3 className="text-lg font-semibold text-red-700 mb-2">🔧 Debug Test</h3>
+            <Button 
+              onClick={() => {
+                console.log('=== DEBUG TEST BUTTON CLICKED ===');
+                console.log('Current metaOAuthOpen:', metaOAuthOpen);
+                console.log('Current metaOAuthType:', metaOAuthType);
+                setMetaOAuthType("instagram");
+                setMetaOAuthOpen(true);
+                console.log('After setting - metaOAuthOpen should be true');
+              }}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Teste: Abrir Modal Instagram
+            </Button>
+          </div>
+
           {/* Social Media Integrations */}
           <div>
             <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
