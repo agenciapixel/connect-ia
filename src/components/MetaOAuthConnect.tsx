@@ -33,7 +33,7 @@ export function MetaOAuthConnect({ open, onOpenChange, channelType, onSuccess }:
   const channelConfig = {
     whatsapp: {
       title: "Conectar WhatsApp Business",
-      description: "Faça login com sua conta do Facebook para conectar o WhatsApp Business",
+      description: "Para conectar o WhatsApp Business, você precisa ter uma conta de WhatsApp Business API configurada no Facebook Business Manager",
       icon: "W",
       color: "from-green-500 to-green-600",
       permissions: ["pages_show_list", "pages_messaging", "whatsapp_business_management", "whatsapp_business_messaging"]
@@ -256,11 +256,32 @@ export function MetaOAuthConnect({ open, onOpenChange, channelType, onSuccess }:
         return;
       }
 
-      setPages(data.data);
+      // Verificar se é WhatsApp Business e se há WhatsApp disponível
+      if (channelType === 'whatsapp') {
+        const whatsappPages = data.data.filter((page: any) => {
+          // Verificar se a página tem WhatsApp Business configurado
+          return page.tasks && page.tasks.includes('MESSAGING');
+        });
+
+        if (whatsappPages.length === 0) {
+          toast.error("Nenhuma página com WhatsApp Business encontrada. Configure o WhatsApp Business API no Facebook Business Manager primeiro.");
+          setLoading(false);
+          return;
+        }
+
+        setPages(whatsappPages);
+      } else {
+        setPages(data.data);
+      }
+
       setStep('select');
     } catch (error: any) {
       console.error("Error fetching pages:", error);
-      toast.error(error.message || "Erro ao buscar páginas");
+      if (channelType === 'whatsapp') {
+        toast.error("Erro ao verificar WhatsApp Business. Certifique-se de que sua conta tem WhatsApp Business API configurado.");
+      } else {
+        toast.error(error.message || "Erro ao buscar páginas");
+      }
     } finally {
       setLoading(false);
     }
@@ -449,6 +470,19 @@ export function MetaOAuthConnect({ open, onOpenChange, channelType, onSuccess }:
         </DialogHeader>
 
         <div className="space-y-4 py-4">
+          {/* Alerta informativo para WhatsApp Business */}
+          {channelType === 'whatsapp' && (
+            <Alert className="bg-blue-500/10 border-blue-500/20">
+              <AlertDescription>
+                <strong>Requisitos para WhatsApp Business:</strong><br/>
+                • Você precisa ter uma conta de WhatsApp Business API<br/>
+                • Configure o WhatsApp Business no Facebook Business Manager<br/>
+                • Certifique-se de que sua página do Facebook tem WhatsApp Business ativado<br/>
+                • Se não tiver, você pode usar Instagram ou Messenger normalmente
+              </AlertDescription>
+            </Alert>
+          )}
+
           {step === 'auth' && (
             <>
               {/* Status de Login */}
