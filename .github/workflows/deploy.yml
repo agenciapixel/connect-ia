@@ -34,14 +34,14 @@ jobs:
     - name: Deploy to Hostinger
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
-        server: connectia.agenciapixel.digital
+        server: ftp.connectia.agenciapixel.digital
         # Secrets configuradas no GitHub: Settings → Secrets and variables → Actions
         username: ${{ secrets.HOSTINGER_USERNAME }}
         password: ${{ secrets.HOSTINGER_PASSWORD }}
         local-dir: ./dist/
         server-dir: /public_html/
-        protocol: ftp
-        port: 21
+        protocol: sftp
+        port: 22
         timeout: 60000
         log-level: verbose
         exclude: |
