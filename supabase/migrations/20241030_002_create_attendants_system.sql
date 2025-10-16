@@ -458,3 +458,4 @@ INSERT INTO public.attendants (
 )
 ON CONFLICT (email) DO NOTHING;
 
+

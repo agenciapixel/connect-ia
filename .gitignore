@@ -97,5 +97,12 @@ deploy-*.sh
 !deploy-simples.sh
 !deploy-hostinger.sh
 
+# PHP Composer
+vendor/
+composer.lock
+
+# Hosting directories
+public_html/
+
 # Local development
 .env.example

@@ -224,3 +224,4 @@ Announcement: "Claro e direto" + "Novidades"
 **Versão do sistema:** 2.0  
 **Status:** ✅ Implementado e Testado
 
+

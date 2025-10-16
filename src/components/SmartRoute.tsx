@@ -25,3 +25,4 @@ export function SmartRoute({ children, permission, fallbackComponent }: SmartRou
   );
 }
 
+
