@@ -31,26 +31,17 @@ jobs:
     - name: Build project
       run: npm run build
       
-    - name: Deploy to Hostinger
-      uses: appleboy/scp-action@v0.1.7
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
       with:
-        host: connectia.agenciapixel.digital
-        username: ${{ secrets.HOSTINGER_USERNAME }}
-        password: ${{ secrets.HOSTINGER_PASSWORD }}
-        port: 22
-        source: "./dist/*"
-        target: "/public_html/"
-        strip_components: 1
-          
-    - name: Notify deployment success
+        name: dist-files
+        path: dist/
+        retention-days: 1
+        
+    - name: Notify build success
       if: success()
       run: |
-        echo "✅ Deploy concluído com sucesso!"
-        echo "🌐 Site: https://connectia.agenciapixel.digital"
-        echo "📱 Teste no mobile: https://connectia.agenciapixel.digital"
-        
-    - name: Notify deployment failure
-      if: failure()
-      run: |
-        echo "❌ Deploy falhou!"
-        echo "Verifique os logs acima para mais detalhes."
+        echo "✅ Build concluído com sucesso!"
+        echo "📦 Arquivos prontos para deploy"
+        echo "🌐 Hostinger Git Deploy deve fazer o deploy automaticamente"
+        echo "🔗 Verifique: https://connectia.agenciapixel.digital"
