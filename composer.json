@@ -1,0 +1,15 @@
+{
+  "name": "connect-ia",
+  "description": "Connect IA - Sistema de CRM e Automação",
+  "scripts": {
+    "post-install-cmd": [
+      "npm install",
+      "npm run build",
+      "cp -r dist/* public_html/",
+      "cp public/.htaccess public_html/"
+    ]
+  },
+  "require": {
+    "php": ">=7.4"
+  }
+}

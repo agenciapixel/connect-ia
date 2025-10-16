@@ -21,7 +21,7 @@ Execute estes comandos no terminal:
 
 ```bash
 # Conectar ao repositório GitHub (substitua SEU_USUARIO)
-git remote add origin https://github.com/SEU_USUARIO/connect-ia.git
+git remote add origin https://github.com/agenciapixel/connect-ia.git
 
 # Renomear branch para main
 git branch -M main
