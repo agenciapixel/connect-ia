@@ -82,7 +82,7 @@ export function CRMPipeline({ prospects, onRefresh }: CRMPipelineProps) {
 
       toast.success(`Prospect movido para ${PIPELINE_STAGES.find(s => s.id === newStage)?.label}`);
       onRefresh();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error moving prospect:', error);
       toast.error('Erro ao mover prospect');
     } finally {
@@ -132,7 +132,7 @@ export function CRMPipeline({ prospects, onRefresh }: CRMPipelineProps) {
 
       toast.success("Prospect exportado para Contatos!");
       onRefresh();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error:", error);
       toast.error("Erro ao exportar prospect");
     }
@@ -176,7 +176,7 @@ export function CRMPipeline({ prospects, onRefresh }: CRMPipelineProps) {
       toast.success('Prospect atualizado com sucesso!');
       onRefresh();
       handleCloseProspectModal();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error updating prospect:', error);
       toast.error('Erro ao atualizar prospect');
     }
@@ -196,7 +196,7 @@ export function CRMPipeline({ prospects, onRefresh }: CRMPipelineProps) {
       toast.success('Prospect excluído com sucesso!');
       onRefresh();
       handleCloseProspectModal();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error deleting prospect:', error);
       toast.error('Erro ao excluir prospect');
     }

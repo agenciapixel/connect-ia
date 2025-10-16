@@ -105,7 +105,7 @@ export function BulkExportProspects({ prospects, selectedIds, onExportComplete }
 
       setIsOpen(false);
       onExportComplete();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error:", error);
       toast.error("Erro ao exportar prospects");
     } finally {

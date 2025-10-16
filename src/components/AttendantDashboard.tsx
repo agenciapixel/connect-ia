@@ -52,7 +52,7 @@ interface Attendant {
   department?: string;
   position?: string;
   status: 'online' | 'busy' | 'away' | 'offline' | 'break' | 'training';
-  working_hours?: any;
+  working_hours?: Record<string, unknown>;
   max_concurrent_chats: number;
   auto_accept: boolean;
   skills: string[];
@@ -62,7 +62,7 @@ interface Attendant {
   avg_response_time: number;
   satisfaction_score: number;
   last_activity_at?: string;
-  notifications?: any;
+  notifications?: Record<string, unknown>;
   created_at: string;
   updated_at: string;
   // Dados relacionados
