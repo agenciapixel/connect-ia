@@ -1,6 +1,12 @@
 # Apache configuration for React SPA
 RewriteEngine On
 
+# Fix MIME types for JavaScript and CSS
+AddType application/javascript .js
+AddType text/css .css
+AddType image/x-icon .ico
+AddType image/svg+xml .svg
+
 # Handle Angular and React Router
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
