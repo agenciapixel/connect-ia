@@ -490,8 +490,8 @@ export default function Integrations() {
 
       if (!email || !password) {
         toast({ title: "Erro", description: "Email e senha são obrigatórios" });
-      return;
-    }
+        return;
+      }
 
       try {
         const credentials = {
@@ -674,167 +674,64 @@ export default function Integrations() {
                   </p>
                   <Separator />
                   {isChannelConnected("instagram") ? (
-                  <div className="space-y-3">
-                    {/* Informações da conta conectada */}
-                    {(() => {
-                      const allChannels = [...channels, ...localChannels];
-                      const channel = allChannels.find(ch => ch.channel_type === "instagram");
-                      return channel ? (
-                        <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                          <div className="flex items-center gap-2 mb-2">
-                            <CheckCircle2 className="h-4 w-4 text-green-600" />
-                            <span className="text-sm font-medium text-green-800 dark:text-green-200">
-                              Conectado
-                            </span>
-                      </div>
-                          {channel.credentials_json?.username && (
-                            <p className="text-xs text-green-700 dark:text-green-300">
-                              @{channel.credentials_json.username}
+                    <div className="space-y-3">
+                      {/* Informações da conta conectada */}
+                      {(() => {
+                        const allChannels = [...channels, ...localChannels];
+                        const channel = allChannels.find(ch => ch.channel_type === "instagram");
+                        return channel ? (
+                          <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                            <div className="flex items-center gap-2 mb-2">
+                              <CheckCircle2 className="h-4 w-4 text-green-600" />
+                              <span className="text-sm font-medium text-green-800 dark:text-green-200">
+                                Conectado
+                              </span>
+                            </div>
+                            {channel.credentials_json?.username && (
+                              <p className="text-xs text-green-700 dark:text-green-300">
+                                @{channel.credentials_json.username}
+                              </p>
+                            )}
+                            <p className="text-xs text-green-600 dark:text-green-400">
+                              Conectado em {new Date(channel.created_at).toLocaleDateString('pt-BR')}
                             </p>
-                          )}
-                          <p className="text-xs text-green-600 dark:text-green-400">
-                            Conectado em {new Date(channel.created_at).toLocaleDateString('pt-BR')}
-                          </p>
-                    </div>
-                      ) : null;
-                    })()}
-                    
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="flex-1"
-                        onClick={() => {
-                          const allChannels = [...channels, ...localChannels];
-                          const channel = allChannels.find(ch => ch.channel_type === "instagram");
-                          if (channel) {
-                            handleChannelSettings(channel);
-                          }
-                        }}
-                      >
-                        <Settings className="h-4 w-4 mr-2" />
-                        Configurar
-                      </Button>
-                      <Button 
-                        variant="destructive" 
-                        size="sm"
-                        onClick={async () => {
-                          const allChannels = [...channels, ...localChannels];
-                          const channel = allChannels.find(ch => ch.channel_type === "instagram");
-                          if (channel) await handleDisconnectChannel(channel.id);
-                        }}
-                      >
-                        Desconectar
-                      </Button>
-                    </div>
-                    </div>
-                  ) : (
-                    <Button 
-                      className="w-full"
-                    onClick={() => handleConnectClick("instagram", "Instagram", "instagram")}
-                    >
-                      Conectar
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* WhatsApp */}
-              <Card className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-green-600 to-green-700 flex items-center justify-center text-white font-bold">
-                        W
-                      </div>
-                      <div>
-                        <CardTitle className="flex items-center gap-2">
-                        WhatsApp
-                        {isChannelConnected("whatsapp") ? (
-                            <Badge variant="secondary" className="bg-green-500/10 text-green-700">
-                              <CheckCircle2 className="h-3 w-3 mr-1" />
-                              Conectado
-                            </Badge>
-                        ) : (
-                          <Badge variant="outline">Disponível</Badge>
-                          )}
-                        </CardTitle>
-                      </div>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-sm text-muted-foreground">
-                  Conecte sua conta do WhatsApp
-                  </p>
-                  <Separator />
-                  {isChannelConnected("whatsapp") ? (
-                  <div className="space-y-3">
-                    {/* Informações da conta conectada */}
-                    {(() => {
-                      const allChannels = [...channels, ...localChannels];
-                      const channel = allChannels.find(ch => ch.channel_type === "whatsapp");
-                      return channel ? (
-                        <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                          <div className="flex items-center gap-2 mb-2">
-                            <CheckCircle2 className="h-4 w-4 text-green-600" />
-                            <span className="text-sm font-medium text-green-800 dark:text-green-200">
-                              Conectado
-                            </span>
                           </div>
-                          {channel.credentials_json?.phone_number && (
-                            <p className="text-xs text-green-700 dark:text-green-300">
-                              📞 {channel.credentials_json.phone_number}
-                            </p>
-                          )}
-                          <p className="text-xs text-green-600 dark:text-green-400">
-                            Conectado em {new Date(channel.created_at).toLocaleDateString('pt-BR')}
-                          </p>
-                        </div>
-                      ) : null;
-                    })()}
-                    
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="flex-1"
-                        onClick={() => {
-                          const allChannels = [...channels, ...localChannels];
-                          const channel = allChannels.find(ch => ch.channel_type === "whatsapp");
-                          if (channel) {
-                            handleChannelSettings(channel);
-                          }
-                        }}
-                      >
-                        <Settings className="h-4 w-4 mr-2" />
-                        Configurar
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={async () => {
-                          console.log('🔴 Botão Desconectar clicado!');
-                          const allChannels = [...channels, ...localChannels];
-                          console.log('📋 Todos os canais:', allChannels);
-                          const channel = allChannels.find(ch => ch.channel_type === "whatsapp");
-                          console.log('📱 Canal WhatsApp encontrado:', channel);
-                          if (channel) {
-                            console.log('🗑️ Chamando handleDisconnectChannel com ID:', channel.id);
-                            await handleDisconnectChannel(channel.id);
-                          } else {
-                            console.error('❌ Nenhum canal WhatsApp encontrado para desconectar!');
-                          }
-                        }}
-                      >
-                        Desconectar
-                      </Button>
-                    </div>
+                        ) : null;
+                      })()}
+                      
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => {
+                            const allChannels = [...channels, ...localChannels];
+                            const channel = allChannels.find(ch => ch.channel_type === "instagram");
+                            if (channel) {
+                              handleChannelSettings(channel);
+                            }
+                          }}
+                        >
+                          <Settings className="h-4 w-4 mr-2" />
+                          Configurar
+                        </Button>
+                        <Button 
+                          variant="destructive" 
+                          size="sm"
+                          onClick={async () => {
+                            const allChannels = [...channels, ...localChannels];
+                            const channel = allChannels.find(ch => ch.channel_type === "instagram");
+                            if (channel) await handleDisconnectChannel(channel.id);
+                          }}
+                        >
+                          Desconectar
+                        </Button>
+                      </div>
                     </div>
                   ) : (
                     <Button 
                       className="w-full"
-                    onClick={() => handleConnectClick("whatsapp", "WhatsApp Business", "whatsapp")}
+                      onClick={() => handleConnectClick("instagram", "Instagram", "instagram")}
                     >
                       Conectar
                     </Button>
@@ -847,19 +744,19 @@ export default function Integrations() {
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center">
-                      <Mail className="h-6 w-6 text-white" />
+                      <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center">
+                        <Mail className="h-6 w-6 text-white" />
                       </div>
                       <div>
                         <CardTitle className="flex items-center gap-2">
-                        Email
-                        {isChannelConnected("email") ? (
+                          Email
+                          {isChannelConnected("email") ? (
                             <Badge variant="secondary" className="bg-green-500/10 text-green-700">
                               <CheckCircle2 className="h-3 w-3 mr-1" />
                               Conectado
                             </Badge>
-                        ) : (
-                          <Badge variant="outline">Disponível</Badge>
+                          ) : (
+                            <Badge variant="outline">Disponível</Badge>
                           )}
                         </CardTitle>
                       </div>
@@ -868,77 +765,77 @@ export default function Integrations() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <p className="text-sm text-muted-foreground">
-                  Conecte sua conta de email
+                    Conecte sua conta de email
                   </p>
                   <Separator />
                   {isChannelConnected("email") ? (
-                  <div className="space-y-3">
-                    {/* Informações da conta conectada */}
-                    {(() => {
-                      const allChannels = [...channels, ...localChannels];
-                      const channel = allChannels.find(ch => ch.channel_type === "email");
-                      return channel ? (
-                        <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                          <div className="flex items-center gap-2 mb-2">
-                            <CheckCircle2 className="h-4 w-4 text-green-600" />
-                            <span className="text-sm font-medium text-green-800 dark:text-green-200">
-                              Conectado
-                            </span>
-                    </div>
-                          {channel.credentials_json?.email && (
-                            <p className="text-xs text-green-700 dark:text-green-300">
-                              📧 {channel.credentials_json.email}
-                            </p>
-                          )}
-                          {channel.credentials_json?.smtp_server && (
+                    <div className="space-y-3">
+                      {/* Informações da conta conectada */}
+                      {(() => {
+                        const allChannels = [...channels, ...localChannels];
+                        const channel = allChannels.find(ch => ch.channel_type === "email");
+                        return channel ? (
+                          <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                            <div className="flex items-center gap-2 mb-2">
+                              <CheckCircle2 className="h-4 w-4 text-green-600" />
+                              <span className="text-sm font-medium text-green-800 dark:text-green-200">
+                                Conectado
+                              </span>
+                            </div>
+                            {channel.credentials_json?.email && (
+                              <p className="text-xs text-green-700 dark:text-green-300">
+                                📧 {channel.credentials_json.email}
+                              </p>
+                            )}
+                            {channel.credentials_json?.smtp_server && (
+                              <p className="text-xs text-green-600 dark:text-green-400">
+                                SMTP: {channel.credentials_json.smtp_server}
+                              </p>
+                            )}
                             <p className="text-xs text-green-600 dark:text-green-400">
-                              SMTP: {channel.credentials_json.smtp_server}
+                              Conectado em {new Date(channel.created_at).toLocaleDateString('pt-BR')}
                             </p>
-                          )}
-                          <p className="text-xs text-green-600 dark:text-green-400">
-                            Conectado em {new Date(channel.created_at).toLocaleDateString('pt-BR')}
-                          </p>
-                  </div>
-                      ) : null;
-                    })()}
-                    
+                          </div>
+                        ) : null;
+                      })()}
+                      
                       <div className="flex gap-2">
                         <Button 
                           variant="outline" 
                           size="sm"
-                        className="flex-1"
-                        onClick={() => {
-                          const allChannels = [...channels, ...localChannels];
-                          const channel = allChannels.find(ch => ch.channel_type === "email");
-                          if (channel) {
-                            handleChannelSettings(channel);
-                          }
-                        }}
+                          className="flex-1"
+                          onClick={() => {
+                            const allChannels = [...channels, ...localChannels];
+                            const channel = allChannels.find(ch => ch.channel_type === "email");
+                            if (channel) {
+                              handleChannelSettings(channel);
+                            }
+                          }}
                         >
                           <Settings className="h-4 w-4 mr-2" />
-                        Configurar
+                          Configurar
                         </Button>
                         <Button 
                           variant="destructive" 
                           size="sm"
-                        onClick={async () => {
-                          const allChannels = [...channels, ...localChannels];
-                          const channel = allChannels.find(ch => ch.channel_type === "email");
-                          if (channel) await handleDisconnectChannel(channel.id);
-                        }}
+                          onClick={async () => {
+                            const allChannels = [...channels, ...localChannels];
+                            const channel = allChannels.find(ch => ch.channel_type === "email");
+                            if (channel) await handleDisconnectChannel(channel.id);
+                          }}
                         >
                           Desconectar
                         </Button>
                       </div>
                     </div>
-                ) : (
-                  <Button 
-                    className="w-full"
-                    onClick={() => handleConnectClick("email", "Email (SMTP)", "email")}
-                  >
-                    Conectar
-                  </Button>
-                )}
+                  ) : (
+                    <Button 
+                      className="w-full"
+                      onClick={() => handleConnectClick("email", "Email (SMTP)", "email")}
+                    >
+                      Conectar
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
 
