@@ -1,4 +1,7 @@
-name: Deploy Connect IA to Hostinger
+# GitHub Actions desabilitado - usando Git Deploy da Hostinger
+# O Git Deploy da Hostinger é mais confiável e não requer credenciais FTP
+
+name: Build Only (Git Deploy da Hostinger)
 
 on:
   push:
@@ -6,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  build-only:
     runs-on: ubuntu-latest
     
     steps:
@@ -24,14 +27,8 @@ jobs:
     - name: Build project
       run: npm run build
       
-    - name: Deploy to Hostinger
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.3
-      with:
-        server: ftp.connectia.agenciapixel.digital
-        username: ${{ secrets.HOSTINGER_USERNAME }}
-        password: ${{ secrets.HOSTINGER_PASSWORD }}
-        local-dir: ./dist/
-        server-dir: /public_html/
-        
-    - name: Notify deployment
-      run: echo "✅ Deploy concluído para https://connectia.agenciapixel.digital"
+    - name: Notify build completion
+      run: |
+        echo "✅ Build concluído!"
+        echo "🚀 Git Deploy da Hostinger fará o deploy automaticamente"
+        echo "🌐 Site: https://connectia.agenciapixel.digital"
