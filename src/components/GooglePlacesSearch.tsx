@@ -73,7 +73,7 @@ export function GooglePlacesSearch({ onResults }: GooglePlacesSearchProps) {
       );
 
       onResults?.(response.places);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Search error:", error);
 
       if (error.code === 1) {

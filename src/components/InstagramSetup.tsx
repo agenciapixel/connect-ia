@@ -63,7 +63,7 @@ export function InstagramSetup({ open, onOpenChange, onSuccess }: InstagramSetup
       if (onSuccess) {
         onSuccess();
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error connecting Instagram:', error);
       toast.error(error.message || "Erro ao conectar canal");
     } finally {

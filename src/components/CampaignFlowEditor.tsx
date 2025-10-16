@@ -702,7 +702,7 @@ Obrigado pelo contato! 🙏`;
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label>Tipo de Etapa</Label>
-              <Select value={stepType} onValueChange={(value: any) => setStepType(value)}>
+              <Select value={stepType} onValueChange={(value: string) => setStepType(value)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -819,7 +819,7 @@ Obrigado pelo contato! 🙏`;
                   <Label>Unidade</Label>
                   <Select 
                     value={stepConfig.delayUnit} 
-                    onValueChange={(value: any) => setStepConfig({ ...stepConfig, delayUnit: value })}
+                    onValueChange={(value: string) => setStepConfig({ ...stepConfig, delayUnit: value })}
                   >
                     <SelectTrigger>
                       <SelectValue />

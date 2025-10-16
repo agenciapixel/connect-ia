@@ -576,7 +576,7 @@ export default function AttendantDashboard() {
                         <div key={conversation.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
                           <div className="flex items-center space-x-3">
                             <div className="flex items-center space-x-1">
-                              {getChannelIcon((conversation as any).channel_type || 'whatsapp')}
+                              {getChannelIcon((conversation as Record<string, unknown>).channel_type as string || 'whatsapp')}
                             </div>
                             <div>
                               <p className="font-medium text-sm">
@@ -742,7 +742,7 @@ export default function AttendantDashboard() {
                         <div className="flex items-start justify-between">
                           <div className="flex items-center space-x-3">
                             <div className="flex items-center space-x-1">
-                              {getChannelIcon((conversation as any).channel_type || 'whatsapp')}
+                              {getChannelIcon((conversation as Record<string, unknown>).channel_type as string || 'whatsapp')}
                             </div>
                             <div>
                               <p className="font-medium">{conversation.contacts?.full_name || 'Cliente'}</p>

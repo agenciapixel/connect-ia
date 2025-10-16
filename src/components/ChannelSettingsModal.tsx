@@ -13,10 +13,19 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Settings, Trash2, RefreshCw } from "lucide-react";
 
+interface ChannelAccount {
+  id: string;
+  name: string;
+  channel_type: string;
+  status: string;
+  credentials_json: Record<string, unknown>;
+  created_at: string;
+}
+
 interface ChannelSettingsModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  channel: any;
+  channel: ChannelAccount;
   onDisconnect: (channelId: string) => void;
 }
 

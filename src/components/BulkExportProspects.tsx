@@ -15,7 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 interface BulkExportProspectsProps {
-  prospects: any[];
+  prospects: Record<string, unknown>[];
   selectedIds: string[];
   onExportComplete: () => void;
 }
