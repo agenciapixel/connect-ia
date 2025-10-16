@@ -32,25 +32,15 @@ jobs:
       run: npm run build
       
     - name: Deploy to Hostinger
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      uses: appleboy/scp-action@v0.1.7
       with:
-        server: ftp.connectia.agenciapixel.digital
-        # Secrets configuradas no GitHub: Settings → Secrets and variables → Actions
+        host: connectia.agenciapixel.digital
         username: ${{ secrets.HOSTINGER_USERNAME }}
         password: ${{ secrets.HOSTINGER_PASSWORD }}
-        local-dir: ./dist/
-        server-dir: /public_html/
-        protocol: sftp
         port: 22
-        timeout: 60000
-        log-level: verbose
-        exclude: |
-          **/.git*
-          **/.git*/**
-          **/node_modules/**
-          **/.env*
-          **/README.md
-          **/.github/**
+        source: "./dist/*"
+        target: "/public_html/"
+        strip_components: 1
           
     - name: Notify deployment success
       if: success()
