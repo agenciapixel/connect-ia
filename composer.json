@@ -1,6 +1,7 @@
 {
-  "name": "connect-ia",
+  "name": "agenciapixel/connect-ia",
   "description": "Connect IA - Sistema de CRM e Automação",
+  "type": "project",
   "scripts": {
     "post-install-cmd": [
       "npm install",
@@ -12,5 +13,12 @@
   },
   "require": {
     "php": ">=7.4"
-  }
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Agência Pixel",
+      "email": "contato@agenciapixel.digital"
+    }
+  ]
 }
