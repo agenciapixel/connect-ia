@@ -27,8 +27,17 @@ jobs:
     - name: Build project
       run: npm run build
       
+    - name: Commit built files
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add dist/
+        git commit -m "Build: Add compiled files to repository" || exit 0
+        git push
+        
     - name: Notify build completion
       run: |
         echo "✅ Build concluído!"
+        echo "📁 Arquivos compilados commitados no repositório"
         echo "🚀 Git Deploy da Hostinger fará o deploy automaticamente"
         echo "🌐 Site: https://connectia.agenciapixel.digital"
