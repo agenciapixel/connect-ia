@@ -7,8 +7,8 @@ echo ""
 
 # Configurações (ALTERE AQUI)
 FTP_HOST="ftp.connectia.agenciapixel.digital"
-FTP_USER="seu_usuario_ftp"
-FTP_PASS="sua_senha_ftp"
+FTP_USER="connectia@agenciapixel.digital"
+FTP_PASS="SUA_SENHA_FTP_AQUI"
 FTP_DIR="/public_html"
 
 # Cores para output

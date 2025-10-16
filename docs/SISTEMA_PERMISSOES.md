@@ -221,3 +221,6 @@ const { userRole, permissions, canAccess } = usePermissions();
 O sistema de permissões garante que cada usuário tenha acesso apenas às funcionalidades necessárias para seu papel, mantendo a segurança e organização do sistema. A implementação é flexível e permite futuras expansões conforme necessário.
 
 
+
+
+

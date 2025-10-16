@@ -140,3 +140,6 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 **Próxima versão planejada:** 2.1.0 (Melhorias no Editor de Fluxo)
 
 
+
+
+

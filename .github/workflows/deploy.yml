@@ -2,9 +2,7 @@ name: Deploy Connect IA to Hostinger
 
 on:
   push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -24,24 +22,17 @@ jobs:
     - name: Install dependencies
       run: npm install
       
-    - name: Run linter
-      run: npm run lint
-      continue-on-error: true
-      
     - name: Build project
       run: npm run build
       
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
+    - name: Deploy to Hostinger
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.3
       with:
-        name: dist-files
-        path: dist/
-        retention-days: 1
+        server: ftp.connectia.agenciapixel.digital
+        username: ${{ secrets.HOSTINGER_USERNAME }}
+        password: ${{ secrets.HOSTINGER_PASSWORD }}
+        local-dir: ./dist/
+        server-dir: /public_html/
         
-    - name: Notify build success
-      if: success()
-      run: |
-        echo "✅ Build concluído com sucesso!"
-        echo "📦 Arquivos prontos para deploy"
-        echo "🌐 Hostinger Git Deploy deve fazer o deploy automaticamente"
-        echo "🔗 Verifique: https://connectia.agenciapixel.digital"
+    - name: Notify deployment
+      run: echo "✅ Deploy concluído para https://connectia.agenciapixel.digital"

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-echo "🚀 DEPLOY SIMPLES - CONNECT IA"
-echo "==============================="
+echo "🚀 CORREÇÃO AUTOMÁTICA - PÁGINA EM BRANCO"
+echo "========================================="
 echo "Domínio: connectia.agenciapixel.digital"
 echo ""
 
@@ -19,10 +19,10 @@ if [ ! -f "package.json" ]; then
 fi
 
 echo -e "${BLUE}📦 Fazendo build do projeto...${NC}"
-export PATH="./node-v20.11.0-darwin-x64/bin:$PATH"
+npm run build
 
-if ! npm run build; then
-    echo -e "${RED}❌ Erro no build. Verifique os logs acima.${NC}"
+if [ ! -d "dist" ]; then
+    echo -e "${RED}❌ Erro no build!${NC}"
     exit 1
 fi
 
@@ -31,18 +31,17 @@ echo ""
 
 echo -e "${BLUE}📁 Criando pacote para upload...${NC}"
 
-# Criar diretório de upload
-rm -rf deploy_package
-mkdir -p deploy_package
+# Criar diretório temporário
+mkdir -p upload_package
 
-# Copiar todos os arquivos
-cp -r dist/* deploy_package/
+# Copiar todos os arquivos necessários
+cp -r dist/* upload_package/
 
-echo -e "${GREEN}✅ Pacote criado em: deploy_package/${NC}"
+echo -e "${GREEN}✅ Pacote criado em: upload_package/${NC}"
 echo ""
 
 echo -e "${BLUE}📋 Conteúdo do pacote:${NC}"
-ls -la deploy_package/
+ls -la upload_package/
 
 echo ""
 echo -e "${YELLOW}🚀 PRÓXIMOS PASSOS:${NC}"
@@ -54,13 +53,12 @@ echo -e "${BLUE}2. Vá em Files → File Manager${NC}"
 echo ""
 echo -e "${BLUE}3. Navegue até public_html/${NC}"
 echo ""
-echo -e "${BLUE}4. DELETE todos os arquivos atuais${NC}"
+echo -e "${BLUE}4. DELETE todos os arquivos atuais em public_html/${NC}"
 echo "   (ou mova para uma pasta de backup)"
 echo ""
-echo -e "${BLUE}5. Faça upload de TODOS os arquivos da pasta deploy_package/${NC}"
+echo -e "${BLUE}5. Faça upload de TODOS os arquivos da pasta upload_package/${NC}"
 echo "   - Selecione TODOS os arquivos"
 echo "   - Faça upload para public_html/"
-echo "   - Certifique-se que a pasta assets/ seja enviada"
 echo ""
 echo -e "${BLUE}6. Verifique se a estrutura ficou assim:${NC}"
 echo "   public_html/"
@@ -72,11 +70,9 @@ echo "   │   └── ..."
 echo "   ├── favicon.ico"
 echo "   └── ..."
 echo ""
-
 echo -e "${GREEN}✅ Após o upload, teste:${NC}"
 echo "🌐 https://connectia.agenciapixel.digital"
 echo ""
-
 echo -e "${YELLOW}💡 DICA:${NC}"
-echo "Se preferir, posso configurar o deploy automático com suas credenciais FTP!"
-echo "Execute: ./deploy-automatico.sh (após configurar as credenciais)"
+echo "Se ainda não funcionar, verifique se os arquivos estão na raiz de public_html/"
+echo "e não dentro de uma subpasta!"
