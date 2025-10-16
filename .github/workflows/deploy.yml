@@ -35,6 +35,7 @@ jobs:
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
         server: ftp.connectia.agenciapixel.digital
+        # Secrets configuradas no GitHub: Settings → Secrets and variables → Actions
         username: ${{ secrets.HOSTINGER_USERNAME }}
         password: ${{ secrets.HOSTINGER_PASSWORD }}
         local-dir: ./dist/
