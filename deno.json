@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "lib": ["deno.ns", "dom"],
+    "strict": true
+  },
+  "imports": {
+    "https://deno.land/std@0.225.0/": "https://deno.land/std@0.225.0/"
+  }
+}

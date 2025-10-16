@@ -82,28 +82,6 @@ export function ChannelSettingsModal({
 
           <Separator />
 
-          {/* Credenciais (apenas visualização) */}
-          <div className="space-y-4">
-            <Label className="text-sm font-medium">Credenciais</Label>
-            <div className="space-y-2">
-              {channel.credentials_json && Object.entries(channel.credentials_json).map(([key, value]) => (
-                <div key={key} className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground capitalize">
-                    {key.replace(/_/g, ' ')}:
-                  </span>
-                  <span className="text-sm font-mono bg-muted px-2 py-1 rounded text-xs">
-                    {typeof value === 'string' && value.length > 20 
-                      ? `${value.substring(0, 20)}...` 
-                      : String(value)
-                    }
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <Separator />
-
           {/* Ações */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">

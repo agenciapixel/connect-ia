@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Bot, Plus, Trash2, Edit, Loader2, Sparkles, MessageSquare, FileText, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { AIAgentTester } from "@/components/AIAgentTester";
 
 type AgentType = 'vendas' | 'suporte' | 'sdr' | 'atendimento' | 'outros';
 type AgentStatus = 'ativo' | 'inativo' | 'treinamento';
@@ -251,35 +252,65 @@ const AgentsIA = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-        <div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">
-            Agentes de IA
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Crie agentes especializados e utilize ferramentas de IA
-          </p>
+    <div className="flex flex-col h-full">
+      {/* Header com Breadcrumbs */}
+      <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="flex h-16 items-center px-6">
+          <div className="flex items-center space-x-2">
+            <Bot className="h-5 w-5 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">Sistema</span>
+            <span className="text-sm text-muted-foreground">/</span>
+            <span className="text-sm font-medium">Agentes de IA</span>
+          </div>
         </div>
+      </div>
 
-        <Tabs defaultValue="agents" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 max-w-md">
-            <TabsTrigger value="agents">Meus Agentes</TabsTrigger>
-            <TabsTrigger value="tools">Ferramentas IA</TabsTrigger>
-          </TabsList>
+      {/* Conteúdo Principal */}
+      <div className="flex-1 overflow-auto">
+        <div className="container mx-auto p-6 space-y-6">
+          {/* Header da Página */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">Agentes de IA</h1>
+              <div className="flex items-center gap-2 mt-1">
+                <p className="text-muted-foreground">Crie agentes especializados e utilize ferramentas de IA</p>
+                <Badge variant="outline" className="text-xs">
+                  <div className="w-2 h-2 bg-purple-500 rounded-full mr-2 animate-pulse"></div>
+                  IA Ativa
+                </Badge>
+              </div>
+            </div>
+          </div>
 
-          <TabsContent value="agents" className="space-y-6 mt-6">
-            <div className="flex justify-end">
-              <Dialog open={createDialogOpen} onOpenChange={(open) => {
-                setCreateDialogOpen(open);
-                if (!open) resetForm();
-              }}>
-                <DialogTrigger asChild>
-                  <Button className="bg-gradient-to-r from-primary to-purple-500">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Criar Agente
-                  </Button>
-                </DialogTrigger>
+          {/* Tabs de Navegação */}
+          <Tabs defaultValue="agents" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-3 max-w-2xl">
+              <TabsTrigger value="agents">
+                <Bot className="h-4 w-4 mr-2" />
+                Meus Agentes
+              </TabsTrigger>
+              <TabsTrigger value="test">
+                <Sparkles className="h-4 w-4 mr-2" />
+                Testar Agentes
+              </TabsTrigger>
+              <TabsTrigger value="tools">
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Ferramentas IA
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="agents" className="space-y-6">
+              <div className="flex justify-end">
+                <Dialog open={createDialogOpen} onOpenChange={(open) => {
+                  setCreateDialogOpen(open);
+                  if (!open) resetForm();
+                }}>
+                  <DialogTrigger asChild>
+                    <Button className="bg-gradient-to-r from-primary to-purple-500">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Criar Agente
+                    </Button>
+                  </DialogTrigger>
                 <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>{editingAgent ? "Editar Agente" : "Criar Novo Agente"}</DialogTitle>
@@ -332,38 +363,56 @@ const AgentsIA = () => {
               </Dialog>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total de Agentes</CardTitle>
-                  <Bot className="h-4 w-4 text-primary" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{agents.length}</div>
-                  <p className="text-xs text-muted-foreground">{agents.filter(a => a.status === 'ativo').length} ativos</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Agentes Ativos</CardTitle>
-                  <Bot className="h-4 w-4 text-green-500" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{agents.filter(a => a.status === 'ativo').length}</div>
-                  <p className="text-xs text-muted-foreground">Prontos para atender</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Modelo IA</CardTitle>
-                  <Bot className="h-4 w-4 text-purple-500" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">Gemini 2.5</div>
-                  <p className="text-xs text-muted-foreground">Google Flash</p>
-                </CardContent>
-              </Card>
-            </div>
+          {/* Métricas principais */}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <Card className="relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-lg group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/5 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform" />
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Total de Agentes</CardTitle>
+                <div className="h-10 w-10 rounded-full bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
+                  <Bot className="h-5 w-5 text-blue-600" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold tracking-tight">{agents.length}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {agents.filter(a => a.status === 'ativo').length} ativos
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-lg group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-500/5 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform" />
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Agentes Ativos</CardTitle>
+                <div className="h-10 w-10 rounded-full bg-green-500/10 flex items-center justify-center group-hover:bg-green-500/20 transition-colors">
+                  <Bot className="h-5 w-5 text-green-600" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold tracking-tight">{agents.filter(a => a.status === 'ativo').length}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Prontos para atender
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-lg group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-500/5 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform" />
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Modelo IA</CardTitle>
+                <div className="h-10 w-10 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
+                  <Sparkles className="h-5 w-5 text-purple-600" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold tracking-tight">Gemini 2.5</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Google Flash
+                </p>
+              </CardContent>
+            </Card>
+          </div>
 
             {agents.length === 0 ? (
               <Card className="p-12 text-center">
@@ -377,7 +426,7 @@ const AgentsIA = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {agents.map((agent) => (
-                  <Card key={agent.id} className="group hover:border-primary/50 transition-all">
+                  <Card key={agent.id} className="border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-lg group">
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
@@ -410,38 +459,62 @@ const AgentsIA = () => {
             )}
           </TabsContent>
 
-          <TabsContent value="tools" className="space-y-6 mt-6">
-            <div className="grid gap-6 md:grid-cols-3">
-              <Card className="cursor-pointer hover:border-primary/50" onClick={() => setMessageDialogOpen(true)}>
-                <CardHeader>
-                  <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mb-4">
-                    <MessageSquare className="h-6 w-6 text-white" />
-                  </div>
-                  <CardTitle><Sparkles className="h-5 w-5 inline mr-2" />Gerar Mensagem</CardTitle>
-                  <CardDescription>Mensagens persuasivas com IA</CardDescription>
-                </CardHeader>
-              </Card>
+          <TabsContent value="test" className="space-y-6 mt-6">
+            <AIAgentTester />
+          </TabsContent>
 
-              <Card className="cursor-pointer hover:border-primary/50" onClick={() => setSummarizeDialogOpen(true)}>
+            <TabsContent value="tools" className="space-y-6">
+              <Card className="border-2 hover:border-primary/30 transition-all shadow-lg">
                 <CardHeader>
-                  <div className="h-12 w-12 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mb-4">
-                    <FileText className="h-6 w-6 text-white" />
-                  </div>
-                  <CardTitle><Sparkles className="h-5 w-5 inline mr-2" />Resumir</CardTitle>
-                  <CardDescription>Resumos inteligentes</CardDescription>
+                  <CardTitle className="flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-primary" />
+                    Ferramentas de IA
+                  </CardTitle>
+                  <CardDescription>Utilize ferramentas inteligentes para otimizar seu trabalho</CardDescription>
                 </CardHeader>
-              </Card>
+                <CardContent>
+                  <div className="grid gap-6 md:grid-cols-3">
+                    <Card className="cursor-pointer hover:border-primary/50 transition-all duration-300 hover:shadow-lg group" onClick={() => setMessageDialogOpen(true)}>
+                      <CardHeader>
+                        <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                          <MessageSquare className="h-6 w-6 text-white" />
+                        </div>
+                        <CardTitle className="flex items-center gap-2">
+                          <Sparkles className="h-4 w-4 text-blue-600" />
+                          Gerar Mensagem
+                        </CardTitle>
+                        <CardDescription>Mensagens persuasivas com IA</CardDescription>
+                      </CardHeader>
+                    </Card>
 
-              <Card className="cursor-pointer hover:border-primary/50" onClick={() => setOptimizeDialogOpen(true)}>
-                <CardHeader>
-                  <div className="h-12 w-12 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center mb-4">
-                    <TrendingUp className="h-6 w-6 text-white" />
+                    <Card className="cursor-pointer hover:border-primary/50 transition-all duration-300 hover:shadow-lg group" onClick={() => setSummarizeDialogOpen(true)}>
+                      <CardHeader>
+                        <div className="h-12 w-12 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                          <FileText className="h-6 w-6 text-white" />
+                        </div>
+                        <CardTitle className="flex items-center gap-2">
+                          <Sparkles className="h-4 w-4 text-purple-600" />
+                          Resumir
+                        </CardTitle>
+                        <CardDescription>Resumos inteligentes</CardDescription>
+                      </CardHeader>
+                    </Card>
+
+                    <Card className="cursor-pointer hover:border-primary/50 transition-all duration-300 hover:shadow-lg group" onClick={() => setOptimizeDialogOpen(true)}>
+                      <CardHeader>
+                        <div className="h-12 w-12 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                          <TrendingUp className="h-6 w-6 text-white" />
+                        </div>
+                        <CardTitle className="flex items-center gap-2">
+                          <Sparkles className="h-4 w-4 text-orange-600" />
+                          Otimizar
+                        </CardTitle>
+                        <CardDescription>Melhore campanhas</CardDescription>
+                      </CardHeader>
+                    </Card>
                   </div>
-                  <CardTitle><Sparkles className="h-5 w-5 inline mr-2" />Otimizar</CardTitle>
-                  <CardDescription>Melhore campanhas</CardDescription>
-                </CardHeader>
+                </CardContent>
               </Card>
-            </div>
 
             <Dialog open={messageDialogOpen} onOpenChange={setMessageDialogOpen}>
               <DialogContent className="max-w-2xl">
@@ -548,8 +621,9 @@ const AgentsIA = () => {
                 </div>
               </DialogContent>
             </Dialog>
-          </TabsContent>
-        </Tabs>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     </div>
   );

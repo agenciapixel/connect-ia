@@ -1,0 +1,61 @@
+name: Deploy Connect IA to Hostinger
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Run linter
+      run: npm run lint
+      continue-on-error: true
+      
+    - name: Build project
+      run: npm run build
+      
+    - name: Deploy to Hostinger
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ftp.connectia.agenciapixel.digital
+        username: ${{ secrets.HOSTINGER_USERNAME }}
+        password: ${{ secrets.HOSTINGER_PASSWORD }}
+        local-dir: ./dist/
+        server-dir: /public_html/
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/node_modules/**
+          **/.env*
+          **/README.md
+          **/.github/**
+          
+    - name: Notify deployment success
+      if: success()
+      run: |
+        echo "✅ Deploy concluído com sucesso!"
+        echo "🌐 Site: https://connectia.agenciapixel.digital"
+        echo "📱 Teste no mobile: https://connectia.agenciapixel.digital"
+        
+    - name: Notify deployment failure
+      if: failure()
+      run: |
+        echo "❌ Deploy falhou!"
+        echo "Verifique os logs acima para mais detalhes."

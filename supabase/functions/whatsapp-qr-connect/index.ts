@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+const EVOLUTION_API_URL = Deno.env.get('EVOLUTION_API_URL')!;
+const EVOLUTION_API_KEY = Deno.env.get('EVOLUTION_API_KEY')!;
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -34,12 +36,15 @@ serve(async (req) => {
       case 'save_manual':
         return await saveManualConnection(credentials, orgId, name, supabase);
 
+      case 'save_qr_connection':
+        return await saveQRConnection(credentials, orgId, name, sessionId, supabase);
+
       case 'disconnect':
         return await disconnectSession(sessionId, supabase);
 
       default:
         return new Response(JSON.stringify({
-          error: 'Ação inválida. Use: save_manual, disconnect'
+          error: 'Ação inválida. Use: save_manual, save_qr_connection, disconnect'
         }), {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -57,6 +62,73 @@ serve(async (req) => {
     });
   }
 });
+
+async function saveQRConnection(credentials: any, orgId: string, name: string, sessionId: string, supabase: any) {
+  try {
+    // 1. Criar instância no Evolution API
+    const createResponse = await fetch(`${EVOLUTION_API_URL}/instance/create`, {
+      method: 'POST',
+      headers: {
+        'apikey': EVOLUTION_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        instanceName: sessionId,
+        qrcode: true
+      })
+    });
+
+    if (!createResponse.ok) {
+      throw new Error('Erro ao criar instância');
+    }
+
+    // 2. Conectar e pegar QR Code
+    const connectResponse = await fetch(`${EVOLUTION_API_URL}/instance/connect/${sessionId}`, {
+      method: 'GET',
+      headers: { 'apikey': EVOLUTION_API_KEY }
+    });
+
+    const qrData = await connectResponse.json();
+
+    // 3. Salvar no banco
+    const { data, error } = await supabase
+      .from('channel_accounts')
+      .insert({
+        org_id: orgId,
+        channel_type: 'whatsapp',
+        name: name,
+        credentials: {
+          session_id: sessionId,
+          connection_type: 'evolution_api'
+        },
+        status: 'pending',
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    // 4. Retornar QR Code REAL
+    return new Response(JSON.stringify({
+      success: true,
+      qrCode: qrData.base64,    // Imagem do QR Code
+      qrCodeText: qrData.code    // Texto do QR Code
+    }), {
+      status: 200,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+
+  } catch (error) {
+    console.error('Error:', error);
+    return new Response(JSON.stringify({
+      error: 'Erro ao gerar QR Code',
+      details: error instanceof Error ? error.message : 'Erro desconhecido'
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+}
 
 async function saveManualConnection(credentials: any, orgId: string, name: string, supabase: any) {
   try {

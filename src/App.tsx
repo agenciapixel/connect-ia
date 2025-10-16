@@ -1,15 +1,19 @@
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppLayout } from "./components/Layout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { PermissionGuard } from "./components/PermissionGuard";
+import { SmartRoute } from "./components/SmartRoute";
+import { OrganizationProvider } from "./contexts/OrganizationContext";
 import Dashboard from "./pages/Dashboard";
 import Inbox from "./pages/Inbox";
 import Contacts from "./pages/Contacts";
 import Campaigns from "./pages/Campaigns";
 import Prospects from "./pages/Prospects";
+import Attendants from "./pages/Attendants";
+import CRM from "./pages/CRM";
 import Settings from "./pages/Settings";
 import AgentsIA from "./pages/AgentsIA";
 import Integrations from "./pages/Integrations";
@@ -29,12 +33,12 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <OrganizationProvider>
+          <Toaster />
+          <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <Routes>
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route
               path="/"
               element={
@@ -60,7 +64,9 @@ const App = () => {
               element={
                 <ProtectedRoute>
                   <AppLayout>
-                    <Contacts />
+                    <SmartRoute permission="canManageContacts">
+                      <Contacts />
+                    </SmartRoute>
                   </AppLayout>
                 </ProtectedRoute>
               }
@@ -70,7 +76,9 @@ const App = () => {
               element={
                 <ProtectedRoute>
                   <AppLayout>
-                    <Campaigns />
+                    <SmartRoute permission="canManageCampaigns">
+                      <Campaigns />
+                    </SmartRoute>
                   </AppLayout>
                 </ProtectedRoute>
               }
@@ -80,17 +88,45 @@ const App = () => {
               element={
                 <ProtectedRoute>
                   <AppLayout>
-                    <Prospects />
+                    <SmartRoute permission="canCreateProspects">
+                      <Prospects />
+                    </SmartRoute>
                   </AppLayout>
                 </ProtectedRoute>
               }
-          />
+            />
+        <Route
+          path="/attendants"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <SmartRoute permission="canManageAttendants">
+                  <Attendants />
+                </SmartRoute>
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/crm"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <SmartRoute permission="canManageCRM">
+                  <CRM />
+                </SmartRoute>
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
           <Route
             path="/settings"
             element={
               <ProtectedRoute>
                 <AppLayout>
-                  <Settings />
+                  <SmartRoute permission="canManageSettings">
+                    <Settings />
+                  </SmartRoute>
                 </AppLayout>
               </ProtectedRoute>
             }
@@ -100,7 +136,9 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <AppLayout>
-                  <AgentsIA />
+                  <SmartRoute permission="canManageAIAgents">
+                    <AgentsIA />
+                  </SmartRoute>
                 </AppLayout>
               </ProtectedRoute>
             }
@@ -110,7 +148,9 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <AppLayout>
-                  <Integrations />
+                  <SmartRoute permission="canManageIntegrations">
+                    <Integrations />
+                  </SmartRoute>
                 </AppLayout>
               </ProtectedRoute>
             }
@@ -118,6 +158,7 @@ const App = () => {
           <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
+        </OrganizationProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

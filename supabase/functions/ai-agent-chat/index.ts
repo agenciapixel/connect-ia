@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { agentId, message, conversationId } = await req.json();
+    const { agentId, message, conversationId, contactId } = await req.json();
 
     if (!agentId || !message) {
       throw new Error('agentId e message são obrigatórios');
@@ -43,7 +43,131 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY não configurada');
     }
 
-    // Chamar a API da Lovable AI
+    // ============================================
+    // BUSCAR HISTÓRICO DA CONVERSA (últimas 10 mensagens)
+    // ============================================
+    let conversationHistory: any[] = [];
+    let contactName = 'Cliente';
+
+    if (conversationId) {
+      // Buscar informações do contato
+      const { data: conversation } = await supabase
+        .from('conversations')
+        .select('contact_id, contacts(full_name, external_id)')
+        .eq('id', conversationId)
+        .single();
+
+      if (conversation?.contacts) {
+        contactName = conversation.contacts.full_name ||
+                     `Cliente ${conversation.contacts.external_id?.slice(-4)}` ||
+                     'Cliente';
+      }
+
+      // Buscar últimas mensagens da conversa
+      const { data: messages, error: messagesError } = await supabase
+        .from('messages')
+        .select('content, direction, sender_type, created_at')
+        .eq('conversation_id', conversationId)
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      if (!messagesError && messages && messages.length > 0) {
+        // Inverter para ordem cronológica
+        conversationHistory = messages.reverse();
+        console.log(`📚 Histórico carregado: ${conversationHistory.length} mensagens`);
+      }
+    } else if (contactId) {
+      // Se não tem conversationId mas tem contactId, buscar informações do contato
+      const { data: contact } = await supabase
+        .from('contacts')
+        .select('full_name, external_id')
+        .eq('id', contactId)
+        .single();
+
+      if (contact) {
+        contactName = contact.full_name ||
+                     `Cliente ${contact.external_id?.slice(-4)}` ||
+                     'Cliente';
+      }
+    }
+
+    // ============================================
+    // CONSTRUIR CONTEXTO DA CONVERSA
+    // ============================================
+    let contextPrompt = '';
+
+    if (conversationHistory.length > 0) {
+      contextPrompt = '\n\n📋 HISTÓRICO DA CONVERSA:\n';
+      conversationHistory.forEach((msg, index) => {
+        const role = msg.direction === 'inbound' ? contactName : 'Você';
+        const time = new Date(msg.created_at).toLocaleTimeString('pt-BR', {
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        contextPrompt += `[${time}] ${role}: ${msg.content}\n`;
+      });
+      contextPrompt += '\n---\n';
+    }
+
+    // ============================================
+    // PROMPT MELHORADO COM DIRETRIZES ADICIONAIS
+    // ============================================
+    const enhancedSystemPrompt = `${agent.system_prompt}
+
+${contextPrompt}
+
+⚠️ DIRETRIZES IMPORTANTES DE RESPOSTA:
+
+1. SEJA CONCISO:
+   - Mantenha respostas entre 2-4 parágrafos CURTOS
+   - Máximo de 150-200 palavras por resposta
+   - Use frases curtas e diretas
+   - Evite repetições desnecessárias
+
+2. CONSIDERE O HISTÓRICO:
+   - Leia TODA a conversa acima antes de responder
+   - Não repita informações já ditas
+   - Faça referência a mensagens anteriores quando relevante
+   - Mantenha consistência com respostas anteriores
+
+3. FORMATAÇÃO:
+   - Use quebras de linha para facilitar leitura
+   - Não use listas muito longas (máximo 3-5 itens)
+   - Evite explicações muito técnicas ou verbosas
+   - Prefira perguntas diretas a múltiplas opções
+
+4. TOM:
+   - Seja natural e conversacional (como WhatsApp)
+   - Evite ser muito formal ou robótico
+   - Use emojis com moderação (1-2 por mensagem)
+   - Fale diretamente com o cliente pelo nome quando apropriado
+
+5. CONTEXTO:
+   - Nome do cliente: ${contactName}
+   - Esta é uma conversa ${conversationHistory.length > 0 ? 'em andamento' : 'nova'}
+   ${conversationHistory.length > 0 ? `- Já foram trocadas ${conversationHistory.length} mensagens` : ''}
+
+Responda AGORA à última mensagem do cliente de forma CONCISA e DIRETA:`;
+
+    // ============================================
+    // CONSTRUIR ARRAY DE MENSAGENS PARA A IA
+    // ============================================
+    const messages = [
+      { role: 'system', content: enhancedSystemPrompt },
+      { role: 'user', content: message }
+    ];
+
+    console.log('🤖 Chamando IA com contexto:', {
+      agentName: agent.name,
+      agentType: agent.type,
+      historyMessages: conversationHistory.length,
+      contactName: contactName,
+      messageLength: message.length
+    });
+
+    // ============================================
+    // CHAMAR A API DA LOVABLE AI
+    // ============================================
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -52,12 +176,9 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: agent.model,
-        messages: [
-          { role: 'system', content: agent.system_prompt },
-          { role: 'user', content: message }
-        ],
+        messages: messages,
         temperature: agent.temperature,
-        max_tokens: agent.max_tokens,
+        max_tokens: Math.min(agent.max_tokens, 500), // Limitar para respostas mais curtas
       }),
     });
 
@@ -68,31 +189,55 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    const aiResponse = data.choices[0].message.content;
+    let aiResponse = data.choices[0].message.content;
 
-    // Registrar a conversa se conversationId foi fornecido
+    // ============================================
+    // PÓS-PROCESSAMENTO DA RESPOSTA
+    // ============================================
+
+    // Remover excesso de quebras de linha
+    aiResponse = aiResponse.replace(/\n{3,}/g, '\n\n');
+
+    // Limitar tamanho se ainda estiver muito longa (aproximadamente 250 palavras)
+    const words = aiResponse.split(/\s+/);
+    if (words.length > 250) {
+      aiResponse = words.slice(0, 250).join(' ') + '...';
+      console.log('⚠️ Resposta truncada por exceder limite de palavras');
+    }
+
+    console.log('✅ Resposta gerada:', {
+      length: aiResponse.length,
+      words: aiResponse.split(/\s+/).length
+    });
+
+    // ============================================
+    // REGISTRAR A CONVERSA
+    // ============================================
     if (conversationId) {
       await supabase.from('agent_conversations').upsert({
         id: conversationId,
         agent_id: agentId,
         status: 'active',
+        updated_at: new Date().toISOString()
       });
     }
 
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         response: aiResponse,
         agentName: agent.name,
-        agentType: agent.type 
-      }), 
+        agentType: agent.type,
+        contextUsed: conversationHistory.length > 0,
+        historyMessages: conversationHistory.length
+      }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
   } catch (error: any) {
-    console.error('Error in ai-agent-chat:', error);
+    console.error('❌ Error in ai-agent-chat:', error);
     return new Response(
-      JSON.stringify({ error: error.message || 'Erro ao processar mensagem' }), 
+      JSON.stringify({ error: error.message || 'Erro ao processar mensagem' }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

@@ -26,11 +26,49 @@ serve(async (req) => {
 
     console.log('Supabase client created');
 
-    // Insert channel into database
     // Sempre usar UUID fixo para evitar problemas de foreign key
     const orgIdToUse = '00000000-0000-0000-0000-000000000000';
     
     console.log('Usando org_id fixo:', orgIdToUse);
+
+    // Verificar se a organização existe, se não existir, criar
+    console.log('Verificando se a organização existe...');
+    const { data: existingOrg, error: checkError } = await supabase
+      .from('organizations')
+      .select('*')
+      .eq('id', orgIdToUse)
+      .single();
+
+    if (checkError && checkError.code !== 'PGRST116') { // PGRST116 = not found
+      console.error('Erro ao verificar organização:', checkError);
+      throw checkError;
+    }
+
+    if (!existingOrg) {
+      console.log('Organização não existe, criando...');
+      const { data: newOrg, error: createError } = await supabase
+        .from('organizations')
+        .insert({
+          id: orgIdToUse,
+          name: 'Organização de Teste',
+          description: 'Organização para testes e desenvolvimento',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (createError) {
+        console.error('Erro ao criar organização:', createError);
+        throw createError;
+      }
+
+      console.log('Organização criada com sucesso:', newOrg);
+    } else {
+      console.log('Organização já existe:', existingOrg);
+    }
+
+    // Insert channel into database
     
     const { data, error } = await supabase
       .from('channel_accounts')
