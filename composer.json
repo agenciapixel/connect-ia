@@ -5,6 +5,7 @@
     "post-install-cmd": [
       "npm install",
       "npm run build",
+      "mkdir -p public_html",
       "cp -r dist/* public_html/",
       "cp public/.htaccess public_html/"
     ]

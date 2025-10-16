@@ -9,8 +9,8 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "postinstall": "npm run build && cp -r dist/* public_html/ && cp public/.htaccess public_html/",
-    "deploy": "npm run build && cp -r dist/* public_html/ && cp public/.htaccess public_html/"
+    "postinstall": "npm run build && mkdir -p public_html && cp -r dist/* public_html/ && cp public/.htaccess public_html/",
+    "deploy": "npm run build && mkdir -p public_html && cp -r dist/* public_html/ && cp public/.htaccess public_html/"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
