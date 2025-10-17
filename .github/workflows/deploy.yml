@@ -27,21 +27,32 @@ jobs:
     - name: Build project
       run: npm run build
       
+    - name: Copy dist files to root for Hostinger Git Deploy
+      run: |
+        echo "📁 Copiando arquivos da pasta dist/ para a raiz..."
+        cp -r dist/* . || echo "⚠️ Erro ao copiar arquivos"
+        ls -la
+        echo "✅ Arquivos copiados para a raiz"
+        
     - name: Commit built files locally
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add dist/
-        git commit -m "Build: Add compiled files to repository" || exit 0
-        echo "✅ Arquivos compilados commitados localmente"
+        git add .
+        git commit -m "Build: Deploy compiled files to root for Hostinger Git Deploy" || exit 0
+        echo "✅ Arquivos compilados commitados na raiz"
         
     - name: Notify build completion
       run: |
         echo "✅ Build concluído!"
-        echo "📁 Arquivos compilados commitados localmente"
+        echo "📁 Arquivos compilados copiados para a raiz"
         echo "⚠️  Push manual necessário para atualizar repositório"
         echo "📋 Próximos passos:"
         echo "   1. Fazer pull do repositório local"
         echo "   2. Fazer push para atualizar GitHub"
         echo "   3. Git Deploy da Hostinger fará deploy automático"
+        echo "   4. Arquivos estarão disponíveis em:"
+        echo "      - https://connectia.agenciapixel.digital/assets/index-AY6h670N.js"
+        echo "      - https://connectia.agenciapixel.digital/assets/index-BE4tGbRk.css"
+        echo "      - https://connectia.agenciapixel.digital/favicon.ico"
         echo "🌐 Site: https://connectia.agenciapixel.digital"
