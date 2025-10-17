@@ -24,16 +24,17 @@ import { UserRoleBadge } from "./UserRoleBadge";
 
     const menuItems = [
       { title: "Dashboard", url: "/", icon: Home, permission: "canViewReports" as const },
-      { title: "Inbox", url: "/inbox", icon: MessageSquare, permission: "canAccessInbox" as const },
-      { title: "Contatos", url: "/contacts", icon: Users, permission: "canManageContacts" as const },
-      { title: "Campanhas", url: "/campaigns", icon: Megaphone, permission: "canManageCampaigns" as const },
-      { title: "Prospecção", url: "/prospects", icon: MapPin, permission: "canCreateProspects" as const },
+      { title: "Painel", url: "/painel", icon: Home, permission: "canViewReports" as const },
+      { title: "Caixa de Entrada", url: "/caixa-entrada", icon: MessageSquare, permission: "canAccessInbox" as const },
+      { title: "Contatos", url: "/contatos", icon: Users, permission: "canManageContacts" as const },
+      { title: "Campanhas", url: "/campanhas", icon: Megaphone, permission: "canManageCampaigns" as const },
+      { title: "Prospecção", url: "/prospeccao", icon: MapPin, permission: "canCreateProspects" as const },
       { title: "CRM", url: "/crm", icon: TrendingUp, permission: "canManageCRM" as const },
-      { title: "Atendentes", url: "/attendants", icon: UserCheck, permission: "canManageAttendants" as const },
-      { title: "Agentes IA", url: "/agents", icon: Bot, permission: "canManageAIAgents" as const },
-      { title: "Integrações", url: "/integrations", icon: Plug, permission: "canManageIntegrations" as const },
-      { title: "Planos", url: "/pricing", icon: CreditCard, permission: "canViewReports" as const },
-      { title: "Configurações", url: "/settings", icon: Settings, permission: "canManageSettings" as const },
+      { title: "Atendentes", url: "/atendentes", icon: UserCheck, permission: "canManageAttendants" as const },
+      { title: "Agentes IA", url: "/agentes-ia", icon: Bot, permission: "canManageAIAgents" as const },
+      { title: "Integrações", url: "/integracoes", icon: Plug, permission: "canManageIntegrations" as const },
+      { title: "Planos", url: "/planos", icon: CreditCard, permission: "canViewReports" as const },
+      { title: "Configurações", url: "/configuracoes", icon: Settings, permission: "canManageSettings" as const },
     ];
 
 export function AppSidebar() {

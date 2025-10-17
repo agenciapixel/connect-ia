@@ -193,7 +193,7 @@ export function usePlanMiddleware() {
         label: 'Fazer Upgrade',
         onClick: () => {
           // Navegar para página de planos
-          window.location.href = '/pricing';
+          window.location.href = '/planos';
         }
       }
     });

@@ -38,9 +38,9 @@ const App = () => {
           <Toaster />
           <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <Routes>
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/autenticacao" element={<Auth />} />
+              <Route path="/politica-privacidade" element={<PrivacyPolicy />} />
+              <Route path="/planos" element={<Pricing />} />
             <Route
               path="/"
               element={
@@ -52,7 +52,17 @@ const App = () => {
               }
             />
             <Route
-              path="/inbox"
+              path="/painel"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <Dashboard />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/caixa-entrada"
               element={
                 <ProtectedRoute>
                   <AppLayout>
@@ -62,7 +72,7 @@ const App = () => {
               }
             />
             <Route
-              path="/contacts"
+              path="/contatos"
               element={
                 <ProtectedRoute>
                   <AppLayout>
@@ -74,7 +84,7 @@ const App = () => {
               }
             />
             <Route
-              path="/campaigns"
+              path="/campanhas"
               element={
                 <ProtectedRoute>
                   <AppLayout>
@@ -86,7 +96,7 @@ const App = () => {
               }
             />
             <Route
-              path="/prospects"
+              path="/prospeccao"
               element={
                 <ProtectedRoute>
                   <AppLayout>
@@ -98,7 +108,7 @@ const App = () => {
               }
             />
         <Route
-          path="/attendants"
+          path="/atendentes"
           element={
             <ProtectedRoute>
               <AppLayout>
@@ -122,7 +132,7 @@ const App = () => {
           }
         />
           <Route
-            path="/settings"
+            path="/configuracoes"
             element={
               <ProtectedRoute>
                 <AppLayout>
@@ -134,7 +144,7 @@ const App = () => {
             }
           />
           <Route
-            path="/agents"
+            path="/agentes-ia"
             element={
               <ProtectedRoute>
                 <AppLayout>
@@ -146,7 +156,7 @@ const App = () => {
             }
           />
           <Route
-            path="/integrations"
+            path="/integracoes"
             element={
               <ProtectedRoute>
                 <AppLayout>
