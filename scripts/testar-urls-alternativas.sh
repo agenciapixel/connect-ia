@@ -1,0 +1,102 @@
+#!/bin/bash
+
+echo "🔗 TESTE URLs ALTERNATIVAS - EXCLUSÃO DE DADOS"
+echo "=============================================="
+echo ""
+
+# Cores
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+echo -e "${RED}⚠️  PROBLEMA: URL principal retornando 404${NC}"
+echo -e "${BLUE}Solução: URLs alternativas criadas${NC}"
+echo ""
+
+echo -e "${GREEN}🔗 URLs ALTERNATIVAS PARA TESTAR:${NC}"
+echo ""
+echo "1. URL Simplificada:"
+echo "   https://connectia.agenciapixel.digital/data-deletion-simple.html"
+echo ""
+echo "2. URL Mínima:"
+echo "   https://connectia.agenciapixel.digital/delete-data.html"
+echo ""
+echo "3. URL Original (quando funcionar):"
+echo "   https://connectia.agenciapixel.digital/data-deletion"
+echo ""
+
+echo -e "${YELLOW}⏳ AGUARDANDO DEPLOY AUTOMÁTICO...${NC}"
+echo ""
+echo "Deploy iniciado em: $(date)"
+echo "Aguardar 2-3 minutos para arquivos serem deployados"
+echo ""
+
+echo -e "${BLUE}🧪 COMANDOS PARA TESTAR:${NC}"
+echo ""
+echo -e "${YELLOW}# Teste URL Simplificada:${NC}"
+echo "curl -I https://connectia.agenciapixel.digital/data-deletion-simple.html"
+echo ""
+echo -e "${YELLOW}# Teste URL Mínima:${NC}"
+echo "curl -I https://connectia.agenciapixel.digital/delete-data.html"
+echo ""
+echo -e "${YELLOW}# Teste URL Original:${NC}"
+echo "curl -I https://connectia.agenciapixel.digital/data-deletion"
+echo ""
+
+echo -e "${GREEN}✅ RESULTADO ESPERADO:${NC}"
+echo ""
+echo "Todas as URLs devem retornar:"
+echo "• Status: 200 OK"
+echo "• Content-Type: text/html"
+echo "• Página carrega no navegador"
+echo ""
+
+echo -e "${BLUE}📋 PARA META FOR DEVELOPERS:${NC}"
+echo ""
+echo -e "${GREEN}RECOMENDADO - URL Simplificada:${NC}"
+echo "https://connectia.agenciapixel.digital/data-deletion-simple.html"
+echo ""
+echo -e "${GREEN}ALTERNATIVA - URL Mínima:${NC}"
+echo "https://connectia.agenciapixel.digital/delete-data.html"
+echo ""
+
+echo -e "${YELLOW}⚠️  IMPORTANTE:${NC}"
+echo ""
+echo "• Aguardar deploy automático (2-3 minutos)"
+echo "• Testar URL no navegador antes de configurar"
+echo "• Meta aceita URLs com extensão .html"
+echo "• Mais importante é que a página carregue"
+echo ""
+
+echo -e "${BLUE}🎯 CONTEÚDO DAS PÁGINAS:${NC}"
+echo ""
+echo -e "${GREEN}data-deletion-simple.html:${NC}"
+echo "• ✅ Instruções claras de exclusão"
+echo "• ✅ Email de contato"
+echo "• ✅ Cronograma do processo"
+echo "• ✅ Lista de dados excluídos"
+echo "• ✅ Conformidade com LGPD e Meta"
+echo ""
+echo -e "${GREEN}delete-data.html:${NC}"
+echo "• ✅ Versão minimalista"
+echo "• ✅ Instruções essenciais"
+echo "• ✅ Email de contato"
+echo "• ✅ Conformidade básica"
+echo "• ✅ Carregamento rápido"
+echo ""
+
+echo -e "${GREEN}🎉 SOLUÇÃO CRIADA!${NC}"
+echo ""
+echo -e "${BLUE}📋 PRÓXIMOS PASSOS:${NC}"
+echo "1. Aguardar deploy automático (2-3 min)"
+echo "2. Testar URLs no navegador"
+echo "3. Escolher URL que funcionar"
+echo "4. Configurar no Meta for Developers"
+echo "5. Aguardar aprovação do Meta"
+echo ""
+
+echo -e "${YELLOW}🌐 TESTAR AGORA:${NC}"
+echo "Acesse no navegador:"
+echo "https://connectia.agenciapixel.digital/data-deletion-simple.html"
