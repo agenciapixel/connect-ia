@@ -1,4 +1,4 @@
-import { Home, MessageSquare, Users, Megaphone, MapPin, Settings, Bot, LogOut, Plug, UserCheck, TrendingUp, CreditCard } from "lucide-react";
+import { Home, MessageSquare, Users, Megaphone, MapPin, Settings, Bot, LogOut, Plug, UserCheck, TrendingUp, CreditCard, Shield } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
   Sidebar,
@@ -34,6 +34,7 @@ import { UserRoleBadge } from "./UserRoleBadge";
       { title: "Agentes IA", url: "/agentes-ia", icon: Bot, permission: "canManageAIAgents" as const },
       { title: "Integrações", url: "/integracoes", icon: Plug, permission: "canManageIntegrations" as const },
       { title: "Planos", url: "/planos", icon: CreditCard, permission: "canViewReports" as const },
+      { title: "Usuários Autorizados", url: "/usuarios-autorizados", icon: Shield, permission: "canManageSettings" as const },
       { title: "Configurações", url: "/configuracoes", icon: Settings, permission: "canManageSettings" as const },
     ];
 

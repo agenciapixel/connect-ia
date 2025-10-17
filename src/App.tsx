@@ -20,6 +20,7 @@ import Integrations from "./pages/Integrations";
 import Auth from "./pages/Auth";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Pricing from "./pages/Pricing";
+import AuthorizedUsers from "./pages/AuthorizedUsers";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -162,6 +163,18 @@ const App = () => {
                 <AppLayout>
                   <SmartRoute permission="canManageIntegrations">
                     <Integrations />
+                  </SmartRoute>
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/usuarios-autorizados"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <SmartRoute permission="canManageSettings">
+                    <AuthorizedUsers />
                   </SmartRoute>
                 </AppLayout>
               </ProtectedRoute>
