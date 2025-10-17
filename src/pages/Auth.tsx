@@ -42,32 +42,36 @@ export default function Auth() {
 
     try {
       const validated = authSchema.parse({ email, password, fullName });
-      const redirectUrl = `${window.location.origin}/`;
-
-      const { error } = await supabase.auth.signUp({
+      console.log('🔍 Tentando cadastrar usuário:', validated.email);
+      
+      const { data, error } = await supabase.auth.signUp({
         email: validated.email,
         password: validated.password,
         options: {
-          emailRedirectTo: redirectUrl,
           data: {
             full_name: validated.fullName,
           },
         },
       });
 
+      console.log('📊 Resposta do Supabase:', { data, error });
+
       if (error) {
+        console.error('❌ Erro no cadastro:', error);
         toast({
           title: "Erro no cadastro",
-          description: error.message,
+          description: `Erro: ${error.message}`,
           variant: "destructive",
         });
       } else {
+        console.log('✅ Cadastro realizado com sucesso!');
         toast({
           title: "Cadastro realizado!",
-          description: "Verifique seu email para confirmar a conta.",
+          description: "Usuário criado com sucesso. Você pode fazer login agora.",
         });
       }
     } catch (error) {
+      console.error('❌ Erro de validação:', error);
       if (error instanceof z.ZodError) {
         toast({
           title: "Dados inválidos",

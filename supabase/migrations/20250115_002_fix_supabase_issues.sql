@@ -31,22 +31,22 @@ DROP POLICY IF EXISTS "Users can insert availability in their org" ON public.att
 DROP POLICY IF EXISTS "Users can update availability in their org" ON public.attendant_availability;
 DROP POLICY IF EXISTS "Users can delete availability in their org" ON public.attendant_availability;
 
--- 6. Verificar e corrigir tabela orgs vs organizations
+-- 6. Verificar e corrigir tabela orgs
 -- Primeiro, vamos verificar se há dados duplicados
 DO $$
 BEGIN
-    -- Se organizations tem dados que não estão em orgs, migrar
-    IF EXISTS (SELECT 1 FROM public.organizations WHERE id NOT IN (SELECT id FROM public.orgs)) THEN
+    -- Verificar se a tabela orgs tem dados válidos
+    IF NOT EXISTS (SELECT 1 FROM public.orgs LIMIT 1) THEN
+        -- Se não há dados em orgs, criar um registro padrão
         INSERT INTO public.orgs (id, name, slug, description, created_at, updated_at)
-        SELECT 
-            id, 
-            name, 
-            LOWER(REPLACE(name, ' ', '-')) as slug,
-            COALESCE(description, '') as description,
-            COALESCE(created_at, NOW()) as created_at,
-            COALESCE(updated_at, NOW()) as updated_at
-        FROM public.organizations 
-        WHERE id NOT IN (SELECT id FROM public.orgs)
+        VALUES (
+            gen_random_uuid(),
+            'Organização Padrão',
+            'organizacao-padrao',
+            'Organização padrão do sistema',
+            NOW(),
+            NOW()
+        )
         ON CONFLICT (id) DO NOTHING;
     END IF;
 END $$;
@@ -175,11 +175,13 @@ ALTER TABLE public.plans ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.usage_tracking ENABLE ROW LEVEL SECURITY;
 
 -- 15. Criar políticas RLS para plans (todos podem ler)
-CREATE POLICY IF NOT EXISTS "Plans are viewable by everyone" ON public.plans
+DROP POLICY IF EXISTS "Plans are viewable by everyone" ON public.plans;
+CREATE POLICY "Plans are viewable by everyone" ON public.plans
     FOR SELECT USING (true);
 
 -- 16. Criar políticas RLS para usage_tracking
-CREATE POLICY IF NOT EXISTS "Users can view usage in their org" ON public.usage_tracking
+DROP POLICY IF EXISTS "Users can view usage in their org" ON public.usage_tracking;
+CREATE POLICY "Users can view usage in their org" ON public.usage_tracking
     FOR SELECT USING (
         EXISTS (
             SELECT 1 FROM public.members
@@ -188,7 +190,8 @@ CREATE POLICY IF NOT EXISTS "Users can view usage in their org" ON public.usage_
         )
     );
 
-CREATE POLICY IF NOT EXISTS "Users can insert usage in their org" ON public.usage_tracking
+DROP POLICY IF EXISTS "Users can insert usage in their org" ON public.usage_tracking;
+CREATE POLICY "Users can insert usage in their org" ON public.usage_tracking
     FOR INSERT WITH CHECK (
         EXISTS (
             SELECT 1 FROM public.members
@@ -197,14 +200,8 @@ CREATE POLICY IF NOT EXISTS "Users can insert usage in their org" ON public.usag
         )
     );
 
-CREATE POLICY IF NOT EXISTS "Users can update usage in their org" ON public.usage_tracking
-    FOR UPDATE USING (
-        EXISTS (
-            SELECT 1 FROM public.members
-            WHERE members.user_id = auth.uid()
-            AND members.org_id = usage_tracking.org_id
-        )
-    );
+-- Política de update será criada separadamente
+-- DROP POLICY IF EXISTS "Users can update usage in their org" ON public.usage_tracking;
 
 -- 17. Criar funções para planos
 CREATE OR REPLACE FUNCTION public.check_plan_limit(org_id UUID, metric_type TEXT, limit_value INTEGER)
@@ -260,7 +257,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-CREATE OR REPLACE FUNCTION public.is_trial_valid(org_id UUID)
+DROP FUNCTION IF EXISTS public.is_trial_valid(UUID);
+CREATE FUNCTION public.is_trial_valid(org_id UUID)
 RETURNS BOOLEAN AS $$
 DECLARE
     trial_end TIMESTAMPTZ;
@@ -286,7 +284,7 @@ DELETE FROM public.conversations WHERE org_id NOT IN (SELECT id FROM public.orgs
 DELETE FROM public.members WHERE org_id NOT IN (SELECT id FROM public.orgs);
 DELETE FROM public.contacts WHERE org_id NOT IN (SELECT id FROM public.orgs);
 DELETE FROM public.prospects WHERE org_id NOT IN (SELECT id FROM public.orgs);
-DELETE FROM public.campaigns WHERE org_id NOT IN (SELECT id FROM public.orgs);
+-- DELETE FROM public.campaigns WHERE org_id NOT IN (SELECT id FROM public.orgs);
 DELETE FROM public.attendants WHERE org_id NOT IN (SELECT id FROM public.orgs);
 DELETE FROM public.usage_tracking WHERE org_id NOT IN (SELECT id FROM public.orgs);
 
@@ -295,7 +293,7 @@ INSERT INTO public.orgs (id, name, slug, description, created_at, updated_at)
 VALUES (
     '00000000-0000-0000-0000-000000000000',
     'Organização Padrão',
-    'organizacao-padrao',
+    'organizacao-padrao-sistema',
     'Organização padrão do sistema',
     NOW(),
     NOW()
@@ -304,13 +302,12 @@ ON CONFLICT (id) DO NOTHING;
 
 -- 20. Atualizar estatísticas das tabelas
 ANALYZE public.orgs;
-ANALYZE public.organizations;
 ANALYZE public.members;
 ANALYZE public.contacts;
 ANALYZE public.conversations;
 ANALYZE public.messages;
 ANALYZE public.prospects;
-ANALYZE public.campaigns;
+-- ANALYZE public.campaigns;
 ANALYZE public.attendants;
 ANALYZE public.plans;
 ANALYZE public.usage_tracking;

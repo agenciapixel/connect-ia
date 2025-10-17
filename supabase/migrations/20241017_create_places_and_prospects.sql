@@ -1,3 +1,6 @@
+-- Criar enum para status de prospects
+CREATE TYPE prospect_status AS ENUM ('new', 'contacted', 'qualified', 'converted', 'lost');
+
 -- Criar tabela places para armazenar dados do Google Places
 CREATE TABLE IF NOT EXISTS public.places (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -23,7 +26,7 @@ CREATE TABLE IF NOT EXISTS public.places (
 -- Criar tabela prospects para armazenar prospects identificados
 CREATE TABLE IF NOT EXISTS public.prospects (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    org_id UUID NOT NULL REFERENCES public.organizations(id) ON DELETE CASCADE,
+    org_id UUID NOT NULL REFERENCES public.orgs(id) ON DELETE CASCADE,
     place_id UUID REFERENCES public.places(id) ON DELETE CASCADE,
     contact_id UUID REFERENCES public.contacts(id) ON DELETE CASCADE,
     status prospect_status DEFAULT 'new'::prospect_status,

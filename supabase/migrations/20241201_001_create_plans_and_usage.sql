@@ -1,21 +1,11 @@
 -- Migration: Criar sistema de planos e controle de uso
 -- Data: 2024-12-01
 
--- Criar tabela de planos
-CREATE TABLE IF NOT EXISTS public.plans (
-    id VARCHAR(20) PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    description TEXT,
-    price_monthly DECIMAL(10,2) NOT NULL,
-    price_yearly DECIMAL(10,2),
-    trial_days INTEGER DEFAULT 0,
-    limits JSONB NOT NULL,
-    features TEXT[] NOT NULL,
-    is_active BOOLEAN DEFAULT true,
-    is_popular BOOLEAN DEFAULT false,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+-- Tabela plans já foi criada na migração base
+-- Apenas adicionar coluna description se não existir
+ALTER TABLE public.plans ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE public.plans ADD COLUMN IF NOT EXISTS trial_days INTEGER DEFAULT 0;
+ALTER TABLE public.plans ADD COLUMN IF NOT EXISTS is_popular BOOLEAN DEFAULT false;
 
 -- Inserir planos com custos calculados
 INSERT INTO public.plans (id, name, description, price_monthly, price_yearly, trial_days, limits, features, is_active, is_popular) VALUES 

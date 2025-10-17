@@ -30,7 +30,10 @@ CREATE TABLE IF NOT EXISTS public.attendants (
     notifications JSONB DEFAULT '{}',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    created_by UUID REFERENCES auth.users(id)
+    created_by UUID REFERENCES auth.users(id),
+    
+    -- Garantir que um email seja único por organização
+    UNIQUE(org_id, email)
 );
 
 -- Create conversation_assignments table
@@ -410,53 +413,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Insert some sample attendants for testing
-INSERT INTO public.attendants (
-    org_id,
-    full_name,
-    email,
-    department,
-    position,
-    status,
-    max_concurrent_chats,
-    auto_accept,
-    skills,
-    specializations
-) VALUES (
-    '00000000-0000-0000-0000-000000000001',
-    'João Silva',
-    'joao@empresa.com',
-    'atendimento',
-    'Atendente Sênior',
-    'offline',
-    5,
-    true,
-    ARRAY['WhatsApp', 'Instagram', 'Vendas'],
-    ARRAY['Suporte Técnico', 'Vendas']
-), (
-    '00000000-0000-0000-0000-000000000001',
-    'Maria Santos',
-    'maria@empresa.com',
-    'vendas',
-    'Especialista em Vendas',
-    'offline',
-    3,
-    false,
-    ARRAY['Vendas', 'Negociação', 'CRM'],
-    ARRAY['Vendas B2B', 'Upselling']
-), (
-    '00000000-0000-0000-0000-000000000001',
-    'Pedro Costa',
-    'pedro@empresa.com',
-    'suporte',
-    'Analista de Suporte',
-    'offline',
-    8,
-    true,
-    ARRAY['Suporte Técnico', 'Troubleshooting', 'Documentação'],
-    ARRAY['Produtos', 'Integrações', 'API']
-)
-ON CONFLICT (email) DO NOTHING;
+-- Sample attendants will be created when needed
+-- INSERT INTO public.attendants (...) VALUES (...) ON CONFLICT (org_id, email) DO NOTHING;
 
 
 

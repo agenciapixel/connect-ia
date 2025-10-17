@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS public.members (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-    org_id UUID NOT NULL REFERENCES public.organizations(id) ON DELETE CASCADE,
+    org_id UUID NOT NULL REFERENCES public.orgs(id) ON DELETE CASCADE,
     role member_role DEFAULT 'member'::member_role,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),

@@ -1,7 +1,7 @@
 -- Migration para criar tabela channel_accounts
 CREATE TABLE IF NOT EXISTS public.channel_accounts (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    org_id UUID NOT NULL REFERENCES public.organizations(id) ON DELETE CASCADE,
+    org_id UUID NOT NULL REFERENCES public.orgs(id) ON DELETE CASCADE,
     channel_type TEXT NOT NULL,
     name TEXT NOT NULL,
     credentials_json JSONB,

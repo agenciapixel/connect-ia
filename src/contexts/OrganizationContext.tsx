@@ -27,11 +27,27 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
 
   const fetchOrganizations = async () => {
     try {
-      console.log('🔍 fetchOrganizations: Iniciando busca...');
+      // Verificação tripla para garantir que há usuário
       const { data: { user } } = await supabase.auth.getUser();
-
+      
       if (!user) {
-        console.warn('⚠️ fetchOrganizations: Nenhum usuário logado');
+        setOrganizations([]);
+        setCurrentOrg(null);
+        setIsLoading(false);
+        return;
+      }
+
+      // Verificação adicional da sessão
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        setOrganizations([]);
+        setCurrentOrg(null);
+        setIsLoading(false);
+        return;
+      }
+
+      // Verificação final - garantir que o usuário da sessão é o mesmo
+      if (session.user.id !== user.id) {
         setOrganizations([]);
         setCurrentOrg(null);
         setIsLoading(false);
@@ -117,16 +133,23 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    fetchOrganizations();
-
     // Listener para mudanças de autenticação
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_IN") {
-        fetchOrganizations();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === "SIGNED_IN" && session?.user) {
+        await fetchOrganizations();
       } else if (event === "SIGNED_OUT") {
         setOrganizations([]);
         setCurrentOrg(null);
         localStorage.removeItem("currentOrgId");
+        setIsLoading(false);
+      } else if (event === "INITIAL_SESSION") {
+        if (session?.user) {
+          await fetchOrganizations();
+        } else {
+          setOrganizations([]);
+          setCurrentOrg(null);
+          setIsLoading(false);
+        }
       }
     });
 

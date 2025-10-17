@@ -24,7 +24,7 @@ CREATE INDEX IF NOT EXISTS idx_messages_analyzed_at ON messages(analyzed_at) WHE
 CREATE TABLE IF NOT EXISTS ai_fallback_config (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   agent_id UUID REFERENCES ai_agents(id) ON DELETE CASCADE,
-  org_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
+  org_id UUID REFERENCES public.orgs(id) ON DELETE CASCADE,
 
   -- Configurações de gatilhos
   enabled BOOLEAN DEFAULT true,
@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS ai_fallback_logs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   conversation_id UUID REFERENCES conversations(id) ON DELETE CASCADE,
   agent_id UUID REFERENCES ai_agents(id) ON DELETE SET NULL,
-  org_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
+  org_id UUID REFERENCES public.orgs(id) ON DELETE CASCADE,
 
   -- Motivo do fallback
   trigger_type VARCHAR(50), -- 'negative_sentiment', 'keywords', 'consecutive_negative', 'manual'
