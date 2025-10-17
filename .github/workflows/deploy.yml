@@ -25,7 +25,15 @@ jobs:
       run: npm install
       
     - name: Build project
-      run: npm run build
+      run: |
+        echo "🔨 Fazendo build do sistema React..."
+        npm run build
+        echo "📁 Verificando arquivos gerados:"
+        ls -la dist/
+        echo "📄 Conteúdo do index.html:"
+        head -10 dist/index.html
+        echo "📄 Conteúdo do JavaScript:"
+        head -5 dist/assets/*.js || echo "Nenhum arquivo JS encontrado"
       
     - name: Copy dist files to root for Hostinger Git Deploy
       run: |
