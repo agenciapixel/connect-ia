@@ -19,6 +19,7 @@ import AgentsIA from "./pages/AgentsIA";
 import Integrations from "./pages/Integrations";
 import Auth from "./pages/Auth";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Pricing from "./pages/Pricing";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -39,6 +40,7 @@ const App = () => {
             <Routes>
               <Route path="/auth" element={<Auth />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/pricing" element={<Pricing />} />
             <Route
               path="/"
               element={
