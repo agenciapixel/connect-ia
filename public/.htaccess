@@ -26,9 +26,16 @@ RewriteEngine On
     </FilesMatch>
 </IfModule>
 
-# Handle Angular and React Router
+# Allow access to HTML files without extension
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} ^/(privacy-policy|terms|data-deletion)/?$
+RewriteRule ^(.*)$ /$1.html [L]
+
+# Handle Angular and React Router (but allow direct access to HTML files)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !\.html$
 RewriteRule . /index.html [L]
 
 # Security headers
