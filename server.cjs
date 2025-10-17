@@ -5,6 +5,18 @@ const path = require('path');
 const port = 8080;
 const distPath = path.join(__dirname, 'dist');
 
+// Sistema de monitoramento
+const monitoring = {
+  startTime: new Date(),
+  requestCount: 0,
+  errorCount: 0,
+  uptime: () => Date.now() - monitoring.startTime.getTime(),
+  log: (message, type = 'INFO') => {
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] ${type}: ${message}`);
+  }
+};
+
 // MIME types
 const mimeTypes = {
   '.html': 'text/html',
@@ -23,6 +35,42 @@ const mimeTypes = {
 };
 
 const server = http.createServer((req, res) => {
+  monitoring.requestCount++;
+  
+  // Endpoints de monitoramento
+  if (req.url === '/health') {
+    const healthData = {
+      status: 'OK',
+      uptime: monitoring.uptime(),
+      timestamp: new Date().toISOString(),
+      requestCount: monitoring.requestCount,
+      errorCount: monitoring.errorCount,
+      version: '1.0.0'
+    };
+    
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(healthData, null, 2));
+    monitoring.log(`Health check accessed - Uptime: ${Math.floor(monitoring.uptime() / 1000)}s`);
+    return;
+  }
+  
+  if (req.url === '/status') {
+    const statusData = {
+      server: 'Connect IA',
+      status: 'running',
+      uptime: Math.floor(monitoring.uptime() / 1000),
+      requests: monitoring.requestCount,
+      errors: monitoring.errorCount,
+      memory: process.memoryUsage(),
+      timestamp: new Date().toISOString()
+    };
+    
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(statusData, null, 2));
+    monitoring.log(`Status accessed - Requests: ${monitoring.requestCount}, Errors: ${monitoring.errorCount}`);
+    return;
+  }
+  
   let filePath = path.join(distPath, req.url === '/' ? '/index.html' : req.url);
   
   // Verificar se o arquivo existe
@@ -36,6 +84,8 @@ const server = http.createServer((req, res) => {
         filePath = path.join(distPath, 'index.html');
       } else {
         // Para arquivos com extensão que não existem, retornar 404
+        monitoring.errorCount++;
+        monitoring.log(`404 Error: ${req.url}`, 'ERROR');
         res.writeHead(404, { 'Content-Type': 'text/html' });
         res.end('<h1>404 - File Not Found</h1>');
         return;
@@ -45,6 +95,8 @@ const server = http.createServer((req, res) => {
     // Ler o arquivo
     fs.readFile(filePath, (err, data) => {
       if (err) {
+        monitoring.errorCount++;
+        monitoring.log(`File read error: ${filePath}`, 'ERROR');
         res.writeHead(404, { 'Content-Type': 'text/html' });
         res.end('<h1>404 - File Not Found</h1>');
         return;
@@ -65,12 +117,18 @@ const server = http.createServer((req, res) => {
       });
       
       res.end(data);
+      
+      // Log de sucesso para arquivos estáticos
+      if (ext && ext !== '.html') {
+        monitoring.log(`Served: ${req.url} (${data.length} bytes)`);
+      }
     });
   });
 });
 
 server.listen(port, () => {
-  console.log(`🚀 Servidor SPA rodando em http://localhost:${port}`);
-  console.log(`📁 Servindo arquivos de: ${distPath}`);
-  console.log(`🔄 Fallback para index.html em todas as rotas`);
+  monitoring.log(`🚀 Servidor SPA iniciado em http://localhost:${port}`);
+  monitoring.log(`📁 Servindo arquivos de: ${distPath}`);
+  monitoring.log(`🔄 Fallback para index.html em todas as rotas`);
+  monitoring.log(`📊 Endpoints de monitoramento: /health e /status`);
 });

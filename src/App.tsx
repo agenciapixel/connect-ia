@@ -21,6 +21,7 @@ import Auth from "./pages/Auth";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Pricing from "./pages/Pricing";
 import AuthorizedUsers from "./pages/AuthorizedUsers";
+import Monitoring from "./pages/Monitoring";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -175,6 +176,18 @@ const App = () => {
                 <AppLayout>
                   <SmartRoute permission="canManageSettings">
                     <AuthorizedUsers />
+                  </SmartRoute>
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/monitoramento"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <SmartRoute permission="canManageSettings">
+                    <Monitoring />
                   </SmartRoute>
                 </AppLayout>
               </ProtectedRoute>
