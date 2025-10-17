@@ -1,6 +1,21 @@
 # Apache configuration for React SPA - Hostinger Optimized
 RewriteEngine On
 
+# CRITICAL: Force correct MIME types for ES6 modules (Hostinger fix)
+<IfModule mod_mime.c>
+    # Override default MIME types
+    RemoveType .js
+    RemoveType .mjs
+    RemoveType .ts
+    RemoveType .tsx
+    
+    # Set correct MIME types
+    AddType application/javascript .js
+    AddType application/javascript .mjs
+    AddType application/javascript .ts
+    AddType application/javascript .tsx
+</IfModule>
+
 # Force MIME types for JavaScript and CSS (Hostinger specific)
 <IfModule mod_mime.c>
     AddType application/javascript .js

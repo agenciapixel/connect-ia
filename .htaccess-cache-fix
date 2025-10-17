@@ -1,0 +1,49 @@
+# Cache busting and MIME type fix for Hostinger
+# This file should be renamed to .htaccess if the main one doesn't work
+
+RewriteEngine On
+
+# Force correct MIME types - OVERRIDE everything
+<IfModule mod_mime.c>
+    # Remove all existing MIME types for JS files
+    RemoveType .js
+    RemoveType .mjs
+    RemoveType .ts
+    RemoveType .tsx
+    
+    # Force correct MIME types
+    AddType application/javascript .js
+    AddType application/javascript .mjs
+    AddType application/javascript .ts
+    AddType application/javascript .tsx
+    
+    # Other types
+    AddType text/css .css
+    AddType image/x-icon .ico
+    AddType image/svg+xml .svg
+    AddType application/json .json
+</IfModule>
+
+# Force headers for JavaScript files
+<IfModule mod_headers.c>
+    <FilesMatch "\.(js|mjs|ts|tsx)$">
+        Header always set Content-Type "application/javascript; charset=utf-8"
+        Header always set Cache-Control "no-cache, no-store, must-revalidate"
+        Header always set Pragma "no-cache"
+        Header always set Expires "0"
+        Header unset X-Content-Type-Options
+    </FilesMatch>
+</IfModule>
+
+# Disable caching for JS files temporarily
+<FilesMatch "\.(js|mjs|ts|tsx)$">
+    ExpiresActive Off
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+</FilesMatch>
+
+# SPA routing
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]
