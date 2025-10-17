@@ -4,6 +4,7 @@ RewriteEngine On
 # Force MIME types for JavaScript and CSS (Hostinger specific)
 <IfModule mod_mime.c>
     AddType application/javascript .js
+    AddType application/javascript .mjs
     AddType text/css .css
     AddType image/x-icon .ico
     AddType image/svg+xml .svg
@@ -16,8 +17,8 @@ RewriteEngine On
 
 # Alternative MIME type configuration
 <IfModule mod_headers.c>
-    <FilesMatch "\.js$">
-        Header set Content-Type "application/javascript"
+    <FilesMatch "\.(js|mjs)$">
+        Header set Content-Type "application/javascript; charset=utf-8"
     </FilesMatch>
     <FilesMatch "\.css$">
         Header set Content-Type "text/css"

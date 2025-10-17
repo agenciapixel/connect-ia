@@ -20,7 +20,8 @@ const monitoring = {
 // MIME types
 const mimeTypes = {
   '.html': 'text/html',
-  '.js': 'text/javascript',
+  '.js': 'application/javascript; charset=utf-8',
+  '.mjs': 'application/javascript; charset=utf-8',
   '.css': 'text/css',
   '.json': 'application/json',
   '.png': 'image/png',
