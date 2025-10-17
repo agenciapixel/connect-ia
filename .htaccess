@@ -8,6 +8,10 @@ RewriteEngine On
     AddType image/x-icon .ico
     AddType image/svg+xml .svg
     AddType application/json .json
+    AddType font/woff .woff
+    AddType font/woff2 .woff2
+    AddType font/ttf .ttf
+    AddType font/eot .eot
 </IfModule>
 
 # Alternative MIME type configuration
@@ -23,6 +27,10 @@ RewriteEngine On
     </FilesMatch>
     <FilesMatch "\.svg$">
         Header set Content-Type "image/svg+xml"
+    </FilesMatch>
+    <FilesMatch "\.(woff|woff2|ttf|eot)$">
+        Header set Content-Type "font/woff"
+        Header set Access-Control-Allow-Origin "*"
     </FilesMatch>
 </IfModule>
 
@@ -44,7 +52,7 @@ Header always set X-Frame-Options DENY
 Header always set X-XSS-Protection "1; mode=block"
 
 # Content Security Policy for React SPA
-Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://connect.facebook.net https://www.facebook.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co wss://*.supabase.in; frame-src 'self' https://www.facebook.com; object-src 'none'; base-uri 'self'; form-action 'self';"
+Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://connect.facebook.net https://www.facebook.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com; connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co wss://*.supabase.in; frame-src 'self' https://www.facebook.com; object-src 'none'; base-uri 'self'; form-action 'self';"
 
 # Cache static assets
 <FilesMatch "\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$">
