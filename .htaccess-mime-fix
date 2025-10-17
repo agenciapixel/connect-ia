@@ -1,0 +1,29 @@
+# Fix MIME types for JavaScript modules - Connect IA
+# This file ensures proper MIME types for ES6 modules
+
+# Force correct MIME types for JavaScript files
+<IfModule mod_mime.c>
+    # Standard JavaScript files
+    AddType application/javascript .js
+    AddType application/javascript .mjs
+    
+    # Ensure charset is set
+    AddCharset UTF-8 .js
+    AddCharset UTF-8 .mjs
+</IfModule>
+
+# Alternative method using mod_headers
+<IfModule mod_headers.c>
+    # Set correct Content-Type for JavaScript files
+    <FilesMatch "\.(js|mjs)$">
+        Header set Content-Type "application/javascript; charset=utf-8"
+        Header unset X-Content-Type-Options
+    </FilesMatch>
+</IfModule>
+
+# Disable MIME type sniffing for JavaScript files
+<IfModule mod_headers.c>
+    <FilesMatch "\.(js|mjs)$">
+        Header set X-Content-Type-Options "nosniff"
+    </FilesMatch>
+</IfModule>
