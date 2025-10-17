@@ -52,6 +52,8 @@ import {
 import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useDynamicMetrics, useRealtimeMetrics } from "@/hooks/useDynamicMetrics";
+import { MetricCard, MetricGrid } from "@/components/MetricCard";
 import { useOrganization } from "@/contexts/OrganizationContext";
 import { useAttendants, useAttendantMetrics } from "@/hooks/useAttendants";
 import { formatDistanceToNow, format, subDays } from "date-fns";
@@ -108,6 +110,10 @@ export default function AttendantsUnified() {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingAttendant, setEditingAttendant] = useState<Attendant | null>(null);
+  
+  // Hooks de métricas dinâmicas
+  const { data: mainMetrics, isLoading: mainMetricsLoading } = useDynamicMetrics('7d');
+  const { data: realtimeMetrics, isLoading: realtimeLoading } = useRealtimeMetrics();
   const [newAttendant, setNewAttendant] = useState({
     full_name: "",
     email: "",
@@ -554,7 +560,12 @@ export default function AttendantsUnified() {
                 </p>
                 <div className="flex items-center mt-1">
                   <TrendingUp className="h-3 w-3 text-blue-500 mr-1" />
-                  <span className="text-xs text-blue-600">+15% vs ontem</span>
+                  <span className="text-xs text-blue-600">
+                    {mainMetrics?.messagesChange ? 
+                      `${mainMetrics.messagesChange > 0 ? '+' : ''}${mainMetrics.messagesChange}% vs ontem` : 
+                      '+0% vs ontem'
+                    }
+                  </span>
                 </div>
               </CardContent>
             </Card>
@@ -571,7 +582,12 @@ export default function AttendantsUnified() {
                 </p>
                 <div className="flex items-center mt-1">
                   <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
-                  <span className="text-xs text-green-600">+5% vs ontem</span>
+                  <span className="text-xs text-green-600">
+                    {mainMetrics?.responseRateChange ? 
+                      `${mainMetrics.responseRateChange > 0 ? '+' : ''}${mainMetrics.responseRateChange}% vs ontem` : 
+                      '+0% vs ontem'
+                    }
+                  </span>
                 </div>
               </CardContent>
             </Card>

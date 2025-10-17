@@ -10,6 +10,8 @@ import { Building2, TrendingUp, DollarSign, BarChart3, Download, Plus, Calendar,
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useOrganization } from "@/contexts/OrganizationContext";
+import { useDynamicMetrics, useContactMetrics } from "@/hooks/useDynamicMetrics";
+import { MetricCard, MetricGrid } from "@/components/MetricCard";
 import { CRMPipeline } from "@/components/CRMPipeline";
 import { OpportunityModal } from "@/components/OpportunityModal";
 import { format, subDays, startOfMonth, endOfMonth } from "date-fns";
@@ -43,6 +45,10 @@ export default function CRM() {
     stage: "all" as "all" | "lead" | "contacted" | "qualified" | "proposal" | "negotiation" | "won",
     assignee: "all" as "all" | "unassigned" | "assigned"
   });
+
+  // Hooks de métricas dinâmicas
+  const { data: mainMetrics, isLoading: mainMetricsLoading } = useDynamicMetrics(analyticsFilters.period);
+  const { data: contactMetrics, isLoading: contactMetricsLoading } = useContactMetrics(analyticsFilters.period);
 
   // Buscar prospects para CRM
   const { data: prospects = [], isLoading, refetch } = useQuery({
@@ -445,7 +451,12 @@ export default function CRM() {
                         <p className="text-xs text-muted-foreground">no período selecionado</p>
                         <div className="flex items-center mt-1">
                           <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
-                          <span className="text-xs text-green-600">+15% vs período anterior</span>
+                          <span className="text-xs text-green-600">
+                            {mainMetrics?.prospectsChange ? 
+                              `${mainMetrics.prospectsChange > 0 ? '+' : ''}${mainMetrics.prospectsChange}% vs período anterior` : 
+                              '+0% vs período anterior'
+                            }
+                          </span>
                         </div>
                       </CardContent>
                     </Card>
@@ -462,7 +473,12 @@ export default function CRM() {
                         <p className="text-xs text-muted-foreground">leads para ganhos</p>
                         <div className="flex items-center mt-1">
                           <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
-                          <span className="text-xs text-green-600">+3% vs período anterior</span>
+                          <span className="text-xs text-green-600">
+                            {mainMetrics?.conversionRateChange ? 
+                              `${mainMetrics.conversionRateChange > 0 ? '+' : ''}${mainMetrics.conversionRateChange}% vs período anterior` : 
+                              '+0% vs período anterior'
+                            }
+                          </span>
                         </div>
                       </CardContent>
                     </Card>
@@ -479,7 +495,12 @@ export default function CRM() {
                         <p className="text-xs text-muted-foreground">valor total estimado</p>
                         <div className="flex items-center mt-1">
                           <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
-                          <span className="text-xs text-green-600">+8% vs período anterior</span>
+                          <span className="text-xs text-green-600">
+                            {mainMetrics?.revenueChange ? 
+                              `${mainMetrics.revenueChange > 0 ? '+' : ''}${mainMetrics.revenueChange}% vs período anterior` : 
+                              '+0% vs período anterior'
+                            }
+                          </span>
                         </div>
                       </CardContent>
                     </Card>
@@ -496,7 +517,12 @@ export default function CRM() {
                         <p className="text-xs text-muted-foreground">valor médio por deal</p>
                         <div className="flex items-center mt-1">
                           <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
-                          <span className="text-xs text-green-600">+5% vs período anterior</span>
+                          <span className="text-xs text-green-600">
+                            {contactMetrics?.totalContactsChange ? 
+                              `${contactMetrics.totalContactsChange > 0 ? '+' : ''}${contactMetrics.totalContactsChange}% vs período anterior` : 
+                              '+0% vs período anterior'
+                            }
+                          </span>
                         </div>
                       </CardContent>
                     </Card>

@@ -17,12 +17,20 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import CampaignFlowEditor from "@/components/CampaignFlowEditor";
+import { useCampaignMetrics, useDynamicMetrics } from "@/hooks/useDynamicMetrics";
+import { MetricCard, MetricGrid } from "@/components/MetricCard";
+import { useOrganization } from "@/contexts/OrganizationContext";
 
 export default function Campaigns() {
+  const { currentOrg } = useOrganization();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showFlowEditor, setShowFlowEditor] = useState(false);
   const [editingCampaign, setEditingCampaign] = useState<any>(null);
   const [activeTab, setActiveTab] = useState("campaigns");
+  
+  // Hooks de métricas dinâmicas
+  const { data: campaignMetrics, isLoading: campaignMetricsLoading } = useCampaignMetrics('7d');
+  const { data: mainMetrics, isLoading: mainMetricsLoading } = useDynamicMetrics('7d');
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -977,7 +985,12 @@ export default function Campaigns() {
                         <p className="text-xs text-muted-foreground">mensagens totais</p>
                         <div className="flex items-center mt-1">
                           <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
-                          <span className="text-xs text-green-600">+12% vs período anterior</span>
+                          <span className="text-xs text-green-600">
+                            {campaignMetrics?.totalCampaignsChange ? 
+                              `${campaignMetrics.totalCampaignsChange > 0 ? '+' : ''}${campaignMetrics.totalCampaignsChange}% vs período anterior` : 
+                              '+0% vs período anterior'
+                            }
+                          </span>
                         </div>
                       </CardContent>
                     </Card>
@@ -992,7 +1005,12 @@ export default function Campaigns() {
                         <p className="text-xs text-muted-foreground">{analyticsData?.totalSent ? ((analyticsData.totalDelivered/analyticsData.totalSent)*100).toFixed(1) : 0}% taxa de entrega</p>
                         <div className="flex items-center mt-1">
                           <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
-                          <span className="text-xs text-green-600">+2% vs período anterior</span>
+                          <span className="text-xs text-green-600">
+                            {mainMetrics?.openRateChange ? 
+                              `${mainMetrics.openRateChange > 0 ? '+' : ''}${mainMetrics.openRateChange}% vs período anterior` : 
+                              '+0% vs período anterior'
+                            }
+                          </span>
                         </div>
                       </CardContent>
                     </Card>
@@ -1007,7 +1025,12 @@ export default function Campaigns() {
                         <p className="text-xs text-muted-foreground">{analyticsData?.openRate || 0}% taxa de abertura</p>
                         <div className="flex items-center mt-1">
                           <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
-                          <span className="text-xs text-green-600">+5% vs período anterior</span>
+                          <span className="text-xs text-green-600">
+                            {mainMetrics?.responseRateChange ? 
+                              `${mainMetrics.responseRateChange > 0 ? '+' : ''}${mainMetrics.responseRateChange}% vs período anterior` : 
+                              '+0% vs período anterior'
+                            }
+                          </span>
                         </div>
                       </CardContent>
                     </Card>
@@ -1022,7 +1045,12 @@ export default function Campaigns() {
                         <p className="text-xs text-muted-foreground">{analyticsData?.clickRate || 0}% taxa de clique</p>
                         <div className="flex items-center mt-1">
                           <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
-                          <span className="text-xs text-green-600">+8% vs período anterior</span>
+                          <span className="text-xs text-green-600">
+                            {mainMetrics?.conversionRateChange ? 
+                              `${mainMetrics.conversionRateChange > 0 ? '+' : ''}${mainMetrics.conversionRateChange}% vs período anterior` : 
+                              '+0% vs período anterior'
+                            }
+                          </span>
                         </div>
                       </CardContent>
                     </Card>
@@ -1037,7 +1065,12 @@ export default function Campaigns() {
                         <p className="text-xs text-muted-foreground">{analyticsData?.replyRate || 0}% taxa de resposta</p>
                         <div className="flex items-center mt-1">
                           <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
-                          <span className="text-xs text-green-600">+3% vs período anterior</span>
+                          <span className="text-xs text-green-600">
+                            {mainMetrics?.revenueChange ? 
+                              `${mainMetrics.revenueChange > 0 ? '+' : ''}${mainMetrics.revenueChange}% vs período anterior` : 
+                              '+0% vs período anterior'
+                            }
+                          </span>
                         </div>
                       </CardContent>
                     </Card>

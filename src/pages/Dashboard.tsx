@@ -60,6 +60,8 @@ import { formatDistanceToNow, format, subDays, startOfDay, endOfDay, subHours, s
 import { ptBR } from "date-fns/locale";
 import { useOrganization } from "@/contexts/OrganizationContext";
 import { usePermissions } from "@/hooks/usePermissions";
+import { useDynamicMetrics, useRealtimeMetrics, useCampaignMetrics, useContactMetrics } from "@/hooks/useDynamicMetrics";
+import { MetricCard, MetricGrid, PerformanceMetric, RealtimeStat } from "@/components/MetricCard";
 import { useState, useEffect } from "react";
 import { 
   LineChart, 
@@ -97,78 +99,14 @@ export default function Dashboard() {
     return () => clearInterval(interval);
   }, []);
 
-  // Buscar estatísticas principais
-  const { data: mainStats, isLoading: mainStatsLoading, refetch: refetchMainStats } = useQuery({
-    queryKey: ["dashboard-main-stats", currentOrg?.id, timeRange],
-    queryFn: async () => {
-      if (!currentOrg) return null;
+  // Usar hooks de métricas dinâmicas
+  const { data: mainStats, isLoading: mainStatsLoading, refetch: refetchMainStats } = useDynamicMetrics(timeRange);
+  const { data: realtimeMetrics, isLoading: realtimeLoading } = useRealtimeMetrics();
+  const { data: campaignMetrics, isLoading: campaignLoading } = useCampaignMetrics(timeRange);
+  const { data: contactMetrics, isLoading: contactLoading } = useContactMetrics(timeRange);
 
-      const days = timeRange === "24h" ? 1 : timeRange === "7d" ? 7 : timeRange === "30d" ? 30 : 90;
-      const startDate = subDays(new Date(), days);
-
-      const [conversationsResult, contactsResult, campaignsResult, prospectsResult] = await Promise.all([
-        supabase.from("conversations").select("id, status, created_at", { count: "exact" }).eq("org_id", currentOrg.id).gte("created_at", startDate.toISOString()),
-        supabase.from("contacts").select("id, created_at", { count: "exact", head: true }).eq("org_id", currentOrg.id).gte("created_at", startDate.toISOString()),
-        supabase.from("campaigns").select("id, status, created_at", { count: "exact", head: true }).eq("org_id", currentOrg.id).gte("created_at", startDate.toISOString()),
-        supabase.from("prospects").select("id, pipeline_stage, created_at", { count: "exact", head: true }).eq("org_id", currentOrg.id).gte("created_at", startDate.toISOString()),
-      ]);
-
-      // Buscar mensagens através das conversas
-      const conversations = conversationsResult.data || [];
-      const conversationIds = conversations.map(c => c.id);
-      let totalMessages = 0;
-      let deliveredMessages = 0;
-      let openedMessages = 0;
-      
-      if (conversationIds.length > 0) {
-        const messagesResult = await supabase
-          .from("messages")
-          .select("id, status, created_at", { count: "exact", head: true })
-          .in("conversation_id", conversationIds)
-          .gte("created_at", startDate.toISOString());
-        totalMessages = messagesResult.count || 0;
-        
-        // Simular métricas de entrega e abertura
-        deliveredMessages = Math.floor(totalMessages * 0.95);
-        openedMessages = Math.floor(deliveredMessages * 0.72);
-      }
-
-      const totalContacts = contactsResult.count || 0;
-      const activeCampaigns = campaignsResult.count || 0;
-      const totalProspects = prospectsResult.count || 0;
-      const wonProspects = prospectsResult.data?.filter(p => p.pipeline_stage === 'won').length || 0;
-      const openConversations = conversations.filter(c => c.status === "open").length;
-      const closedConversations = conversations.filter(c => c.status === "closed").length;
-      
-      const responseRate = conversations.length > 0 
-        ? Math.round((closedConversations / conversations.length) * 100) 
-        : 0;
-
-      const openRate = totalMessages > 0 ? Math.round((openedMessages / totalMessages) * 100) : 0;
-      const conversionRate = totalProspects > 0 ? Math.round((wonProspects / totalProspects) * 100) : 0;
-
-      return {
-        totalMessages,
-        deliveredMessages,
-        openedMessages,
-        totalContacts,
-        activeCampaigns,
-        totalProspects,
-        wonProspects,
-        openConversations,
-        closedConversations,
-        responseRate,
-        openRate,
-        conversionRate,
-        totalRevenue: wonProspects * 2500, // Simulado: R$ 2.500 por prospect ganho
-      };
-    },
-    enabled: !!currentOrg,
-    refetchInterval: 30000, // Atualizar a cada 30 segundos
-  });
-
-  // Buscar métricas de performance em tempo real
-  const { data: realtimeMetrics, isLoading: realtimeLoading } = useQuery({
+  // Buscar métricas de performance em tempo real (duplicado - removendo)
+  const { data: realtimeMetricsOld, isLoading: realtimeLoadingOld } = useQuery({
     queryKey: ["dashboard-realtime", currentOrg?.id],
     queryFn: async () => {
       if (!currentOrg) return null;
@@ -449,102 +387,54 @@ export default function Dashboard() {
       {/* Métricas principais */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {mainStatsLoading ? (
-          Array.from({ length: 4 }).map((_, i) => (
-            <Card key={i} className="relative overflow-hidden border-2">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-10 w-10 rounded-full" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-8 w-20 mb-2" />
-                <Skeleton className="h-4 w-32" />
-              </CardContent>
-            </Card>
-          ))
+          <MetricGrid>
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Card key={i} className="relative overflow-hidden border-2">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-10 w-10 rounded-full" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-8 w-20 mb-2" />
+                  <Skeleton className="h-4 w-32" />
+                </CardContent>
+              </Card>
+            ))}
+          </MetricGrid>
         ) : (
-          <>
-            <Card className="relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-lg group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/5 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform" />
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Total de Mensagens</CardTitle>
-                <div className="h-10 w-10 rounded-full bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
-                  <MessageSquare className="h-5 w-5 text-blue-600" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold tracking-tight">{mainStats?.totalMessages?.toLocaleString() || 0}</div>
-                <div className="flex items-center gap-2 mt-2">
-                  <Badge variant="default" className="flex items-center gap-1 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20">
-                    <ArrowUp className="h-3 w-3" />
-                    +12%
-                  </Badge>
-                  <span className="text-xs text-muted-foreground">vs. período anterior</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-lg group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-500/5 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform" />
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Taxa de Abertura</CardTitle>
-                <div className="h-10 w-10 rounded-full bg-green-500/10 flex items-center justify-center group-hover:bg-green-500/20 transition-colors">
-                  <Eye className="h-5 w-5 text-green-600" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold tracking-tight">{mainStats?.openRate || 0}%</div>
-                <div className="flex items-center gap-2 mt-2">
-                  <Badge variant="default" className="flex items-center gap-1 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20">
-                    <ArrowUp className="h-3 w-3" />
-                    +8%
-                  </Badge>
-                  <span className="text-xs text-muted-foreground">vs. período anterior</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-lg group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-500/5 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform" />
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Taxa de Conversão</CardTitle>
-                <div className="h-10 w-10 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
-                  <Target className="h-5 w-5 text-purple-600" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold tracking-tight">{mainStats?.conversionRate || 0}%</div>
-                <div className="flex items-center gap-2 mt-2">
-                  <Badge variant="default" className="flex items-center gap-1 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20">
-                    <ArrowUp className="h-3 w-3" />
-                    +15%
-                  </Badge>
-                  <span className="text-xs text-muted-foreground">vs. período anterior</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-lg group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-500/5 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform" />
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Receita Gerada</CardTitle>
-                <div className="h-10 w-10 rounded-full bg-orange-500/10 flex items-center justify-center group-hover:bg-orange-500/20 transition-colors">
-                  <DollarSign className="h-5 w-5 text-orange-600" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold tracking-tight">
-                  R$ {mainStats?.totalRevenue?.toLocaleString('pt-BR') || 0}
-                </div>
-                <div className="flex items-center gap-2 mt-2">
-                  <Badge variant="default" className="flex items-center gap-1 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20">
-                    <ArrowUp className="h-3 w-3" />
-                    +22%
-                  </Badge>
-                  <span className="text-xs text-muted-foreground">vs. período anterior</span>
-                </div>
-              </CardContent>
-            </Card>
-          </>
+          <MetricGrid>
+            <MetricCard
+              title="Total de Mensagens"
+              value={mainStats?.totalMessages?.toLocaleString() || 0}
+              change={mainStats?.messagesChange}
+              icon={<MessageSquare className="h-5 w-5 text-blue-600" />}
+              className="border-blue-200"
+            />
+            
+            <MetricCard
+              title="Taxa de Abertura"
+              value={`${mainStats?.openRate || 0}%`}
+              change={mainStats?.openRateChange}
+              icon={<Eye className="h-5 w-5 text-green-600" />}
+              className="border-green-200"
+            />
+            
+            <MetricCard
+              title="Taxa de Conversão"
+              value={`${mainStats?.conversionRate || 0}%`}
+              change={mainStats?.conversionRateChange}
+              icon={<Target className="h-5 w-5 text-purple-600" />}
+              className="border-purple-200"
+            />
+            
+            <MetricCard
+              title="Receita Gerada"
+              value={`R$ ${mainStats?.totalRevenue?.toLocaleString('pt-BR') || 0}`}
+              change={mainStats?.revenueChange}
+              icon={<DollarSign className="h-5 w-5 text-orange-600" />}
+              className="border-orange-200"
+            />
+          </MetricGrid>
         )}
       </div>
 
