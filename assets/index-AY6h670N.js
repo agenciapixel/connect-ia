@@ -278,19 +278,10 @@ function initializeApp() {
   }
 }
 
-// Service Worker (se disponível)
+// Service Worker (desabilitado por enquanto)
 function registerServiceWorker() {
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js')
-        .then((registration) => {
-          console.log('SW registered: ', registration);
-        })
-        .catch((registrationError) => {
-          console.log('SW registration failed: ', registrationError);
-        });
-    });
-  }
+  // Service Worker desabilitado - não necessário para funcionamento básico
+  console.log('Service Worker desabilitado');
 }
 
 // Analytics (se configurado)
