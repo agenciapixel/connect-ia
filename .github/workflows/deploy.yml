@@ -24,16 +24,26 @@ jobs:
     - name: Install dependencies
       run: npm install
       
-    - name: Build project
+    - name: Clean and Build project
       run: |
-        echo "🔨 Fazendo build do sistema React..."
+        echo "🧹 Limpando build anterior..."
+        rm -rf dist/
+        rm -rf node_modules/.vite/
+        
+        echo "🔨 Fazendo build limpo do sistema React..."
         npm run build
+        
         echo "📁 Verificando arquivos gerados:"
         ls -la dist/
+        
         echo "📄 Conteúdo do index.html:"
-        head -10 dist/index.html
-        echo "📄 Conteúdo do JavaScript:"
-        head -5 dist/assets/*.js || echo "Nenhum arquivo JS encontrado"
+        cat dist/index.html
+        
+        echo "📄 Arquivos JavaScript gerados:"
+        ls -la dist/assets/*.js || echo "Nenhum arquivo JS encontrado"
+        
+        echo "📄 Primeiras linhas do JavaScript:"
+        head -10 dist/assets/*.js || echo "Nenhum arquivo JS para mostrar"
       
     - name: Copy dist files to root for Hostinger Git Deploy
       run: |
