@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => ({
   build: {
     outDir: "dist",
     sourcemap: mode === "development",
-    minify: mode === "production",
+    minify: false,
     rollupOptions: {
       output: {
         manualChunks: {
