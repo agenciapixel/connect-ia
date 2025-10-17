@@ -3,11 +3,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { PlanSelector } from '@/components/PlanSelector';
 import { UsageIndicator } from '@/components/UsageIndicator';
-import { usePlanLimits } from '@/hooks/usePlanLimits';
 import { CheckCircle, Star, Zap, Shield, Headphones } from 'lucide-react';
 
 export default function PricingPage() {
-  const { planUsage, isLoading } = usePlanLimits();
+  // Temporariamente desabilitado para debug
+  // const { planUsage, isLoading } = usePlanLimits();
+  const planUsage = null;
+  const isLoading = false;
 
   const features = [
     {
