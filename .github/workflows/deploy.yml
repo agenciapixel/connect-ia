@@ -27,17 +27,21 @@ jobs:
     - name: Build project
       run: npm run build
       
-    - name: Commit built files
+    - name: Commit built files locally
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add dist/
         git commit -m "Build: Add compiled files to repository" || exit 0
-        git push
+        echo "✅ Arquivos compilados commitados localmente"
         
     - name: Notify build completion
       run: |
         echo "✅ Build concluído!"
-        echo "📁 Arquivos compilados commitados no repositório"
-        echo "🚀 Git Deploy da Hostinger fará o deploy automaticamente"
+        echo "📁 Arquivos compilados commitados localmente"
+        echo "⚠️  Push manual necessário para atualizar repositório"
+        echo "📋 Próximos passos:"
+        echo "   1. Fazer pull do repositório local"
+        echo "   2. Fazer push para atualizar GitHub"
+        echo "   3. Git Deploy da Hostinger fará deploy automático"
         echo "🌐 Site: https://connectia.agenciapixel.digital"
