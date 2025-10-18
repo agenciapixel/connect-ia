@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { usePersistentAuth } from "@/hooks/usePersistentAuth";
+import { useSecurity } from "@/hooks/useSecurity";
 import { usePermissions } from "@/hooks/usePermissions";
 import { toast } from "sonner";
 import { OrganizationSwitcher } from "./OrganizationSwitcher";
@@ -43,13 +44,25 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const navigate = useNavigate();
   const { logout, isRemembered } = usePersistentAuth();
+  const { clearSecurity } = useSecurity();
 
   const handleLogout = async () => {
     try {
+      console.log('🔓 Iniciando logout...');
+
+      // Limpar cache de segurança primeiro
+      clearSecurity();
+
+      // Fazer logout do Supabase
       await logout();
+
+      console.log('✅ Logout concluído');
       toast.success(isRemembered ? "Logout realizado. Você permanecerá logado neste dispositivo." : "Logout realizado com sucesso.");
-      navigate("/auth");
+
+      // Redirecionar para autenticação
+      navigate("/autenticacao");
     } catch (error) {
+      console.error('❌ Erro ao fazer logout:', error);
       toast.error("Erro ao sair: " + (error as Error).message);
     }
   };

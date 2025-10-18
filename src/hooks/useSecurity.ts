@@ -193,12 +193,29 @@ export function useSecurity() {
   }, [checkUserAuthorization]);
 
   const clearSecurity = useCallback(() => {
+    console.log('🧹 clearSecurity: Limpando cache de autorização');
+
+    // Limpar cache em memória
+    authCache.clear();
+
+    // Limpar cache localStorage (todos os caches de autorização)
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('auth_cache_')) {
+        localStorage.removeItem(key);
+        console.log('🧹 Removido cache:', key);
+      }
+    });
+
+    // Resetar estado
     setSecurity({
       isAuthorized: false,
       isLoading: false,
     });
+
     isValidatingRef.current = false;
     lastValidatedEmailRef.current = '';
+
+    console.log('✅ clearSecurity: Cache limpo com sucesso');
   }, []);
 
   return {
