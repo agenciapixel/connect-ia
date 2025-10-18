@@ -1218,16 +1218,6 @@ const Copy = createLucideIcon("Copy", [
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const CreditCard = createLucideIcon("CreditCard", [
-  ["rect", { width: "20", height: "14", x: "2", y: "5", rx: "2", key: "ynyp8z" }],
-  ["line", { x1: "2", x2: "22", y1: "10", y2: "10", key: "1b3vmo" }]
-]);
-/**
- * @license lucide-react v0.462.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
 const Crown = createLucideIcon("Crown", [
   [
     "path",
@@ -11641,7 +11631,6 @@ function UserRoleBadge() {
 }
 const menuItems = [
   { title: "Dashboard", url: "/", icon: House, permission: "canViewReports" },
-  { title: "Painel", url: "/painel", icon: House, permission: "canViewReports" },
   { title: "Caixa de Entrada", url: "/caixa-entrada", icon: MessageSquare, permission: "canAccessInbox" },
   { title: "Contatos", url: "/contatos", icon: Users, permission: "canManageContacts" },
   { title: "Campanhas", url: "/campanhas", icon: Megaphone, permission: "canManageCampaigns" },
@@ -11650,9 +11639,6 @@ const menuItems = [
   { title: "Atendentes", url: "/atendentes", icon: UserCheck, permission: "canManageAttendants" },
   { title: "Agentes IA", url: "/agentes-ia", icon: Bot, permission: "canManageAIAgents" },
   { title: "Integrações", url: "/integracoes", icon: Plug, permission: "canManageIntegrations" },
-  { title: "Planos", url: "/planos", icon: CreditCard, permission: "canViewReports" },
-  { title: "Usuários Autorizados", url: "/usuarios-autorizados", icon: Shield, permission: "canManageSettings" },
-  { title: "Monitoramento", url: "/monitoramento", icon: Activity, permission: "canManageSettings" },
   { title: "Configurações", url: "/configuracoes", icon: Settings$1, permission: "canManageSettings" }
 ];
 function AppSidebar() {
@@ -11674,7 +11660,7 @@ function AppSidebar() {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(Sidebar, { collapsible: "icon", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(SidebarHeader, { className: "border-b border-sidebar-border", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 space-y-4", children: state !== "collapsed" ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent", children: "Omnichat IA" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent", children: "Connect IA" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(SidebarTrigger, { className: "text-sidebar-foreground" })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full space-y-3", children: [
