@@ -133,27 +133,39 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+    console.log('🔄 OrganizationContext: useEffect iniciado');
+
     // Listener para mudanças de autenticação
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('🔄 OrganizationContext: Auth state changed:', event, session?.user?.email);
+
       if (event === "SIGNED_IN" && session?.user) {
+        console.log('🔄 OrganizationContext: SIGNED_IN detectado, fetchOrganizations...');
         await fetchOrganizations();
       } else if (event === "SIGNED_OUT") {
+        console.log('🔄 OrganizationContext: SIGNED_OUT detectado');
         setOrganizations([]);
         setCurrentOrg(null);
         localStorage.removeItem("currentOrgId");
         setIsLoading(false);
       } else if (event === "INITIAL_SESSION") {
+        console.log('🔄 OrganizationContext: INITIAL_SESSION detectado');
         if (session?.user) {
+          console.log('🔄 OrganizationContext: Sessão válida, fetchOrganizations...');
           await fetchOrganizations();
         } else {
+          console.log('🔄 OrganizationContext: Sem sessão, setIsLoading(false)');
           setOrganizations([]);
           setCurrentOrg(null);
           setIsLoading(false);
         }
+      } else {
+        console.log('🔄 OrganizationContext: Evento desconhecido:', event);
       }
     });
 
     return () => {
+      console.log('🔄 OrganizationContext: Limpando subscription');
       subscription.unsubscribe();
     };
   }, []);
