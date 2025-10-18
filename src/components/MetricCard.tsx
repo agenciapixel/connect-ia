@@ -50,7 +50,7 @@ export function MetricCard({
         </div>
       </CardHeader>
       <CardContent className="pt-0">
-        <div className={cn("text-2xl sm:text-3xl font-bold tracking-tight mb-1", valueClassName)}>
+        <div className={cn("text-2xl font-bold tracking-tight mb-1", valueClassName)}>
           {formattedValue}
         </div>
         {showChange && change !== undefined && (
