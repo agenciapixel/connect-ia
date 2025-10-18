@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -18,6 +18,10 @@ interface SecurityContext {
   };
 }
 
+// Cache em memória para evitar consultas repetidas
+const authCache = new Map<string, { isAuthorized: boolean; role: 'admin' | 'user' | null; timestamp: number }>();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutos
+
 export function useSecurity() {
   const [security, setSecurity] = useState<SecurityContext>({
     isAuthorized: false,
@@ -35,97 +39,145 @@ export function useSecurity() {
     }
   });
 
-  const checkUserAuthorization = async (userEmail: string): Promise<boolean> => {
+  // Ref para evitar validações duplicadas
+  const isValidatingRef = useRef(false);
+  const lastValidatedEmailRef = useRef<string>('');
+
+  const checkUserAuthorization = useCallback(async (userEmail: string): Promise<boolean> => {
     try {
       console.log('🔍 checkUserAuthorization: Iniciando para:', userEmail);
 
-      // Timeout de 15 segundos (mais realista para Supabase)
+      // Verificar cache primeiro
+      const cached = authCache.get(userEmail);
+      if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION) {
+        console.log('✅ checkUserAuthorization: Usando cache:', cached.isAuthorized);
+        return cached.isAuthorized;
+      }
+
+      // Timeout de 10 segundos (balanceado)
       const queryPromise = supabase
         .from('authorized_users')
-        .select('email')
+        .select('email, role')
         .eq('email', userEmail)
         .maybeSingle();
 
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Timeout: 15 segundos')), 15000)
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('Timeout: 10 segundos')), 10000)
       );
 
-      try {
-        const { data, error } = await Promise.race([queryPromise, timeoutPromise]) as any;
+      const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
 
-        console.log('🔍 checkUserAuthorization: Resposta:', { data, error });
+      console.log('🔍 checkUserAuthorization: Resposta:', { data, error });
 
-        if (error) {
-          console.error('❌ checkUserAuthorization: Erro:', error);
-          // Em caso de erro do banco, negar acesso (segurança primeiro)
-          return false;
+      if (error) {
+        console.error('❌ checkUserAuthorization: Erro:', error);
+        // Verificar cache antigo em caso de erro
+        if (cached) {
+          console.log('🔄 checkUserAuthorization: Usando cache antigo por erro');
+          return cached.isAuthorized;
         }
-
-        const result = !!data;
-        console.log('🔍 checkUserAuthorization: Resultado:', result);
-        return result;
-
-      } catch (timeoutError) {
-        console.log('⏱️ checkUserAuthorization: Timeout detectado');
-        // Em caso de timeout, negar acesso por segurança
-        console.error('❌ checkUserAuthorization: Acesso negado por timeout');
         return false;
       }
 
+      const result = !!data;
+      console.log('✅ checkUserAuthorization: Resultado:', result);
+
+      // Atualizar cache
+      if (data) {
+        authCache.set(userEmail, {
+          isAuthorized: result,
+          role: data.role as 'admin' | 'user',
+          timestamp: Date.now()
+        });
+      }
+
+      return result;
+
     } catch (err) {
       console.error('❌ checkUserAuthorization: Exception:', err);
-      // Em caso de erro, negar acesso (fail-secure)
+
+      // Verificar cache em caso de timeout
+      const cached = authCache.get(userEmail);
+      if (cached) {
+        console.log('🔄 checkUserAuthorization: Usando cache por timeout/erro');
+        return cached.isAuthorized;
+      }
+
       return false;
     }
-  };
+  }, []);
 
-  const getUserRole = async (userEmail: string): Promise<'admin' | 'user' | null> => {
+  const getUserRole = useCallback(async (userEmail: string): Promise<'admin' | 'user' | null> => {
     try {
       console.log('🔍 getUserRole: Iniciando para:', userEmail);
 
-      // Timeout de 15 segundos (consistente com checkUserAuthorization)
+      // Verificar cache primeiro
+      const cached = authCache.get(userEmail);
+      if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION) {
+        console.log('✅ getUserRole: Usando cache:', cached.role);
+        return cached.role;
+      }
+
+      // Timeout de 10 segundos
       const queryPromise = supabase
         .from('authorized_users')
         .select('role')
         .eq('email', userEmail)
         .maybeSingle();
 
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Timeout: 15 segundos')), 15000)
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('Timeout: 10 segundos')), 10000)
       );
 
-      try {
-        const { data, error } = await Promise.race([queryPromise, timeoutPromise]) as any;
+      const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
 
-        console.log('🔍 getUserRole: Resposta:', { data, error });
+      console.log('🔍 getUserRole: Resposta:', { data, error });
 
-        if (error) {
-          console.error('❌ getUserRole: Erro:', error);
-          return null; // Retornar null em caso de erro
+      if (error) {
+        console.error('❌ getUserRole: Erro:', error);
+        // Usar cache em caso de erro
+        if (cached) {
+          console.log('🔄 getUserRole: Usando cache por erro');
+          return cached.role;
         }
-
-        if (!data) {
-          console.log('❌ getUserRole: Usuário não encontrado na tabela');
-          return null; // Usuário não está na tabela authorized_users
-        }
-
-        const result = data.role as 'admin' | 'user';
-        console.log('✅ getUserRole: Role encontrado:', result);
-        return result;
-
-      } catch (timeoutError) {
-        console.error('⏱️ getUserRole: Timeout detectado');
-        return null; // Retornar null em caso de timeout
+        return null;
       }
+
+      if (!data) {
+        console.log('❌ getUserRole: Usuário não encontrado na tabela');
+        return null;
+      }
+
+      const result = data.role as 'admin' | 'user';
+      console.log('✅ getUserRole: Role encontrado:', result);
+
+      // Atualizar cache se já existir
+      const existingCache = authCache.get(userEmail);
+      if (existingCache) {
+        authCache.set(userEmail, {
+          ...existingCache,
+          role: result,
+          timestamp: Date.now()
+        });
+      }
+
+      return result;
 
     } catch (err) {
       console.error('❌ getUserRole: Exception:', err);
-      return null; // Retornar null em caso de exceção
+
+      // Usar cache em caso de timeout
+      const cached = authCache.get(userEmail);
+      if (cached) {
+        console.log('🔄 getUserRole: Usando cache por timeout');
+        return cached.role;
+      }
+
+      return null;
     }
-  };
+  }, []);
 
-
-  const getPermissions = (role: 'admin' | 'user' | null) => {
+  const getPermissions = useCallback((role: 'admin' | 'user' | null) => {
     if (role === 'admin') {
       return {
         canManageContacts: true,
@@ -160,14 +212,17 @@ export function useSecurity() {
         canManageIntegrations: false,
       };
     }
-  };
+  }, []);
 
-  const validateUser = async (userEmail: string) => {
+  const validateUser = useCallback(async (userEmail: string) => {
     // Evitar validações duplicadas
-    if (security.isLoading) {
-      console.log('🔍 useSecurity: Validação já em andamento, pulando...');
+    if (isValidatingRef.current && lastValidatedEmailRef.current === userEmail) {
+      console.log('🔍 useSecurity: Validação já em andamento para', userEmail, ', pulando...');
       return;
     }
+
+    isValidatingRef.current = true;
+    lastValidatedEmailRef.current = userEmail;
 
     console.log('🔍 useSecurity: Iniciando validação para:', userEmail);
     setSecurity(prev => ({ ...prev, isLoading: true }));
@@ -176,7 +231,7 @@ export function useSecurity() {
       console.log('🔍 useSecurity: Verificando autorização...');
       const isAuthorized = await checkUserAuthorization(userEmail);
       console.log('🔍 useSecurity: Autorização:', isAuthorized);
-      
+
       console.log('🔍 useSecurity: Obtendo role...');
       const userRole = await getUserRole(userEmail);
       console.log('🔍 useSecurity: Role obtido:', userRole);
@@ -190,12 +245,14 @@ export function useSecurity() {
         permissions
       });
 
-      console.log('🔍 useSecurity: Validação concluída:', { isAuthorized, userRole, permissions });
+      console.log('✅ useSecurity: Validação concluída:', { isAuthorized, userRole, permissions });
 
       if (!isAuthorized) {
         console.log('❌ useSecurity: Usuário não autorizado, fazendo logout');
         toast.error('Usuário não autorizado. Entre em contato com o administrador.');
         await supabase.auth.signOut();
+        // Limpar cache
+        authCache.delete(userEmail);
       }
 
     } catch (error) {
@@ -207,17 +264,21 @@ export function useSecurity() {
         userRole: null,
         permissions: getPermissions(null)
       }));
+    } finally {
+      isValidatingRef.current = false;
     }
-  };
+  }, [checkUserAuthorization, getUserRole, getPermissions]);
 
-  const clearSecurity = () => {
+  const clearSecurity = useCallback(() => {
     setSecurity({
       isAuthorized: false,
       isLoading: false,
       userRole: null,
       permissions: getPermissions(null)
     });
-  };
+    isValidatingRef.current = false;
+    lastValidatedEmailRef.current = '';
+  }, [getPermissions]);
 
   return {
     ...security,
@@ -225,4 +286,3 @@ export function useSecurity() {
     clearSecurity
   };
 }
-

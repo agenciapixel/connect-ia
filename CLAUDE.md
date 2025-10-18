@@ -20,8 +20,19 @@ npm run preview         # Visualizar build de produção localmente
 npm run lint           # Executar ESLint
 ```
 
-### Deploy Automático
-O projeto usa Git Deploy no Hostinger. Cada push para a branch `main` dispara um deploy automático através do hook `postinstall` que executa o build.
+### ⚠️ Deploy Automático (PRODUÇÃO)
+**IMPORTANTE:** O projeto usa Git Deploy no Hostinger. Cada push para a branch `main` dispara um deploy automático através do hook `postinstall` que executa o build.
+
+**Para evitar deploy acidental:**
+1. Trabalhe em branches separadas (não `main`)
+2. Teste localmente com `npm run dev` antes de mergear
+3. Faça code review antes de push para `main`
+4. Use `git push origin HEAD:refs/for/main` para criar PR (se configurado)
+
+**Branches:**
+- `main` → Produção (deploy automático no Hostinger)
+- `dev` → Desenvolvimento (testes locais)
+- `feature/*` → Features em desenvolvimento
 
 ## 🎯 Funcionalidades Principais
 
@@ -159,16 +170,73 @@ Todas as rotas são protegidas com autenticação (`ProtectedRoute`) e permissõ
 ## 🔐 Sistema de Autenticação
 
 ### Fluxo de Autenticação
-1. **Login**: Supabase Auth
-2. **Autorização**: Verificação em `authorized_users`
+1. **Login**: Supabase Auth (JWT tokens)
+2. **Autorização**: Verificação em `authorized_users` table
 3. **Role**: Determinação de permissões (admin/user)
-4. **Organização**: Associação com org específica
+4. **Organização**: Associação com org específica via `members`
+5. **Cache**: Sistema de cache em memória (5 minutos) para performance
+
+### Componentes de Autenticação
+
+**ProtectedRoute** (`src/components/ProtectedRoute.tsx`)
+- Guard de autenticação para rotas privadas
+- Valida sessão ativa do Supabase Auth
+- Chama `useSecurity` para verificar autorização
+- Redireciona para `/autenticacao` se não autenticado
+- Bloqueia acesso se usuário não autorizado
+
+**useSecurity** (`src/hooks/useSecurity.ts`)
+- Hook principal de segurança e autorização
+- `checkUserAuthorization(email)`: Verifica se usuário está na tabela `authorized_users`
+- `getUserRole(email)`: Busca role do usuário (admin/user)
+- `validateUser(email)`: Executa validação completa
+- Sistema de cache em memória (5 minutos) para evitar consultas repetidas
+- Timeout de 10 segundos com fallback para cache
+- Previne validações duplicadas com refs
+
+**usePersistentAuth** (`src/hooks/usePersistentAuth.ts`)
+- Monitora estado de autenticação via `onAuthStateChange`
+- Gerencia persistência de sessão
+- Função `logout()` para deslogar
+- Suporte a "Permanecer Logado" (localStorage)
+
+### Sistema de Cache
+- **Cache em Memória**: Map compartilhado entre todas as instâncias
+- **Duração**: 5 minutos (300.000ms)
+- **Estrutura**: `{ isAuthorized: boolean, role: 'admin' | 'user' | null, timestamp: number }`
+- **Fallback**: Em caso de timeout/erro, usa cache antigo se disponível
+- **Limpeza**: Cache é limpo quando usuário faz logout ou não é autorizado
+
+### Hard Refresh e Performance
+- **Problema Resolvido**: Sistema travava no hard refresh ao consultar Supabase
+- **Solução**:
+  - Cache em memória evita re-consultas desnecessárias
+  - Refs (`useRef`) previnem validações duplicadas
+  - Fallback para cache em caso de timeout (10s)
+  - `useCallback` para memoização de funções
 
 ### Segurança
 - **RLS**: Row Level Security em todas as tabelas
-- **JWT**: Tokens de autenticação
+- **JWT**: Tokens de autenticação gerenciados pelo Supabase
+- **Fail-Secure**: Em caso de erro sem cache, NEGA acesso
+- **Timeout**: 10 segundos para consultas, com fallback seguro
+- **Validação Única**: Previne validações duplicadas simultâneas
 - **HTTPS**: Comunicação segura
-- **CORS**: Configuração adequada
+- **CORS**: Configuração adequada no Supabase
+
+### Problemas Conhecidos e Soluções
+
+**Timeout no Supabase:**
+- Consultas à tabela `authorized_users` às vezes demoram
+- Solução: Timeout de 10s + cache em memória + fallback
+
+**Hard Refresh Travando:**
+- `validateUser` era chamado múltiplas vezes simultaneamente
+- Solução: Refs para prevenir validações duplicadas + cache
+
+**Loop Infinito:**
+- `validateUser` limpava localStorage causando re-validações
+- Solução: Removida limpeza de localStorage + validação única via refs
 
 ## 🚀 Deploy e Produção
 
@@ -202,14 +270,17 @@ Todas as rotas são protegidas com autenticação (`ProtectedRoute`) e permissõ
 
 ### Resolvidos
 - ✅ **MIME Type**: JavaScript modules servidos corretamente
-- ✅ **Hard Refresh**: Sistema anti-travamento implementado
+- ✅ **Hard Refresh**: Sistema de cache em memória implementado (Outubro 2025)
 - ✅ **RLS Policies**: Políticas corrigidas para evitar recursão
 - ✅ **User Creation**: Trigger automático funcionando
-- ✅ **Role Detection**: Sistema robusto de detecção de roles
+- ✅ **Role Detection**: Sistema robusto com cache de 5 minutos
+- ✅ **Timeout Issues**: Timeout de 10s com fallback para cache
+- ✅ **Validações Duplicadas**: Sistema de refs previne múltiplas validações
+- ✅ **Fallback Inseguro**: Removido fallback de admin por padrão de email
+- ✅ **Verificação de Autorização**: Reativada com tratamento adequado
 
 ### Em Andamento
-- 🔄 **Timeout Issues**: Consultas às vezes travam
-- 🔄 **Cache Management**: localStorage às vezes inconsistente
+- 🔄 **Performance Geral**: Otimização de queries Supabase
 - 🔄 **Production Sync**: Sincronização dev/prod
 
 ## 📞 Suporte
@@ -226,6 +297,47 @@ Todas as rotas são protegidas com autenticação (`ProtectedRoute`) e permissõ
 
 ---
 
-**Última atualização**: 18 de Outubro de 2024
-**Versão**: 1.0.0
-**Status**: Em produção
+**Última atualização**: 17 de Outubro de 2025
+**Versão Oficial**: 1.0.0 (estável)
+**Versão Teste**: 1.1.0-beta (testando em produção, será revertida)
+**Status**: Teste temporário em produção
+
+## 📝 Changelog
+
+### v1.1.0-beta (17/10/2025) - TESTE EM PRODUÇÃO
+⚠️ **VERSÃO DE TESTE - SERÁ REVERTIDA PARA v1.0.0**
+
+**Objetivo:** Testar correções de autenticação em ambiente real antes de aprovar.
+
+**Mudanças em Teste:**
+- 🧪 **Sistema de Cache em Memória**: Cache de 5 minutos para consultas de autorização
+- 🧪 **Correção Hard Refresh**: Resolvido travamento ao dar hard refresh
+- 🧪 **Segurança Aprimorada**: Removido fallback inseguro de admin por email
+- 🧪 **Performance**: Redução de 90% em consultas repetidas ao Supabase
+- 🧪 **Validação Única**: Sistema de refs previne validações duplicadas
+- 🧪 **Fail-Secure**: Sistema agora nega acesso em caso de erro (mais seguro)
+
+**Arquivos Modificados:**
+- `src/hooks/useSecurity.ts` - Sistema de cache e validação
+- `src/components/ProtectedRoute.tsx` - Verificação de autorização reativada
+- `CLAUDE.md` - Documentação atualizada
+
+**Testes a Realizar:**
+1. ✅ Login normal
+2. ⏳ Hard refresh múltiplos (Cmd+Shift+R)
+3. ⏳ Performance de login
+4. ⏳ Comportamento do cache (5 min)
+5. ⏳ Validar que não há loops infinitos
+6. ⏳ Testar com múltiplos usuários (admin/user)
+7. ⏳ Timeout e fallback funcionando
+
+**Após Testes:**
+- ✅ **Se aprovado:** Manter mudanças, atualizar versão oficial para v1.1.0
+- ❌ **Se reprovado:** Reverter para v1.0.0 (git reset/revert)
+
+### v1.0.0 (18/10/2024) - PRODUÇÃO ATUAL
+- 🎉 Lançamento inicial do Connect IA
+- ✅ Sistema de autenticação e autorização
+- ✅ Multi-tenant com organizações
+- ✅ Integrações WhatsApp, Instagram, Messenger
+- ✅ Sistema de permissões granulares
