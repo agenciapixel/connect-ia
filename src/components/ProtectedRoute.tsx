@@ -17,7 +17,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     } else {
       clearSecurity();
     }
-  }, [user?.email, validateUser, clearSecurity]);
+  }, [user?.email]); // Removido validateUser e clearSecurity das dependências para evitar loop
 
   if (loading || isLoading) {
     return (

@@ -126,6 +126,12 @@ export function useSecurity() {
   };
 
   const validateUser = async (userEmail: string) => {
+    // Evitar validações desnecessárias se já está carregando ou já validado
+    if (security.isLoading || (security.isAuthorized && security.userRole)) {
+      console.log('🔍 useSecurity: Validação já em andamento ou concluída, pulando...');
+      return;
+    }
+
     console.log('🔍 useSecurity: Iniciando validação para:', userEmail);
     setSecurity(prev => ({ ...prev, isLoading: true }));
 

@@ -11757,26 +11757,35 @@ function useSecurity() {
   });
   const checkUserAuthorization = async (userEmail) => {
     try {
+      console.log("🔍 checkUserAuthorization: Iniciando para:", userEmail);
       const { data, error } = await supabase.from("authorized_users").select("email").eq("email", userEmail).single();
+      console.log("🔍 checkUserAuthorization: Resposta:", { data, error });
       if (error) {
-        console.error("Erro ao verificar autorização:", error);
+        console.error("❌ checkUserAuthorization: Erro:", error);
         return false;
       }
-      return !!data;
+      const result = !!data;
+      console.log("🔍 checkUserAuthorization: Resultado:", result);
+      return result;
     } catch (err) {
-      console.error("Erro ao verificar autorização:", err);
+      console.error("❌ checkUserAuthorization: Exception:", err);
       return false;
     }
   };
   const getUserRole = async (userEmail) => {
     try {
+      console.log("🔍 getUserRole: Iniciando para:", userEmail);
       const { data, error } = await supabase.from("authorized_users").select("role").eq("email", userEmail).single();
+      console.log("🔍 getUserRole: Resposta:", { data, error });
       if (error || !data) {
+        console.log("❌ getUserRole: Erro ou sem dados:", error);
         return null;
       }
-      return data.role;
+      const result = data.role;
+      console.log("🔍 getUserRole: Resultado:", result);
+      return result;
     } catch (err) {
-      console.error("Erro ao obter role do usuário:", err);
+      console.error("❌ getUserRole: Exception:", err);
       return null;
     }
   };
@@ -11817,6 +11826,10 @@ function useSecurity() {
     }
   };
   const validateUser = async (userEmail) => {
+    if (security.isLoading || security.isAuthorized && security.userRole) {
+      console.log("🔍 useSecurity: Validação já em andamento ou concluída, pulando...");
+      return;
+    }
     console.log("🔍 useSecurity: Iniciando validação para:", userEmail);
     setSecurity((prev) => ({ ...prev, isLoading: true }));
     try {
@@ -11873,7 +11886,7 @@ function ProtectedRoute({ children }) {
     } else {
       clearSecurity();
     }
-  }, [user == null ? void 0 : user.email, validateUser, clearSecurity]);
+  }, [user == null ? void 0 : user.email]);
   if (loading || isLoading) {
     return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-center min-h-screen", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4" }),
