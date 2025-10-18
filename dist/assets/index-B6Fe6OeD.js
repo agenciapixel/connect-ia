@@ -61633,6 +61633,32 @@ function Auth() {
     ] })
   ] }) });
 }
+function Logout() {
+  const navigate = useNavigate();
+  reactExports.useEffect(() => {
+    const logout = async () => {
+      try {
+        localStorage.clear();
+        await supabase.auth.signOut();
+        console.log("Logout realizado com sucesso");
+        setTimeout(() => {
+          navigate("/autenticacao");
+        }, 2e3);
+      } catch (error) {
+        console.error("Erro ao fazer logout:", error);
+        setTimeout(() => {
+          navigate("/autenticacao");
+        }, 2e3);
+      }
+    };
+    logout();
+  }, [navigate]);
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-center min-h-screen bg-gray-50", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-xl font-semibold text-gray-900 mb-2", children: "Fazendo logout..." }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-600", children: "Limpando sessão e redirecionando para o login." })
+  ] }) });
+}
 function PrivacyPolicy() {
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "container mx-auto px-4 py-8 max-w-4xl", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { children: [
@@ -62799,6 +62825,7 @@ const App = () => {
     /* @__PURE__ */ jsxRuntimeExports.jsx(Toaster, {}),
     /* @__PURE__ */ jsxRuntimeExports.jsx(BrowserRouter, { future: { v7_startTransition: true, v7_relativeSplatPath: true }, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Routes, { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(Route, { path: "/autenticacao", element: /* @__PURE__ */ jsxRuntimeExports.jsx(Auth, {}) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Route, { path: "/logout", element: /* @__PURE__ */ jsxRuntimeExports.jsx(Logout, {}) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(Route, { path: "/politica-privacidade", element: /* @__PURE__ */ jsxRuntimeExports.jsx(PrivacyPolicy, {}) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(Route, { path: "/planos", element: /* @__PURE__ */ jsxRuntimeExports.jsx(PricingPage, {}) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(

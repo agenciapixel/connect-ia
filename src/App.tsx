@@ -18,6 +18,7 @@ import Settings from "./pages/Settings";
 import AgentsIA from "./pages/AgentsIA";
 import Integrations from "./pages/Integrations";
 import Auth from "./pages/Auth";
+import Logout from "./pages/Logout";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Pricing from "./pages/Pricing";
 import AuthorizedUsers from "./pages/AuthorizedUsers";
@@ -41,6 +42,7 @@ const App = () => {
           <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <Routes>
               <Route path="/autenticacao" element={<Auth />} />
+              <Route path="/logout" element={<Logout />} />
               <Route path="/politica-privacidade" element={<PrivacyPolicy />} />
               <Route path="/planos" element={<Pricing />} />
             <Route
