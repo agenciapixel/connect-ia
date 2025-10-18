@@ -11773,67 +11773,38 @@ function useSecurity() {
   const getUserRole = async (userEmail) => {
     try {
       console.log("🔍 getUserRole: Iniciando para:", userEmail);
+      const { data: session } = await supabase.auth.getSession();
+      console.log("🔍 getUserRole: Sessão ativa:", !!session.session);
+      if (!session.session) {
+        console.log("❌ getUserRole: Sem sessão ativa, retornando user");
+        return "user";
+      }
       const queryPromise = supabase.from("authorized_users").select("role").eq("email", userEmail).maybeSingle();
       const timeoutPromise = new Promise(
-        (_, reject) => setTimeout(() => reject(new Error("Timeout rápido: 3 segundos")), 3e3)
+        (_, reject) => setTimeout(() => reject(new Error("Timeout: 10 segundos")), 1e4)
       );
       try {
         const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
-        console.log("🔍 getUserRole: Resposta rápida:", { data, error });
+        console.log("🔍 getUserRole: Resposta:", { data, error });
         if (error) {
           console.error("❌ getUserRole: Erro:", error);
-          return await getRoleFallback(userEmail);
+          return "user";
         }
         if (!data) {
-          console.log("❌ getUserRole: Sem dados");
-          return await getRoleFallback(userEmail);
+          console.log("❌ getUserRole: Usuário não encontrado na tabela");
+          return "user";
         }
         const result = data.role;
-        console.log("🔍 getUserRole: Resultado:", result);
+        console.log("🔍 getUserRole: Role encontrado na tabela:", result);
         return result;
       } catch (timeoutError) {
-        console.log("⏱️ getUserRole: Timeout detectado, usando fallback inteligente...");
-        return await getRoleFallback(userEmail);
+        console.log("⏱️ getUserRole: Timeout detectado, retornando user...");
+        return "user";
       }
     } catch (err) {
       console.error("❌ getUserRole: Exception:", err);
-      return await getRoleFallback(userEmail);
+      return "user";
     }
-  };
-  const getRoleFallback = async (userEmail) => {
-    try {
-      console.log("🔄 getRoleFallback: Tentando buscar role via localStorage...");
-      const savedRole = localStorage.getItem("userRole");
-      if (savedRole && (savedRole === "admin" || savedRole === "user")) {
-        console.log("🔄 getRoleFallback: Role encontrado no localStorage:", savedRole);
-        return savedRole;
-      }
-      console.log("🔄 getRoleFallback: Tentando consulta simples...");
-      try {
-        const simpleQueryPromise = supabase.from("authorized_users").select("role").eq("email", userEmail).limit(1).single();
-        const simpleTimeoutPromise = new Promise(
-          (_, reject) => setTimeout(() => reject(new Error("Consulta simples timeout")), 2e3)
-        );
-        const { data } = await Promise.race([simpleQueryPromise, simpleTimeoutPromise]);
-        if (data == null ? void 0 : data.role) {
-          console.log("🔄 getRoleFallback: Role encontrado via consulta simples:", data.role);
-          localStorage.setItem("userRole", data.role);
-          return data.role;
-        }
-      } catch (simpleError) {
-        console.log("🔄 getRoleFallback: Consulta simples falhou:", simpleError);
-      }
-    } catch (fallbackError) {
-      console.log("🔄 getRoleFallback: Erro no fallback:", fallbackError);
-    }
-    if (userEmail.includes("admin") || userEmail.includes("ricardo") || userEmail.includes("agenciapixel")) {
-      console.log("🔄 getRoleFallback: Assumindo admin por email:", userEmail);
-      localStorage.setItem("userRole", "admin");
-      return "admin";
-    }
-    console.log("🔄 getRoleFallback: Assumindo user padrão");
-    localStorage.setItem("userRole", "user");
-    return "user";
   };
   const getPermissions = (role) => {
     if (role === "admin") {
@@ -11872,10 +11843,10 @@ function useSecurity() {
     }
   };
   const validateUser = async (userEmail) => {
-    if (security.isLoading || security.isAuthorized && security.userRole) {
-      console.log("🔍 useSecurity: Validação já em andamento ou concluída, pulando...");
-      return;
-    }
+    console.log("🧹 useSecurity: Limpando localStorage para forçar nova validação");
+    localStorage.removeItem("userRole");
+    localStorage.removeItem("rememberMe");
+    localStorage.removeItem("userEmail");
     console.log("🔍 useSecurity: Iniciando validação para:", userEmail);
     setSecurity((prev) => ({ ...prev, isLoading: true }));
     try {
@@ -11884,7 +11855,7 @@ function useSecurity() {
       console.log("🔍 useSecurity: Autorização:", isAuthorized);
       console.log("🔍 useSecurity: Obtendo role...");
       const userRole = await getUserRole(userEmail);
-      console.log("🔍 useSecurity: Role:", userRole);
+      console.log("🔍 useSecurity: Role obtido:", userRole);
       const permissions = getPermissions(userRole);
       setSecurity({
         isAuthorized,
@@ -11892,7 +11863,7 @@ function useSecurity() {
         userRole,
         permissions
       });
-      console.log("🔍 useSecurity: Validação concluída:", { isAuthorized, userRole });
+      console.log("🔍 useSecurity: Validação concluída:", { isAuthorized, userRole, permissions });
       if (!isAuthorized) {
         console.log("❌ useSecurity: Usuário não autorizado, fazendo logout");
         ue$1.error("Usuário não autorizado. Entre em contato com o administrador.");

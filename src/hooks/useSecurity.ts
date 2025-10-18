@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -38,8 +38,8 @@ export function useSecurity() {
   const checkUserAuthorization = async (userEmail: string): Promise<boolean> => {
     try {
       console.log('🔍 checkUserAuthorization: Iniciando para:', userEmail);
-      
-      // Solução mais agressiva: usar timeout muito baixo para detectar travamento rapidamente
+
+      // Timeout de 15 segundos (mais realista para Supabase)
       const queryPromise = supabase
         .from('authorized_users')
         .select('email')
@@ -47,44 +47,43 @@ export function useSecurity() {
         .maybeSingle();
 
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Timeout rápido: 3 segundos')), 3000)
+        setTimeout(() => reject(new Error('Timeout: 15 segundos')), 15000)
       );
 
       try {
         const { data, error } = await Promise.race([queryPromise, timeoutPromise]) as any;
-        
-        console.log('🔍 checkUserAuthorization: Resposta rápida:', { data, error });
+
+        console.log('🔍 checkUserAuthorization: Resposta:', { data, error });
 
         if (error) {
           console.error('❌ checkUserAuthorization: Erro:', error);
+          // Em caso de erro do banco, negar acesso (segurança primeiro)
           return false;
         }
 
         const result = !!data;
         console.log('🔍 checkUserAuthorization: Resultado:', result);
         return result;
-        
+
       } catch (timeoutError) {
-        console.log('⏱️ checkUserAuthorization: Timeout detectado, usando fallback...');
-        
-        // Fallback: assumir que usuário está autorizado se já está logado
-        // Isso evita travamento após hard refresh
-        console.log('🔄 checkUserAuthorization: Fallback - assumindo autorização');
-        return true;
+        console.log('⏱️ checkUserAuthorization: Timeout detectado');
+        // Em caso de timeout, negar acesso por segurança
+        console.error('❌ checkUserAuthorization: Acesso negado por timeout');
+        return false;
       }
-      
+
     } catch (err) {
       console.error('❌ checkUserAuthorization: Exception:', err);
-      // Em caso de erro, assumir autorização para evitar travamento
-      return true;
+      // Em caso de erro, negar acesso (fail-secure)
+      return false;
     }
   };
 
   const getUserRole = async (userEmail: string): Promise<'admin' | 'user' | null> => {
     try {
       console.log('🔍 getUserRole: Iniciando para:', userEmail);
-      
-      // Tentar consulta rápida primeiro
+
+      // Timeout de 15 segundos (consistente com checkUserAuthorization)
       const queryPromise = supabase
         .from('authorized_users')
         .select('role')
@@ -92,94 +91,39 @@ export function useSecurity() {
         .maybeSingle();
 
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Timeout rápido: 3 segundos')), 3000)
+        setTimeout(() => reject(new Error('Timeout: 15 segundos')), 15000)
       );
 
       try {
         const { data, error } = await Promise.race([queryPromise, timeoutPromise]) as any;
-        
-        console.log('🔍 getUserRole: Resposta rápida:', { data, error });
+
+        console.log('🔍 getUserRole: Resposta:', { data, error });
 
         if (error) {
           console.error('❌ getUserRole: Erro:', error);
-          // Tentar fallback mais inteligente
-          return await getRoleFallback(userEmail);
+          return null; // Retornar null em caso de erro
         }
 
         if (!data) {
-          console.log('❌ getUserRole: Sem dados');
-          return await getRoleFallback(userEmail);
+          console.log('❌ getUserRole: Usuário não encontrado na tabela');
+          return null; // Usuário não está na tabela authorized_users
         }
 
         const result = data.role as 'admin' | 'user';
-        console.log('🔍 getUserRole: Resultado:', result);
+        console.log('✅ getUserRole: Role encontrado:', result);
         return result;
-        
+
       } catch (timeoutError) {
-        console.log('⏱️ getUserRole: Timeout detectado, usando fallback inteligente...');
-        return await getRoleFallback(userEmail);
+        console.error('⏱️ getUserRole: Timeout detectado');
+        return null; // Retornar null em caso de timeout
       }
-      
+
     } catch (err) {
       console.error('❌ getUserRole: Exception:', err);
-      return await getRoleFallback(userEmail);
+      return null; // Retornar null em caso de exceção
     }
   };
 
-  // Função auxiliar para fallback inteligente
-  const getRoleFallback = async (userEmail: string): Promise<'admin' | 'user'> => {
-    try {
-      console.log('🔄 getRoleFallback: Tentando buscar role via localStorage...');
-      
-      // Tentar buscar role salvo no localStorage
-      const savedRole = localStorage.getItem('userRole');
-      if (savedRole && (savedRole === 'admin' || savedRole === 'user')) {
-        console.log('🔄 getRoleFallback: Role encontrado no localStorage:', savedRole);
-        return savedRole as 'admin' | 'user';
-      }
-      
-      // Se não encontrar no localStorage, tentar uma consulta mais simples com timeout
-      console.log('🔄 getRoleFallback: Tentando consulta simples...');
-      
-      try {
-        const simpleQueryPromise = supabase
-          .from('authorized_users')
-          .select('role')
-          .eq('email', userEmail)
-          .limit(1)
-          .single();
-          
-        const simpleTimeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Consulta simples timeout')), 2000)
-        );
-        
-        const { data } = await Promise.race([simpleQueryPromise, simpleTimeoutPromise]) as any;
-        
-        if (data?.role) {
-          console.log('🔄 getRoleFallback: Role encontrado via consulta simples:', data.role);
-          // Salvar no localStorage para próxima vez
-          localStorage.setItem('userRole', data.role);
-          return data.role as 'admin' | 'user';
-        }
-      } catch (simpleError) {
-        console.log('🔄 getRoleFallback: Consulta simples falhou:', simpleError);
-      }
-      
-    } catch (fallbackError) {
-      console.log('🔄 getRoleFallback: Erro no fallback:', fallbackError);
-    }
-    
-    // Último recurso: assumir admin se email contém palavras-chave
-    if (userEmail.includes('admin') || userEmail.includes('ricardo') || userEmail.includes('agenciapixel')) {
-      console.log('🔄 getRoleFallback: Assumindo admin por email:', userEmail);
-      localStorage.setItem('userRole', 'admin');
-      return 'admin';
-    }
-    
-    console.log('🔄 getRoleFallback: Assumindo user padrão');
-    localStorage.setItem('userRole', 'user');
-    return 'user';
-  };
 
   const getPermissions = (role: 'admin' | 'user' | null) => {
     if (role === 'admin') {
@@ -219,9 +163,9 @@ export function useSecurity() {
   };
 
   const validateUser = async (userEmail: string) => {
-    // Evitar validações desnecessárias se já está carregando ou já validado
-    if (security.isLoading || (security.isAuthorized && security.userRole)) {
-      console.log('🔍 useSecurity: Validação já em andamento ou concluída, pulando...');
+    // Evitar validações duplicadas
+    if (security.isLoading) {
+      console.log('🔍 useSecurity: Validação já em andamento, pulando...');
       return;
     }
 
@@ -235,7 +179,7 @@ export function useSecurity() {
       
       console.log('🔍 useSecurity: Obtendo role...');
       const userRole = await getUserRole(userEmail);
-      console.log('🔍 useSecurity: Role:', userRole);
+      console.log('🔍 useSecurity: Role obtido:', userRole);
 
       const permissions = getPermissions(userRole);
 
@@ -246,7 +190,7 @@ export function useSecurity() {
         permissions
       });
 
-      console.log('🔍 useSecurity: Validação concluída:', { isAuthorized, userRole });
+      console.log('🔍 useSecurity: Validação concluída:', { isAuthorized, userRole, permissions });
 
       if (!isAuthorized) {
         console.log('❌ useSecurity: Usuário não autorizado, fazendo logout');

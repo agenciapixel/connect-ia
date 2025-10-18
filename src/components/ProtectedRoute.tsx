@@ -34,9 +34,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     return <Navigate to="/autenticacao" replace />;
   }
 
-  // Temporariamente desabilitar verificação de autorização para contornar erro 500
-  // TODO: Reativar quando o problema do Supabase for resolvido
-  /*
+  // Verificação de autorização reativada com tratamento melhorado
   if (!isAuthorized) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -51,7 +49,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
               Acesso Não Autorizado
             </h2>
             <p className="text-gray-600 mb-6">
-              Seu usuário não está autorizado a acessar o sistema. 
+              Seu usuário não está autorizado a acessar o sistema.
               Entre em contato com o administrador para solicitar acesso.
             </p>
             <div className="bg-gray-50 rounded-lg p-4 mb-6">
@@ -70,7 +68,6 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
       </div>
     );
   }
-  */
 
   return <>{children}</>;
 }
