@@ -43,8 +43,12 @@ export default function Auth() {
     try {
       const validated = authSchema.parse({ email, password, fullName });
       console.log('🔍 Tentando cadastrar usuário:', validated.email);
+      console.log('📋 Dados validados:', { email: validated.email, fullName: validated.fullName });
       
-      const { data, error } = await supabase.auth.signUp({
+      console.log('🚀 Iniciando chamada supabase.auth.signUp...');
+      
+      // Adicionar timeout para evitar travamento
+      const signUpPromise = supabase.auth.signUp({
         email: validated.email,
         password: validated.password,
         options: {
@@ -53,6 +57,13 @@ export default function Auth() {
           },
         },
       });
+      
+          const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Timeout: Chamada demorou mais de 60 segundos')), 60000)
+          );
+      
+      const { data, error } = await Promise.race([signUpPromise, timeoutPromise]);
+      console.log('✅ Chamada supabase.auth.signUp concluída');
 
       console.log('📊 Resposta do Supabase:', { data, error });
 
@@ -76,11 +87,48 @@ export default function Auth() {
         }, 1500);
       }
     } catch (error) {
-      console.error('❌ Erro de validação:', error);
+      console.error('❌ Erro no processo de cadastro:', error);
+      
       if (error instanceof z.ZodError) {
         toast({
           title: "Dados inválidos",
           description: error.errors[0].message,
+          variant: "destructive",
+        });
+        } else if (error instanceof Error && error.message.includes('Timeout')) {
+          // Verificar se o usuário foi criado mesmo com timeout
+          console.log('⏱️ Timeout detectado, verificando se usuário foi criado...');
+          
+          try {
+            const { data: checkData, error: checkError } = await supabase.auth.signInWithPassword({
+              email: validated.email,
+              password: validated.password,
+            });
+            
+            if (checkData.user && !checkError) {
+              console.log('✅ Usuário foi criado com sucesso (verificado via login)');
+              toast({
+                title: "Cadastro realizado!",
+                description: "Usuário criado com sucesso. Redirecionando...",
+              });
+              setTimeout(() => {
+                navigate("/");
+              }, 1500);
+              return;
+            }
+          } catch (checkErr) {
+            console.log('❌ Usuário não foi criado:', checkErr);
+          }
+          
+          toast({
+            title: "Timeout",
+            description: "A operação demorou muito para responder. Tente novamente.",
+            variant: "destructive",
+          });
+        } else {
+        toast({
+          title: "Erro inesperado",
+          description: error instanceof Error ? error.message : "Erro desconhecido",
           variant: "destructive",
         });
       }

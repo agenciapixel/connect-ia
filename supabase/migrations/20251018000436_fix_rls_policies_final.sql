@@ -23,6 +23,7 @@ CREATE POLICY "Users can view their own profile" ON public.authorized_users
     FOR SELECT USING (id = auth.uid());
 
 -- Policy for members - users can view their own memberships
+DROP POLICY IF EXISTS "Users can view their own memberships" ON public.members;
 CREATE POLICY "Users can view their own memberships" ON public.members
     FOR SELECT USING (user_id = auth.uid());
 
