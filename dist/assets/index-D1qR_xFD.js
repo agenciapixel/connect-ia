@@ -61381,7 +61381,9 @@ function Auth() {
     try {
       const validated = authSchema.parse({ email, password, fullName });
       console.log("🔍 Tentando cadastrar usuário:", validated.email);
-      const { data, error } = await supabase.auth.signUp({
+      console.log("📋 Dados validados:", { email: validated.email, fullName: validated.fullName });
+      console.log("🚀 Iniciando chamada supabase.auth.signUp...");
+      const signUpPromise = supabase.auth.signUp({
         email: validated.email,
         password: validated.password,
         options: {
@@ -61390,6 +61392,11 @@ function Auth() {
           }
         }
       });
+      const timeoutPromise = new Promise(
+        (_, reject) => setTimeout(() => reject(new Error("Timeout: Chamada demorou mais de 30 segundos")), 3e4)
+      );
+      const { data, error } = await Promise.race([signUpPromise, timeoutPromise]);
+      console.log("✅ Chamada supabase.auth.signUp concluída");
       console.log("📊 Resposta do Supabase:", { data, error });
       if (error) {
         console.error("❌ Erro no cadastro:", error);
@@ -61409,11 +61416,23 @@ function Auth() {
         }, 1500);
       }
     } catch (error) {
-      console.error("❌ Erro de validação:", error);
+      console.error("❌ Erro no processo de cadastro:", error);
       if (error instanceof ZodError) {
         toast2({
           title: "Dados inválidos",
           description: error.errors[0].message,
+          variant: "destructive"
+        });
+      } else if (error instanceof Error && error.message.includes("Timeout")) {
+        toast2({
+          title: "Timeout",
+          description: "A operação demorou muito para responder. Tente novamente.",
+          variant: "destructive"
+        });
+      } else {
+        toast2({
+          title: "Erro inesperado",
+          description: error instanceof Error ? error.message : "Erro desconhecido",
           variant: "destructive"
         });
       }
