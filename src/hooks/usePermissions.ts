@@ -276,10 +276,21 @@ const ROLE_PERMISSIONS: Record<UserRole, Permissions> = {
 
 export function usePermissions() {
   const { currentOrg } = useOrganization();
-  
+
   const userRole: UserRole = currentOrg?.role || "viewer";
   const permissions = ROLE_PERMISSIONS[userRole];
-  
+
+  // Debug: Log para identificar problema de role
+  console.log('🔐 usePermissions:', {
+    currentOrg: currentOrg ? {
+      id: currentOrg.id,
+      name: currentOrg.name,
+      role: currentOrg.role
+    } : null,
+    userRole,
+    fallbackUsed: !currentOrg?.role
+  });
+
   return {
     userRole,
     permissions,
@@ -287,13 +298,13 @@ export function usePermissions() {
     isManager: userRole === "manager",
     isAgent: userRole === "agent",
     isViewer: userRole === "viewer",
-    
+
     // Helper functions for common permission checks
     canAccess: (permission: keyof Permissions) => permissions[permission],
-    canAccessAny: (...permissions: (keyof Permissions)[]) => 
-      permissions.some(permission => permissions[permission]),
-    canAccessAll: (...permissions: (keyof Permissions)[]) => 
-      permissions.every(permission => permissions[permission]),
+    canAccessAny: (...permissionKeys: (keyof Permissions)[]) =>
+      permissionKeys.some(permission => permissions[permission]),
+    canAccessAll: (...permissionKeys: (keyof Permissions)[]) =>
+      permissionKeys.every(permission => permissions[permission]),
   };
 }
 
