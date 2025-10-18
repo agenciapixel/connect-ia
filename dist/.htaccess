@@ -18,19 +18,8 @@ RewriteEngine On
 
 # Force MIME types for JavaScript and CSS (Hostinger specific)
 <IfModule mod_mime.c>
-    # JavaScript files - CRITICAL for ES6 modules
     AddType application/javascript .js
     AddType application/javascript .mjs
-    AddType application/javascript .ts
-    AddType application/javascript .tsx
-    
-    # Ensure charset is set for JavaScript
-    AddCharset UTF-8 .js
-    AddCharset UTF-8 .mjs
-    AddCharset UTF-8 .ts
-    AddCharset UTF-8 .tsx
-    
-    # Other file types
     AddType text/css .css
     AddType image/x-icon .ico
     AddType image/svg+xml .svg
@@ -41,12 +30,10 @@ RewriteEngine On
     AddType font/eot .eot
 </IfModule>
 
-# Alternative MIME type configuration - Force correct headers
+# Alternative MIME type configuration
 <IfModule mod_headers.c>
-    <FilesMatch "\.(js|mjs|ts|tsx)$">
+    <FilesMatch "\.(js|mjs)$">
         Header set Content-Type "application/javascript; charset=utf-8"
-        Header unset X-Content-Type-Options
-        Header set Access-Control-Allow-Origin "*"
     </FilesMatch>
     <FilesMatch "\.css$">
         Header set Content-Type "text/css"
