@@ -11,7 +11,10 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
     // https: true, // Temporariamente desabilitado para resolver problema SSL
   },
-  plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
+  plugins: [
+    react(),
+    ...(mode === "development" ? [componentTagger()] : [])
+  ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
