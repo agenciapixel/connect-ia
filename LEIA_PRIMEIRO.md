@@ -28,6 +28,14 @@ Você será redirecionado automaticamente!
 
 ## 📚 Documentação Disponível
 
+### 🔥 INTEGRAÇÃO META (WhatsApp/Instagram/Messenger)
+- **[GUIA_COMPLETO_INTEGRACAO_META.md](GUIA_COMPLETO_INTEGRACAO_META.md)** ⭐ **PRINCIPAL!**
+  - WhatsApp via QR Code (5 min - Recomendado)
+  - WhatsApp via API Oficial do Meta (30 min)
+  - Instagram Business
+  - Messenger
+  - TUDO EM UM SÓ ARQUIVO!
+
 ### Para Começar
 - **[COMANDOS_RAPIDOS.md](COMANDOS_RAPIDOS.md)** ⚡
   - Comandos de terminal copy-paste
