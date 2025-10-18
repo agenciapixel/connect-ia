@@ -14,9 +14,7 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
 import { usePersistentAuth } from "@/hooks/usePersistentAuth";
-import { usePermissions } from "@/hooks/usePermissions";
 import { toast } from "sonner";
 import { OrganizationSwitcher } from "./OrganizationSwitcher";
 import { HiddenUnless } from "./PermissionGuard";
@@ -24,7 +22,6 @@ import { UserRoleBadge } from "./UserRoleBadge";
 
     const menuItems = [
       { title: "Dashboard", url: "/", icon: Home, permission: "canViewReports" as const },
-      { title: "Painel", url: "/painel", icon: Home, permission: "canViewReports" as const },
       { title: "Caixa de Entrada", url: "/caixa-entrada", icon: MessageSquare, permission: "canAccessInbox" as const },
       { title: "Contatos", url: "/contatos", icon: Users, permission: "canManageContacts" as const },
       { title: "Campanhas", url: "/campanhas", icon: Megaphone, permission: "canManageCampaigns" as const },
@@ -33,9 +30,6 @@ import { UserRoleBadge } from "./UserRoleBadge";
       { title: "Atendentes", url: "/atendentes", icon: UserCheck, permission: "canManageAttendants" as const },
       { title: "Agentes IA", url: "/agentes-ia", icon: Bot, permission: "canManageAIAgents" as const },
       { title: "Integrações", url: "/integracoes", icon: Plug, permission: "canManageIntegrations" as const },
-      { title: "Planos", url: "/planos", icon: CreditCard, permission: "canViewReports" as const },
-      { title: "Usuários Autorizados", url: "/usuarios-autorizados", icon: Shield, permission: "canManageSettings" as const },
-      { title: "Monitoramento", url: "/monitoramento", icon: Activity, permission: "canManageSettings" as const },
       { title: "Configurações", url: "/configuracoes", icon: Settings, permission: "canManageSettings" as const },
     ];
 
@@ -70,7 +64,7 @@ export function AppSidebar() {
             <>
               <div className="flex items-center justify-between">
                 <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                  Omnichat IA
+                  Connect IA
                 </h1>
                 <SidebarTrigger className="text-sidebar-foreground" />
               </div>
