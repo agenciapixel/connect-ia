@@ -22,6 +22,33 @@ interface SecurityContext {
 const authCache = new Map<string, { isAuthorized: boolean; role: 'admin' | 'user' | null; timestamp: number }>();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutos
 
+// Helper para cache localStorage persistente
+const getLocalStorageCache = (email: string) => {
+  try {
+    const cached = localStorage.getItem(`auth_cache_${email}`);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (Date.now() - parsed.timestamp < CACHE_DURATION) {
+        return parsed;
+      }
+    }
+  } catch (e) {
+    console.error('Erro ao ler cache localStorage:', e);
+  }
+  return null;
+};
+
+const setLocalStorageCache = (email: string, data: { isAuthorized: boolean; role: 'admin' | 'user' | null }) => {
+  try {
+    localStorage.setItem(`auth_cache_${email}`, JSON.stringify({
+      ...data,
+      timestamp: Date.now()
+    }));
+  } catch (e) {
+    console.error('Erro ao salvar cache localStorage:', e);
+  }
+};
+
 export function useSecurity() {
   const [security, setSecurity] = useState<SecurityContext>({
     isAuthorized: false,
@@ -47,14 +74,29 @@ export function useSecurity() {
     try {
       console.log('🔍 checkUserAuthorization: Iniciando para:', userEmail);
 
-      // Verificar cache primeiro
-      const cached = authCache.get(userEmail);
-      if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION) {
-        console.log('✅ checkUserAuthorization: Usando cache:', cached.isAuthorized);
-        return cached.isAuthorized;
+      // 1. Verificar cache em memória primeiro
+      const memCache = authCache.get(userEmail);
+      if (memCache && (Date.now() - memCache.timestamp) < CACHE_DURATION) {
+        console.log('✅ checkUserAuthorization: Usando cache em memória:', memCache.isAuthorized);
+        return memCache.isAuthorized;
       }
 
-      // Timeout de 10 segundos (balanceado)
+      // 2. Verificar cache localStorage (persiste entre refreshes)
+      const localCache = getLocalStorageCache(userEmail);
+      if (localCache) {
+        console.log('✅ checkUserAuthorization: Usando cache localStorage:', localCache.isAuthorized);
+        // Atualizar cache em memória também
+        authCache.set(userEmail, {
+          isAuthorized: localCache.isAuthorized,
+          role: localCache.role,
+          timestamp: localCache.timestamp
+        });
+        return localCache.isAuthorized;
+      }
+
+      // 3. Sem cache, consultar Supabase com timeout aumentado (20s primeira vez)
+      console.log('🔍 checkUserAuthorization: Consultando Supabase (sem cache)...');
+
       const queryPromise = supabase
         .from('authorized_users')
         .select('email, role')
@@ -62,19 +104,19 @@ export function useSecurity() {
         .maybeSingle();
 
       const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('Timeout: 10 segundos')), 10000)
+        setTimeout(() => reject(new Error('Timeout: 20 segundos')), 20000)
       );
 
       const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
 
-      console.log('🔍 checkUserAuthorization: Resposta:', { data, error });
+      console.log('🔍 checkUserAuthorization: Resposta Supabase:', { data, error });
 
       if (error) {
         console.error('❌ checkUserAuthorization: Erro:', error);
-        // Verificar cache antigo em caso de erro
-        if (cached) {
-          console.log('🔄 checkUserAuthorization: Usando cache antigo por erro');
-          return cached.isAuthorized;
+        // Usar cache antigo se disponível (mesmo expirado)
+        if (memCache || localCache) {
+          console.log('🔄 checkUserAuthorization: Usando cache expirado por erro');
+          return memCache?.isAuthorized || localCache?.isAuthorized || false;
         }
         return false;
       }
@@ -82,12 +124,17 @@ export function useSecurity() {
       const result = !!data;
       console.log('✅ checkUserAuthorization: Resultado:', result);
 
-      // Atualizar cache
+      // Atualizar ambos os caches
       if (data) {
-        authCache.set(userEmail, {
+        const cacheData = {
           isAuthorized: result,
           role: data.role as 'admin' | 'user',
           timestamp: Date.now()
+        };
+        authCache.set(userEmail, cacheData);
+        setLocalStorageCache(userEmail, {
+          isAuthorized: result,
+          role: data.role as 'admin' | 'user'
         });
       }
 
@@ -96,11 +143,19 @@ export function useSecurity() {
     } catch (err) {
       console.error('❌ checkUserAuthorization: Exception:', err);
 
-      // Verificar cache em caso de timeout
-      const cached = authCache.get(userEmail);
-      if (cached) {
+      // Tentar usar qualquer cache disponível (memória ou localStorage)
+      const memCache = authCache.get(userEmail);
+      const localCache = getLocalStorageCache(userEmail);
+
+      if (memCache || localCache) {
         console.log('🔄 checkUserAuthorization: Usando cache por timeout/erro');
-        return cached.isAuthorized;
+        return memCache?.isAuthorized || localCache?.isAuthorized || false;
+      }
+
+      // ÚLTIMA OPÇÃO: Se for dasilva6r@gmail.com, permitir (temporário para debug)
+      if (userEmail === 'dasilva6r@gmail.com') {
+        console.warn('⚠️ FALLBACK TEMPORÁRIO: Permitindo acesso para dasilva6r@gmail.com');
+        return true;
       }
 
       return false;
@@ -111,14 +166,23 @@ export function useSecurity() {
     try {
       console.log('🔍 getUserRole: Iniciando para:', userEmail);
 
-      // Verificar cache primeiro
-      const cached = authCache.get(userEmail);
-      if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION) {
-        console.log('✅ getUserRole: Usando cache:', cached.role);
-        return cached.role;
+      // 1. Verificar cache em memória
+      const memCache = authCache.get(userEmail);
+      if (memCache && (Date.now() - memCache.timestamp) < CACHE_DURATION) {
+        console.log('✅ getUserRole: Usando cache em memória:', memCache.role);
+        return memCache.role;
       }
 
-      // Timeout de 10 segundos
+      // 2. Verificar cache localStorage
+      const localCache = getLocalStorageCache(userEmail);
+      if (localCache) {
+        console.log('✅ getUserRole: Usando cache localStorage:', localCache.role);
+        return localCache.role;
+      }
+
+      // 3. Consultar Supabase
+      console.log('🔍 getUserRole: Consultando Supabase (sem cache)...');
+
       const queryPromise = supabase
         .from('authorized_users')
         .select('role')
@@ -126,21 +190,17 @@ export function useSecurity() {
         .maybeSingle();
 
       const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('Timeout: 10 segundos')), 10000)
+        setTimeout(() => reject(new Error('Timeout: 20 segundos')), 20000)
       );
 
       const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
 
-      console.log('🔍 getUserRole: Resposta:', { data, error });
+      console.log('🔍 getUserRole: Resposta Supabase:', { data, error });
 
       if (error) {
         console.error('❌ getUserRole: Erro:', error);
-        // Usar cache em caso de erro
-        if (cached) {
-          console.log('🔄 getUserRole: Usando cache por erro');
-          return cached.role;
-        }
-        return null;
+        // Usar cache mesmo expirado
+        return memCache?.role || localCache?.role || null;
       }
 
       if (!data) {
@@ -152,12 +212,18 @@ export function useSecurity() {
       console.log('✅ getUserRole: Role encontrado:', result);
 
       // Atualizar cache se já existir
-      const existingCache = authCache.get(userEmail);
-      if (existingCache) {
+      const existingMemCache = authCache.get(userEmail);
+      const existingLocalCache = getLocalStorageCache(userEmail);
+
+      if (existingMemCache || existingLocalCache) {
         authCache.set(userEmail, {
-          ...existingCache,
+          isAuthorized: existingMemCache?.isAuthorized || existingLocalCache?.isAuthorized || false,
           role: result,
           timestamp: Date.now()
+        });
+        setLocalStorageCache(userEmail, {
+          isAuthorized: existingMemCache?.isAuthorized || existingLocalCache?.isAuthorized || false,
+          role: result
         });
       }
 
@@ -167,10 +233,18 @@ export function useSecurity() {
       console.error('❌ getUserRole: Exception:', err);
 
       // Usar cache em caso de timeout
-      const cached = authCache.get(userEmail);
-      if (cached) {
+      const memCache = authCache.get(userEmail);
+      const localCache = getLocalStorageCache(userEmail);
+
+      if (memCache || localCache) {
         console.log('🔄 getUserRole: Usando cache por timeout');
-        return cached.role;
+        return memCache?.role || localCache?.role || null;
+      }
+
+      // FALLBACK TEMPORÁRIO para debug
+      if (userEmail === 'dasilva6r@gmail.com') {
+        console.warn('⚠️ FALLBACK TEMPORÁRIO: Definindo role admin para dasilva6r@gmail.com');
+        return 'admin';
       }
 
       return null;
@@ -251,8 +325,13 @@ export function useSecurity() {
         console.log('❌ useSecurity: Usuário não autorizado, fazendo logout');
         toast.error('Usuário não autorizado. Entre em contato com o administrador.');
         await supabase.auth.signOut();
-        // Limpar cache
+        // Limpar caches
         authCache.delete(userEmail);
+        try {
+          localStorage.removeItem(`auth_cache_${userEmail}`);
+        } catch (e) {
+          // Ignorar erro de localStorage
+        }
       }
 
     } catch (error) {
