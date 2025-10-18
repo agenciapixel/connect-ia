@@ -7,7 +7,7 @@ interface Organization {
   name: string;
   slug: string;
   plan: string | null;
-  role: "admin" | "manager" | "agent" | "viewer";
+  role: "admin" | "member" | "viewer";
 }
 
 interface OrganizationContextType {
@@ -26,24 +26,34 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchOrganizations = async () => {
-    console.log('🔄 [SIMPLE] fetchOrganizations: INICIANDO...');
-    setIsLoading(true);
+    console.log('🔄 fetchOrganizations: INICIANDO...');
 
     try {
-      // Pegar user_id do Supabase Auth (já logado)
-      const { data: { user } } = await supabase.auth.getUser();
+      // Buscar sessão (mais rápido e confiável que getUser)
+      console.log('🔄 fetchOrganizations: Buscando sessão...');
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      console.log('🔄 fetchOrganizations: getSession retornou:', session?.user ? session.user.email : 'null');
 
-      if (!user) {
-        console.log('❌ [SIMPLE] Sem usuário logado');
+      if (sessionError) {
+        console.error('❌ fetchOrganizations: Erro ao buscar sessão:', sessionError);
         setOrganizations([]);
         setCurrentOrg(null);
         setIsLoading(false);
         return;
       }
 
-      console.log('✅ [SIMPLE] Usuário:', user.email);
+      if (!session?.user) {
+        console.log('❌ fetchOrganizations: Sem sessão, abortando');
+        setOrganizations([]);
+        setCurrentOrg(null);
+        setIsLoading(false);
+        return;
+      }
 
-      // Buscar organizações do usuário
+      const user = session.user;
+      console.log('✅ fetchOrganizations: Sessão válida, usuário:', user.email);
+
+      // Buscar todas as organizações do usuário através da tabela members
       const { data: memberships, error } = await supabase
         .from("members")
         .select(`
@@ -57,12 +67,10 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
         `)
         .eq("user_id", user.id);
 
-      if (error) {
-        console.error('❌ [SIMPLE] Erro ao buscar members:', error);
-        throw error;
-      }
+      console.log('📊 fetchOrganizations: Memberships retornadas:', memberships);
+      console.log('❌ fetchOrganizations: Erro?', error);
 
-      console.log('📊 [SIMPLE] Memberships:', memberships);
+      if (error) throw error;
 
       const orgs: Organization[] = (memberships || [])
         .filter(m => m.orgs)
@@ -71,32 +79,36 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
           name: m.orgs.name,
           slug: m.orgs.slug,
           plan: m.orgs.plan,
-          role: m.role as "admin" | "manager" | "agent" | "viewer",
+          role: m.role as "admin" | "member" | "viewer",
         }));
 
-      console.log('🏢 [SIMPLE] Organizações:', orgs);
+      console.log('🏢 fetchOrganizations: Organizações processadas:', orgs);
       setOrganizations(orgs);
 
-      // Selecionar primeira organização
-      if (orgs.length > 0) {
+      // Se não há org atual selecionada, selecionar a primeira
+      if (!currentOrg && orgs.length > 0) {
         const savedOrgId = localStorage.getItem("currentOrgId");
         const orgToSet = orgs.find(o => o.id === savedOrgId) || orgs[0];
         setCurrentOrg(orgToSet);
         localStorage.setItem("currentOrgId", orgToSet.id);
-        console.log('✅ [SIMPLE] Organização selecionada:', orgToSet.name, 'Role:', orgToSet.role);
-      } else {
-        console.log('⚠️ [SIMPLE] Nenhuma organização encontrada');
-        setCurrentOrg(null);
+      }
+
+      // Se a org atual não está mais na lista, mudar para a primeira
+      if (currentOrg && !orgs.find(o => o.id === currentOrg.id)) {
+        const orgToSet = orgs[0] || null;
+        setCurrentOrg(orgToSet);
+        if (orgToSet) {
+          localStorage.setItem("currentOrgId", orgToSet.id);
+        } else {
+          localStorage.removeItem("currentOrgId");
+        }
       }
 
     } catch (error) {
-      console.error("❌ [SIMPLE] Erro:", error);
+      console.error("Erro ao buscar organizações:", error);
       toast.error("Erro ao carregar organizações");
-      setOrganizations([]);
-      setCurrentOrg(null);
     } finally {
       setIsLoading(false);
-      console.log('✅ [SIMPLE] fetchOrganizations: CONCLUÍDO');
     }
   };
 
@@ -106,35 +118,51 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
       setCurrentOrg(org);
       localStorage.setItem("currentOrgId", orgId);
       toast.success(`Organização alterada para: ${org.name}`);
+
+      // Recarregar a página para atualizar todos os dados
       window.location.reload();
     }
   };
 
   const refreshOrganizations = async () => {
+    setIsLoading(true);
     await fetchOrganizations();
   };
 
   useEffect(() => {
-    console.log('🔄 [SIMPLE] OrganizationContext: Montando...');
-
-    // Buscar organizações imediatamente
-    fetchOrganizations();
+    console.log('🔄 OrganizationContext: useEffect iniciado');
 
     // Listener para mudanças de autenticação
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('🔄 [SIMPLE] Auth changed:', event);
+      console.log('🔄 OrganizationContext: Auth state changed:', event, session?.user?.email);
 
       if (event === "SIGNED_IN" && session?.user) {
+        console.log('🔄 OrganizationContext: SIGNED_IN detectado, fetchOrganizations...');
         await fetchOrganizations();
       } else if (event === "SIGNED_OUT") {
+        console.log('🔄 OrganizationContext: SIGNED_OUT detectado');
         setOrganizations([]);
         setCurrentOrg(null);
         localStorage.removeItem("currentOrgId");
         setIsLoading(false);
+      } else if (event === "INITIAL_SESSION") {
+        console.log('🔄 OrganizationContext: INITIAL_SESSION detectado');
+        if (session?.user) {
+          console.log('🔄 OrganizationContext: Sessão válida, fetchOrganizations...');
+          await fetchOrganizations();
+        } else {
+          console.log('🔄 OrganizationContext: Sem sessão, setIsLoading(false)');
+          setOrganizations([]);
+          setCurrentOrg(null);
+          setIsLoading(false);
+        }
+      } else {
+        console.log('🔄 OrganizationContext: Evento desconhecido:', event);
       }
     });
 
     return () => {
+      console.log('🔄 OrganizationContext: Limpando subscription');
       subscription.unsubscribe();
     };
   }, []);

@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Check, Crown, Zap, Users, Bot, MapPin, MessageSquare } from 'lucide-react';
-import { usePlanLimits } from '@/hooks/usePlanLimits';
+// import { usePlanLimits } from '@/hooks/usePlanLimits'; // DESABILITADO - Sistema de planos removido
 import { toast } from 'sonner';
 
 interface PlanSelectorProps {
@@ -12,7 +12,8 @@ interface PlanSelectorProps {
 }
 
 export function PlanSelector({ onPlanSelect, className }: PlanSelectorProps) {
-  const { planUsage, isLoading } = usePlanLimits();
+  // const { planUsage, isLoading } = usePlanLimits(); // DESABILITADO - Sistema de planos removido
+  const isLoading = false; // Temporário
   const [selectedPlan, setSelectedPlan] = useState<string>('basic');
 
   const plans = [
@@ -170,7 +171,7 @@ export function PlanSelector({ onPlanSelect, className }: PlanSelectorProps) {
       {plans.map((plan) => {
         const Icon = plan.icon;
         const isSelected = selectedPlan === plan.id;
-        const isCurrentPlan = planUsage?.plan.id === plan.id;
+        const isCurrentPlan = false; // planUsage?.plan.id === plan.id; // DESABILITADO
         
         return (
           <Card 

@@ -16,7 +16,7 @@ export default function PrivacyPolicy() {
           <section>
             <h2 className="text-2xl font-semibold mb-4">1. Informações Gerais</h2>
             <p className="text-muted-foreground leading-relaxed">
-              Esta Política de Privacidade descreve como o Omnichat IA ("nós", "nosso" ou "a empresa") 
+              Esta Política de Privacidade descreve como o Connect IA ("nós", "nosso" ou "a empresa")
               coleta, usa, armazena e protege suas informações pessoais quando você utiliza nossos serviços.
             </p>
           </section>
@@ -167,9 +167,9 @@ export default function PrivacyPolicy() {
               tratamos suas informações pessoais, entre em contato conosco:
             </p>
             <div className="mt-4 p-4 bg-muted rounded-lg">
-              <p className="font-medium">Omnichat IA</p>
-              <p>E-mail: privacidade@omnichat-ia.com</p>
-              <p>Suporte: suporte@omnichat-ia.com</p>
+              <p className="font-medium">Connect IA - Agência Pixel</p>
+              <p>E-mail: ricardo@agenciapixel.digital</p>
+              <p>Encarregado de Dados (DPO): Ricardo da Silva</p>
             </div>
           </section>
 

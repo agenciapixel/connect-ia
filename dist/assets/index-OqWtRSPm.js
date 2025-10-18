@@ -15,9 +15,9 @@ var __privateWrapper = (obj, member, setter, getter) => ({
   }
 });
 var _provider, _providerCalled, _a, _focused, _cleanup, _setup, _b, _online, _cleanup2, _setup2, _c, _gcTimeout, _d, _initialState, _revertState, _cache, _client, _retryer, _defaultOptions, _abortSignalConsumed, _Query_instances, dispatch_fn, _e2, _client2, _currentQuery, _currentQueryInitialState, _currentResult, _currentResultState, _currentResultOptions, _currentThenable, _selectError, _selectFn, _selectResult, _lastQueryWithDefinedData, _staleTimeoutId, _refetchIntervalId, _currentRefetchInterval, _trackedProps, _QueryObserver_instances, executeFetch_fn, updateStaleTimeout_fn, computeRefetchInterval_fn, updateRefetchInterval_fn, updateTimers_fn, clearStaleTimeout_fn, clearRefetchInterval_fn, updateQuery_fn, notify_fn, _f, _client3, _observers, _mutationCache, _retryer2, _Mutation_instances, dispatch_fn2, _g, _mutations, _scopes, _mutationId, _h, _client4, _currentResult2, _currentMutation, _mutateOptions, _MutationObserver_instances, updateResult_fn, notify_fn2, _i, _queries, _j, _queryCache, _mutationCache2, _defaultOptions2, _queryDefaults, _mutationDefaults, _mountCount, _unsubscribeFocus, _unsubscribeOnline, _k;
-import { j as jsxRuntimeExports, P as Primitive, c as createContextScope, a as createCollection, u as useComposedRefs, B as Branch, b as useControllableState, d as Presence, e as composeEventHandlers, f as useCallbackRef, R as Root$8, g as Portal$2, h as useLayoutEffect2, i as dispatchDiscreteCustomEvent, k as createPopperScope, D as DismissableLayer, C as Content, l as createSlottable, m as useId, n as Root2$3, A as Anchor, o as Arrow, S as Slot$2, O as Overlay, p as Portal$3, q as Content$1, r as Close$1, T as Title$1, s as Description$1, t as Root$9, v as composeRefs, w as Trigger$3, x as hideOthers, y as ReactRemoveScroll, z as createSlot, E as useFocusGuards, F as FocusScope, L as List, G as Trigger$4, H as Content$2, I as Root2$4, J as useDirection, K as SubTrigger2, M as SubContent2, N as Portal2, Q as Content2$3, U as Item2, V as CheckboxItem2, W as ItemIndicator2, X as RadioItem2, Y as Label2, Z as Separator2, _ as Root2$5, $ as Trigger$5, a0 as useSize } from "./ui-C5Jq7IRO.js";
+import { j as jsxRuntimeExports, P as Primitive, c as createContextScope, a as createCollection, u as useComposedRefs, B as Branch, b as useControllableState, d as Presence, e as composeEventHandlers, f as useCallbackRef, R as Root$7, g as Portal$2, h as useLayoutEffect2, i as dispatchDiscreteCustomEvent, k as createPopperScope, D as DismissableLayer, C as Content, l as createSlottable, m as useId, n as Root2$3, A as Anchor, o as Arrow, S as Slot$2, O as Overlay, p as Portal$3, q as Content$1, r as Close$1, T as Title$1, s as Description$1, t as Root$8, v as composeRefs, w as Trigger$3, x as hideOthers, y as ReactRemoveScroll, z as createSlot, E as useFocusGuards, F as FocusScope, L as List, G as Trigger$4, H as Content$2, I as Root2$4, J as useDirection, K as SubTrigger2, M as SubContent2, N as Portal2, Q as Content2$3, U as Item2, V as CheckboxItem2, W as ItemIndicator2, X as RadioItem2, Y as Label2, Z as Separator2, _ as Root2$5, $ as Trigger$5, a0 as useSize } from "./ui-C5Jq7IRO.js";
 import { a as reactDomExports, r as reactExports, c as React$1, R as React$2, b as ReactDOM, d as commonjsGlobal, e as getDefaultExportFromCjs } from "./vendor-PW6CrziB.js";
-import { c as createClient } from "./supabase-DlgCEs1u.js";
+import { c as createClient } from "./supabase-Bw2zT0KV.js";
 (function polyfill() {
   const relList = document.createElement("link").relList;
   if (relList && relList.supports && relList.supports("modulepreload")) {
@@ -202,7 +202,7 @@ var VisuallyHidden = reactExports.forwardRef(
   }
 );
 VisuallyHidden.displayName = NAME$2;
-var Root$7 = VisuallyHidden;
+var Root$6 = VisuallyHidden;
 var PROVIDER_NAME$1 = "ToastProvider";
 var [Collection$2, useCollection$2, createCollectionScope$2] = createCollection("Toast");
 var [createToastContext] = createContextScope("Toast", [createCollectionScope$2]);
@@ -564,7 +564,7 @@ var ToastImpl = reactExports.forwardRef(
       ),
       /* @__PURE__ */ jsxRuntimeExports.jsx(ToastInteractiveProvider, { scope: __scopeToast, onClose: handleClose, children: reactDomExports.createPortal(
         /* @__PURE__ */ jsxRuntimeExports.jsx(Collection$2.ItemSlot, { scope: __scopeToast, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Root$8,
+          Root$7,
           {
             asChild: true,
             onEscapeKeyDown: composeEventHandlers(onEscapeKeyDown, () => {
@@ -2474,12 +2474,12 @@ const lengthUnitRegex = /\d+(%|px|r?em|[sdl]?v([hwib]|min|max)|pt|pc|in|cm|mm|ca
 const colorFunctionRegex = /^(rgba?|hsla?|hwb|(ok)?(lab|lch))\(.+\)$/;
 const shadowRegex = /^(inset_)?-?((\d+)?\.?(\d+)[a-z]+|0)_-?((\d+)?\.?(\d+)[a-z]+|0)/;
 const imageRegex = /^(url|image|image-set|cross-fade|element|(repeating-)?(linear|radial|conic)-gradient)\(.+\)$/;
-const isLength$4 = (value) => isNumber$5(value) || stringLengths.has(value) || fractionRegex.test(value);
+const isLength$4 = (value) => isNumber$4(value) || stringLengths.has(value) || fractionRegex.test(value);
 const isArbitraryLength = (value) => getIsArbitraryValue(value, "length", isLengthOnly);
-const isNumber$5 = (value) => Boolean(value) && !Number.isNaN(Number(value));
-const isArbitraryNumber = (value) => getIsArbitraryValue(value, "number", isNumber$5);
+const isNumber$4 = (value) => Boolean(value) && !Number.isNaN(Number(value));
+const isArbitraryNumber = (value) => getIsArbitraryValue(value, "number", isNumber$4);
 const isInteger = (value) => Boolean(value) && Number.isInteger(Number(value));
-const isPercent$1 = (value) => value.endsWith("%") && isNumber$5(value.slice(0, -1));
+const isPercent$1 = (value) => value.endsWith("%") && isNumber$4(value.slice(0, -1));
 const isArbitraryValue = (value) => arbitraryValueRegex.test(value);
 const isTshirtSize = (value) => tshirtUnitRegex.test(value);
 const sizeLabels = /* @__PURE__ */ new Set(["length", "size", "percentage"]);
@@ -2539,14 +2539,14 @@ const getDefaultConfig = () => {
   const getSpacingWithAutoAndArbitrary = () => ["auto", isArbitraryValue, spacing];
   const getSpacingWithArbitrary = () => [isArbitraryValue, spacing];
   const getLengthWithEmptyAndArbitrary = () => ["", isLength$4, isArbitraryLength];
-  const getNumberWithAutoAndArbitrary = () => ["auto", isNumber$5, isArbitraryValue];
+  const getNumberWithAutoAndArbitrary = () => ["auto", isNumber$4, isArbitraryValue];
   const getPositions = () => ["bottom", "center", "left", "left-bottom", "left-top", "right", "right-bottom", "right-top", "top"];
   const getLineStyles = () => ["solid", "dashed", "dotted", "double", "none"];
   const getBlendModes = () => ["normal", "multiply", "screen", "overlay", "darken", "lighten", "color-dodge", "color-burn", "hard-light", "soft-light", "difference", "exclusion", "hue", "saturation", "color", "luminosity"];
   const getAlign = () => ["start", "end", "center", "between", "around", "evenly", "stretch"];
   const getZeroAndEmpty = () => ["", "0", isArbitraryValue];
   const getBreaks = () => ["auto", "avoid", "all", "avoid-page", "page", "left", "right", "column"];
-  const getNumberAndArbitrary = () => [isNumber$5, isArbitraryValue];
+  const getNumberAndArbitrary = () => [isNumber$4, isArbitraryValue];
   return {
     cacheSize: 500,
     separator: ":",
@@ -3285,7 +3285,7 @@ const getDefaultConfig = () => {
        * @see https://tailwindcss.com/docs/line-clamp
        */
       "line-clamp": [{
-        "line-clamp": ["none", isNumber$5, isArbitraryNumber]
+        "line-clamp": ["none", isNumber$4, isArbitraryNumber]
       }],
       /**
        * Line Height
@@ -4981,7 +4981,7 @@ var TooltipContentImpl = reactExports.forwardRef(
             },
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(Slottable, { children }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(VisuallyHiddenContentContextProvider, { scope: __scopeTooltip, isInside: true, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Root$7, { id: context.contentId, role: "tooltip", children: ariaLabel || children }) })
+              /* @__PURE__ */ jsxRuntimeExports.jsx(VisuallyHiddenContentContextProvider, { scope: __scopeTooltip, isInside: true, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Root$6, { id: context.contentId, role: "tooltip", children: ariaLabel || children }) })
             ]
           }
         )
@@ -9414,9 +9414,9 @@ Separator$2.displayName = NAME$1;
 function isValidOrientation(orientation) {
   return ORIENTATIONS.includes(orientation);
 }
-var Root$6 = Separator$2;
+var Root$5 = Separator$2;
 const Separator$1 = reactExports.forwardRef(({ className, orientation = "horizontal", decorative = true, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-  Root$6,
+  Root$5,
   {
     ref,
     decorative,
@@ -9425,8 +9425,8 @@ const Separator$1 = reactExports.forwardRef(({ className, orientation = "horizon
     ...props
   }
 ));
-Separator$1.displayName = Root$6.displayName;
-const Sheet = Root$9;
+Separator$1.displayName = Root$5.displayName;
+const Sheet = Root$8;
 const SheetPortal = Portal$3;
 const SheetOverlay = reactExports.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx(
   Overlay,
@@ -10534,7 +10534,7 @@ var N = '[cmdk-group=""]', Y = '[cmdk-group-items=""]', be = '[cmdk-group-headin
   }, []), reactExports.createElement(Primitive.div, { ref: composeRefs(d2, o2), ...c2, "cmdk-list": "", role: "listbox", tabIndex: -1, "aria-activedescendant": p2, "aria-label": u2, id: b2.listId }, B(r2, (m2) => reactExports.createElement("div", { ref: composeRefs(f2, b2.listInnerRef), "cmdk-list-sizer": "" }, m2)));
 }), xe = reactExports.forwardRef((r2, o2) => {
   let { open: n2, onOpenChange: u2, overlayClassName: c2, contentClassName: d2, container: f2, ...p2 } = r2;
-  return reactExports.createElement(Root$9, { open: n2, onOpenChange: u2 }, reactExports.createElement(Portal$3, { container: f2 }, reactExports.createElement(Overlay, { "cmdk-overlay": "", className: c2 }), reactExports.createElement(Content$1, { "aria-label": r2.label, "cmdk-dialog": "", className: d2 }, reactExports.createElement(me, { ref: o2, ...p2 }))));
+  return reactExports.createElement(Root$8, { open: n2, onOpenChange: u2 }, reactExports.createElement(Portal$3, { container: f2 }, reactExports.createElement(Overlay, { "cmdk-overlay": "", className: c2 }), reactExports.createElement(Content$1, { "aria-label": r2.label, "cmdk-dialog": "", className: d2 }, reactExports.createElement(me, { ref: o2, ...p2 }))));
 }), Ie = reactExports.forwardRef((r2, o2) => P$1((u2) => u2.filtered.count === 0) ? reactExports.createElement(Primitive.div, { ref: o2, ...r2, "cmdk-empty": "", role: "presentation" }) : null), Pe = reactExports.forwardRef((r2, o2) => {
   let { progress: n2, children: u2, label: c2 = "Loading...", ...d2 } = r2;
   return reactExports.createElement(Primitive.div, { ref: o2, ...d2, "cmdk-loading": "", role: "progressbar", "aria-valuenow": n2, "aria-valuemin": 0, "aria-valuemax": 100, "aria-label": c2 }, B(r2, (f2) => reactExports.createElement("div", { "aria-hidden": true }, f2)));
@@ -10598,7 +10598,7 @@ function B({ asChild: r2, children: o2 }, n2) {
   return r2 && reactExports.isValidElement(o2) ? reactExports.cloneElement(Me(o2), { ref: o2.ref }, n2(o2.props.children)) : n2(o2);
 }
 var Te = { position: "absolute", width: "1px", height: "1px", padding: "0", margin: "-1px", overflow: "hidden", clip: "rect(0, 0, 0, 0)", whiteSpace: "nowrap", borderWidth: "0" };
-const Dialog = Root$9;
+const Dialog = Root$8;
 const DialogTrigger = Trigger$3;
 const DialogPortal = Portal$3;
 const DialogOverlay = reactExports.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -11016,7 +11016,13 @@ function OrganizationProvider({ children }) {
   const [currentOrg, setCurrentOrg] = reactExports.useState(null);
   const [organizations, setOrganizations] = reactExports.useState([]);
   const [isLoading, setIsLoading] = reactExports.useState(true);
-  const fetchOrganizations = async () => {
+  const isFetchingRef = reactExports.useRef(false);
+  const fetchOrganizations = reactExports.useCallback(async () => {
+    if (isFetchingRef.current) {
+      return;
+    }
+    isFetchingRef.current = true;
+    setIsLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -11025,77 +11031,66 @@ function OrganizationProvider({ children }) {
         setIsLoading(false);
         return;
       }
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!(session == null ? void 0 : session.user)) {
-        setOrganizations([]);
-        setCurrentOrg(null);
-        setIsLoading(false);
-        return;
-      }
-      if (session.user.id !== user.id) {
-        setOrganizations([]);
-        setCurrentOrg(null);
-        setIsLoading(false);
-        return;
-      }
-      console.log("✅ fetchOrganizations: Usuário encontrado:", user.email);
       const { data: memberships, error } = await supabase.from("members").select(`
           role,
           orgs (
             id,
             name,
-            slug,
-            plan
+            slug
           )
         `).eq("user_id", user.id);
-      console.log("📊 fetchOrganizations: Memberships retornadas:", memberships);
-      console.log("❌ fetchOrganizations: Erro?", error);
-      if (error) throw error;
+      if (error) {
+        console.error("Erro ao buscar organizações:", error);
+        throw error;
+      }
       const orgs = (memberships || []).filter((m2) => m2.orgs).map((m2) => ({
         id: m2.orgs.id,
         name: m2.orgs.name,
         slug: m2.orgs.slug,
-        plan: m2.orgs.plan,
+        plan: null,
+        // Removido - sistema de planos desabilitado
         role: m2.role
       }));
-      console.log("🏢 fetchOrganizations: Organizações processadas:", orgs);
       setOrganizations(orgs);
-      if (!currentOrg && orgs.length > 0) {
+      if (orgs.length > 0) {
         const savedOrgId = localStorage.getItem("currentOrgId");
         const orgToSet = orgs.find((o2) => o2.id === savedOrgId) || orgs[0];
-        setCurrentOrg(orgToSet);
         localStorage.setItem("currentOrgId", orgToSet.id);
-      }
-      if (currentOrg && !orgs.find((o2) => o2.id === currentOrg.id)) {
-        const orgToSet = orgs[0] || null;
+        localStorage.setItem("currentOrgRole", orgToSet.role);
+        localStorage.setItem("currentOrgName", orgToSet.name);
         setCurrentOrg(orgToSet);
-        if (orgToSet) {
-          localStorage.setItem("currentOrgId", orgToSet.id);
-        } else {
-          localStorage.removeItem("currentOrgId");
-        }
+      } else {
+        setCurrentOrg(null);
+        localStorage.removeItem("currentOrgId");
+        localStorage.removeItem("currentOrgRole");
+        localStorage.removeItem("currentOrgName");
       }
     } catch (error) {
-      console.error("Erro ao buscar organizações:", error);
+      console.error("Erro ao carregar organizações:", error);
       ue$1.error("Erro ao carregar organizações");
+      setOrganizations([]);
+      setCurrentOrg(null);
     } finally {
+      isFetchingRef.current = false;
       setIsLoading(false);
     }
-  };
+  }, []);
   const switchOrganization = (orgId) => {
     const org = organizations.find((o2) => o2.id === orgId);
     if (org) {
       setCurrentOrg(org);
       localStorage.setItem("currentOrgId", orgId);
+      localStorage.setItem("currentOrgRole", org.role);
+      localStorage.setItem("currentOrgName", org.name);
       ue$1.success(`Organização alterada para: ${org.name}`);
       window.location.reload();
     }
   };
-  const refreshOrganizations = async () => {
-    setIsLoading(true);
+  const refreshOrganizations = reactExports.useCallback(async () => {
     await fetchOrganizations();
-  };
+  }, [fetchOrganizations]);
   reactExports.useEffect(() => {
+    fetchOrganizations();
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_IN" && (session == null ? void 0 : session.user)) {
         await fetchOrganizations();
@@ -11103,21 +11098,15 @@ function OrganizationProvider({ children }) {
         setOrganizations([]);
         setCurrentOrg(null);
         localStorage.removeItem("currentOrgId");
+        localStorage.removeItem("currentOrgRole");
+        localStorage.removeItem("currentOrgName");
         setIsLoading(false);
-      } else if (event === "INITIAL_SESSION") {
-        if (session == null ? void 0 : session.user) {
-          await fetchOrganizations();
-        } else {
-          setOrganizations([]);
-          setCurrentOrg(null);
-          setIsLoading(false);
-        }
       }
     });
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [fetchOrganizations]);
   return /* @__PURE__ */ jsxRuntimeExports.jsx(
     OrganizationContext.Provider,
     {
@@ -11271,201 +11260,173 @@ function OrganizationSwitcher() {
 }
 const ROLE_PERMISSIONS$1 = {
   admin: {
-    // Gestão de Atendentes - Total
     canManageAttendants: true,
     canCreateAttendants: true,
     canEditAttendants: true,
     canDeleteAttendants: true,
     canViewAttendantMetrics: true,
-    // Gestão de Campanhas - Total
     canManageCampaigns: true,
     canCreateCampaigns: true,
     canEditCampaigns: true,
     canDeleteCampaigns: true,
     canViewCampaignAnalytics: true,
-    // CRM e Prospects - Total
     canManageCRM: true,
     canCreateProspects: true,
     canEditProspects: true,
     canDeleteProspects: true,
     canViewCRMAnalytics: true,
-    // Contatos - Total
     canManageContacts: true,
     canCreateContacts: true,
     canEditContacts: true,
     canDeleteContacts: true,
-    // Integrações - Total
     canManageIntegrations: true,
     canConnectChannels: true,
     canConfigureWebhooks: true,
-    // Configurações - Total
     canManageSettings: true,
     canManageUsers: true,
     canManageBilling: true,
-    // Relatórios - Total
     canViewReports: true,
     canExportData: true,
     canViewAdvancedAnalytics: true,
-    // Inbox - Total
     canAccessInbox: true,
     canManageConversations: true,
     canAssignConversations: true,
-    // AI Agents - Total
+    canCloseConversations: true,
     canManageAIAgents: true,
     canCreateAIAgents: true,
-    canConfigureAIAgents: true
+    canEditAIAgents: true,
+    canDeleteAIAgents: true,
+    canTrainAIAgents: true
   },
   manager: {
-    // Gestão de Atendentes - Parcial
     canManageAttendants: true,
     canCreateAttendants: true,
     canEditAttendants: true,
     canDeleteAttendants: false,
     canViewAttendantMetrics: true,
-    // Gestão de Campanhas - Total
     canManageCampaigns: true,
     canCreateCampaigns: true,
     canEditCampaigns: true,
     canDeleteCampaigns: true,
     canViewCampaignAnalytics: true,
-    // CRM e Prospects - Total
     canManageCRM: true,
     canCreateProspects: true,
     canEditProspects: true,
     canDeleteProspects: true,
     canViewCRMAnalytics: true,
-    // Contatos - Total
     canManageContacts: true,
     canCreateContacts: true,
     canEditContacts: true,
     canDeleteContacts: true,
-    // Integrações - Parcial
-    canManageIntegrations: true,
-    canConnectChannels: true,
+    canManageIntegrations: false,
+    canConnectChannels: false,
     canConfigureWebhooks: false,
-    // Configurações - Parcial
     canManageSettings: false,
     canManageUsers: false,
     canManageBilling: false,
-    // Relatórios - Total
     canViewReports: true,
     canExportData: true,
     canViewAdvancedAnalytics: true,
-    // Inbox - Total
     canAccessInbox: true,
     canManageConversations: true,
     canAssignConversations: true,
-    // AI Agents - Total
+    canCloseConversations: true,
     canManageAIAgents: true,
     canCreateAIAgents: true,
-    canConfigureAIAgents: true
+    canEditAIAgents: true,
+    canDeleteAIAgents: false,
+    canTrainAIAgents: true
   },
   agent: {
-    // Gestão de Atendentes - Apenas visualização própria
     canManageAttendants: false,
     canCreateAttendants: false,
     canEditAttendants: false,
     canDeleteAttendants: false,
     canViewAttendantMetrics: false,
-    // Gestão de Campanhas - Nenhuma
     canManageCampaigns: false,
     canCreateCampaigns: false,
     canEditCampaigns: false,
     canDeleteCampaigns: false,
     canViewCampaignAnalytics: false,
-    // CRM e Prospects - Parcial
     canManageCRM: false,
     canCreateProspects: true,
     canEditProspects: true,
     canDeleteProspects: false,
     canViewCRMAnalytics: false,
-    // Contatos - Parcial
     canManageContacts: false,
     canCreateContacts: true,
     canEditContacts: true,
     canDeleteContacts: false,
-    // Integrações - Nenhuma
     canManageIntegrations: false,
     canConnectChannels: false,
     canConfigureWebhooks: false,
-    // Configurações - Nenhuma
     canManageSettings: false,
     canManageUsers: false,
     canManageBilling: false,
-    // Relatórios - Parcial
-    canViewReports: true,
+    canViewReports: false,
     canExportData: false,
     canViewAdvancedAnalytics: false,
-    // Inbox - Total
     canAccessInbox: true,
     canManageConversations: true,
     canAssignConversations: false,
-    // AI Agents - Nenhuma
+    canCloseConversations: true,
     canManageAIAgents: false,
     canCreateAIAgents: false,
-    canConfigureAIAgents: false
+    canEditAIAgents: false,
+    canDeleteAIAgents: false,
+    canTrainAIAgents: false
   },
   viewer: {
-    // Gestão de Atendentes - Apenas visualização
     canManageAttendants: false,
     canCreateAttendants: false,
     canEditAttendants: false,
     canDeleteAttendants: false,
     canViewAttendantMetrics: true,
-    // Gestão de Campanhas - Apenas visualização
     canManageCampaigns: false,
     canCreateCampaigns: false,
     canEditCampaigns: false,
     canDeleteCampaigns: false,
     canViewCampaignAnalytics: true,
-    // CRM e Prospects - Apenas visualização
     canManageCRM: false,
     canCreateProspects: false,
     canEditProspects: false,
     canDeleteProspects: false,
     canViewCRMAnalytics: true,
-    // Contatos - Apenas visualização
     canManageContacts: false,
     canCreateContacts: false,
     canEditContacts: false,
     canDeleteContacts: false,
-    // Integrações - Nenhuma
     canManageIntegrations: false,
     canConnectChannels: false,
     canConfigureWebhooks: false,
-    // Configurações - Nenhuma
     canManageSettings: false,
     canManageUsers: false,
     canManageBilling: false,
-    // Relatórios - Apenas visualização
     canViewReports: true,
     canExportData: false,
-    canViewAdvancedAnalytics: true,
-    // Inbox - Apenas visualização
+    canViewAdvancedAnalytics: false,
     canAccessInbox: true,
     canManageConversations: false,
     canAssignConversations: false,
-    // AI Agents - Apenas visualização
+    canCloseConversations: false,
     canManageAIAgents: false,
     canCreateAIAgents: false,
-    canConfigureAIAgents: false
+    canEditAIAgents: false,
+    canDeleteAIAgents: false,
+    canTrainAIAgents: false
   }
 };
 function usePermissions() {
-  const { currentOrg } = useOrganization();
+  const { currentOrg, isLoading } = useOrganization();
   const userRole = (currentOrg == null ? void 0 : currentOrg.role) || "viewer";
   const permissions = ROLE_PERMISSIONS$1[userRole];
   return {
     userRole,
     permissions,
-    isAdmin: userRole === "admin",
-    isManager: userRole === "manager",
-    isAgent: userRole === "agent",
-    isViewer: userRole === "viewer",
-    // Helper functions for common permission checks
+    isLoading,
     canAccess: (permission) => permissions[permission],
-    canAccessAny: (...permissions2) => permissions2.some((permission) => permissions2[permission]),
-    canAccessAll: (...permissions2) => permissions2.every((permission) => permissions2[permission])
+    canAccessAny: (...permissionsToCheck) => permissionsToCheck.some((p2) => permissions[p2]),
+    canAccessAll: (...permissionsToCheck) => permissionsToCheck.every((p2) => permissions[p2])
   };
 }
 const Card = reactExports.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { ref, className: cn("rounded-lg border bg-card text-card-foreground shadow-sm", className), ...props }));
@@ -11624,7 +11585,7 @@ function HiddenUnless({
   return /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children });
 }
 function UserRoleBadge() {
-  const { userRole } = usePermissions();
+  const { userRole, isLoading } = usePermissions();
   const roleConfig = {
     admin: {
       label: "Administrador",
@@ -11651,6 +11612,19 @@ function UserRoleBadge() {
       className: "border-gray-300 text-gray-600"
     }
   };
+  if (isLoading) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      Badge,
+      {
+        variant: "outline",
+        className: "border-gray-300 text-gray-600 flex items-center gap-1",
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(LoaderCircle, { className: "h-3 w-3 animate-spin" }),
+          "Carregando..."
+        ]
+      }
+    );
+  }
   const config2 = roleConfig[userRole];
   const Icon2 = config2.icon;
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -11687,10 +11661,13 @@ function AppSidebar() {
   const { logout, isRemembered } = usePersistentAuth();
   const handleLogout = async () => {
     try {
+      console.log("🔓 Iniciando logout...");
       await logout();
+      console.log("✅ Logout concluído");
       ue$1.success(isRemembered ? "Logout realizado. Você permanecerá logado neste dispositivo." : "Logout realizado com sucesso.");
-      navigate("/auth");
+      navigate("/autenticacao");
     } catch (error) {
+      console.error("❌ Erro ao fazer logout:", error);
       ue$1.error("Erro ao sair: " + error.message);
     }
   };
@@ -11727,191 +11704,16 @@ function AppLayout({ children }) {
     /* @__PURE__ */ jsxRuntimeExports.jsx(SidebarInset, { className: "flex-1", children: /* @__PURE__ */ jsxRuntimeExports.jsx("main", { className: "flex-1 overflow-auto bg-background", children }) })
   ] }) });
 }
-function useSecurity() {
-  const [security, setSecurity] = reactExports.useState({
-    isAuthorized: false,
-    isLoading: true,
-    userRole: null,
-    permissions: {
-      canManageContacts: false,
-      canManageCampaigns: false,
-      canCreateProspects: false,
-      canManageAttendants: false,
-      canManageCRM: false,
-      canManageSettings: false,
-      canManageAIAgents: false,
-      canManageIntegrations: false
-    }
-  });
-  const checkUserAuthorization = async (userEmail) => {
-    try {
-      console.log("🔍 checkUserAuthorization: Iniciando para:", userEmail);
-      const queryPromise = supabase.from("authorized_users").select("email").eq("email", userEmail).maybeSingle();
-      const timeoutPromise = new Promise(
-        (_, reject) => setTimeout(() => reject(new Error("Timeout rápido: 3 segundos")), 3e3)
-      );
-      try {
-        const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
-        console.log("🔍 checkUserAuthorization: Resposta rápida:", { data, error });
-        if (error) {
-          console.error("❌ checkUserAuthorization: Erro:", error);
-          return false;
-        }
-        const result = !!data;
-        console.log("🔍 checkUserAuthorization: Resultado:", result);
-        return result;
-      } catch (timeoutError) {
-        console.log("⏱️ checkUserAuthorization: Timeout detectado, usando fallback...");
-        console.log("🔄 checkUserAuthorization: Fallback - assumindo autorização");
-        return true;
-      }
-    } catch (err) {
-      console.error("❌ checkUserAuthorization: Exception:", err);
-      return true;
-    }
-  };
-  const getUserRole = async (userEmail) => {
-    try {
-      console.log("🔍 getUserRole: Iniciando para:", userEmail);
-      const { data: session } = await supabase.auth.getSession();
-      console.log("🔍 getUserRole: Sessão ativa:", !!session.session);
-      if (!session.session) {
-        console.log("❌ getUserRole: Sem sessão ativa, retornando user");
-        return "user";
-      }
-      const queryPromise = supabase.from("authorized_users").select("role").eq("email", userEmail).maybeSingle();
-      const timeoutPromise = new Promise(
-        (_, reject) => setTimeout(() => reject(new Error("Timeout: 10 segundos")), 1e4)
-      );
-      try {
-        const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
-        console.log("🔍 getUserRole: Resposta:", { data, error });
-        if (error) {
-          console.error("❌ getUserRole: Erro:", error);
-          return "user";
-        }
-        if (!data) {
-          console.log("❌ getUserRole: Usuário não encontrado na tabela");
-          return "user";
-        }
-        const result = data.role;
-        console.log("🔍 getUserRole: Role encontrado na tabela:", result);
-        return result;
-      } catch (timeoutError) {
-        console.log("⏱️ getUserRole: Timeout detectado, retornando user...");
-        return "user";
-      }
-    } catch (err) {
-      console.error("❌ getUserRole: Exception:", err);
-      return "user";
-    }
-  };
-  const getPermissions = (role) => {
-    if (role === "admin") {
-      return {
-        canManageContacts: true,
-        canManageCampaigns: true,
-        canCreateProspects: true,
-        canManageAttendants: true,
-        canManageCRM: true,
-        canManageSettings: true,
-        canManageAIAgents: true,
-        canManageIntegrations: true
-      };
-    } else if (role === "user") {
-      return {
-        canManageContacts: true,
-        canManageCampaigns: true,
-        canCreateProspects: true,
-        canManageAttendants: false,
-        canManageCRM: true,
-        canManageSettings: false,
-        canManageAIAgents: false,
-        canManageIntegrations: false
-      };
-    } else {
-      return {
-        canManageContacts: false,
-        canManageCampaigns: false,
-        canCreateProspects: false,
-        canManageAttendants: false,
-        canManageCRM: false,
-        canManageSettings: false,
-        canManageAIAgents: false,
-        canManageIntegrations: false
-      };
-    }
-  };
-  const validateUser = async (userEmail) => {
-    console.log("🧹 useSecurity: Limpando localStorage para forçar nova validação");
-    localStorage.removeItem("userRole");
-    localStorage.removeItem("rememberMe");
-    localStorage.removeItem("userEmail");
-    console.log("🔍 useSecurity: Iniciando validação para:", userEmail);
-    setSecurity((prev) => ({ ...prev, isLoading: true }));
-    try {
-      console.log("🔍 useSecurity: Verificando autorização...");
-      const isAuthorized = await checkUserAuthorization(userEmail);
-      console.log("🔍 useSecurity: Autorização:", isAuthorized);
-      console.log("🔍 useSecurity: Obtendo role...");
-      const userRole = await getUserRole(userEmail);
-      console.log("🔍 useSecurity: Role obtido:", userRole);
-      const permissions = getPermissions(userRole);
-      setSecurity({
-        isAuthorized,
-        isLoading: false,
-        userRole,
-        permissions
-      });
-      console.log("🔍 useSecurity: Validação concluída:", { isAuthorized, userRole, permissions });
-      if (!isAuthorized) {
-        console.log("❌ useSecurity: Usuário não autorizado, fazendo logout");
-        ue$1.error("Usuário não autorizado. Entre em contato com o administrador.");
-        await supabase.auth.signOut();
-      }
-    } catch (error) {
-      console.error("❌ useSecurity: Erro na validação:", error);
-      setSecurity((prev) => ({
-        ...prev,
-        isAuthorized: false,
-        isLoading: false,
-        userRole: null,
-        permissions: getPermissions(null)
-      }));
-    }
-  };
-  const clearSecurity = () => {
-    setSecurity({
-      isAuthorized: false,
-      isLoading: false,
-      userRole: null,
-      permissions: getPermissions(null)
-    });
-  };
-  return {
-    ...security,
-    validateUser,
-    clearSecurity
-  };
-}
 function ProtectedRoute({ children }) {
   const { user, loading } = usePersistentAuth();
-  const { isLoading, validateUser, clearSecurity } = useSecurity();
-  reactExports.useEffect(() => {
-    if (user == null ? void 0 : user.email) {
-      validateUser(user.email);
-    } else {
-      clearSecurity();
-    }
-  }, [user == null ? void 0 : user.email]);
-  if (loading || isLoading) {
+  if (!loading && !user) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(Navigate, { to: "/autenticacao", replace: true });
+  }
+  if (loading) {
     return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-center min-h-screen", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-600", children: "Verificando autorização..." })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-600", children: "Carregando..." })
     ] }) });
-  }
-  if (!user) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(Navigate, { to: "/autenticacao", replace: true });
   }
   return /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children });
 }
@@ -12088,18 +11890,18 @@ function useImageLoadingStatus(src, { referrerPolicy, crossOrigin }) {
   }, [image, crossOrigin, referrerPolicy]);
   return loadingStatus;
 }
-var Root$5 = Avatar$1;
+var Root$4 = Avatar$1;
 var Image = AvatarImage$1;
 var Fallback = AvatarFallback$1;
 const Avatar = reactExports.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-  Root$5,
+  Root$4,
   {
     ref,
     className: cn("relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full", className),
     ...props
   }
 ));
-Avatar.displayName = Root$5.displayName;
+Avatar.displayName = Root$4.displayName;
 const AvatarImage = reactExports.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx(Image, { ref, className: cn("aspect-square h-full w-full", className), ...props }));
 AvatarImage.displayName = Image.displayName;
 const AvatarFallback = reactExports.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -15264,14 +15066,14 @@ reactIs_production_min.typeOf = v;
 var reactIsExports = reactIs.exports;
 var baseGetTag$5 = _baseGetTag, isObjectLike$6 = isObjectLike_1;
 var numberTag$2 = "[object Number]";
-function isNumber$3(value) {
+function isNumber$2(value) {
   return typeof value == "number" || isObjectLike$6(value) && baseGetTag$5(value) == numberTag$2;
 }
-var isNumber_1 = isNumber$3;
-const isNumber$4 = /* @__PURE__ */ getDefaultExportFromCjs(isNumber_1);
-var isNumber$2 = isNumber_1;
+var isNumber_1 = isNumber$2;
+const isNumber$3 = /* @__PURE__ */ getDefaultExportFromCjs(isNumber_1);
+var isNumber$1 = isNumber_1;
 function isNaN$1(value) {
-  return isNumber$2(value) && value != +value;
+  return isNumber$1(value) && value != +value;
 }
 var _isNaN = isNaN$1;
 const isNan = /* @__PURE__ */ getDefaultExportFromCjs(_isNaN);
@@ -15287,14 +15089,14 @@ var mathSign = function mathSign2(value) {
 var isPercent = function isPercent2(value) {
   return isString$2(value) && value.indexOf("%") === value.length - 1;
 };
-var isNumber$1 = function isNumber(value) {
-  return isNumber$4(value) && !isNan(value);
+var isNumber = function isNumber2(value) {
+  return isNumber$3(value) && !isNan(value);
 };
 var isNullish = function isNullish2(value) {
   return isNil$1(value);
 };
 var isNumOrStr = function isNumOrStr2(value) {
-  return isNumber$1(value) || isString$2(value);
+  return isNumber(value) || isString$2(value);
 };
 var idCounter = 0;
 var uniqueId = function uniqueId2(prefix2) {
@@ -15304,7 +15106,7 @@ var uniqueId = function uniqueId2(prefix2) {
 var getPercentValue = function getPercentValue2(percent, totalValue) {
   var defaultValue = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : 0;
   var validate = arguments.length > 3 && arguments[3] !== void 0 ? arguments[3] : false;
-  if (!isNumber$1(percent) && !isString$2(percent)) {
+  if (!isNumber(percent) && !isString$2(percent)) {
     return defaultValue;
   }
   var value;
@@ -15348,7 +15150,7 @@ var hasDuplicate = function hasDuplicate2(ary) {
   return false;
 };
 var interpolateNumber$2 = function interpolateNumber(numberA, numberB) {
-  if (isNumber$1(numberA) && isNumber$1(numberB)) {
+  if (isNumber(numberA) && isNumber(numberB)) {
     return function(t2) {
       return numberA + t2 * (numberB - numberA);
     };
@@ -15397,7 +15199,7 @@ var getLinearRegression = function getLinearRegression2(data) {
   };
 };
 var compareValues = function compareValues2(a2, b2) {
-  if (isNumber$1(a2) && isNumber$1(b2)) {
+  if (isNumber(a2) && isNumber(b2)) {
     return a2 - b2;
   }
   if (isString$2(a2) && isString$2(b2)) {
@@ -15894,7 +15696,7 @@ var validateWidthHeight = function validateWidthHeight2(el) {
     return false;
   }
   var _el$props = el.props, width = _el$props.width, height = _el$props.height;
-  if (!isNumber$1(width) || width <= 0 || !isNumber$1(height) || height <= 0) {
+  if (!isNumber(width) || width <= 0 || !isNumber(height) || height <= 0) {
     return false;
   }
   return true;
@@ -18589,7 +18391,7 @@ var Legend = /* @__PURE__ */ function(_PureComponent) {
     key: "getWithHeight",
     value: function getWithHeight(item, chartWidth) {
       var _this$defaultProps$it = _objectSpread$E(_objectSpread$E({}, this.defaultProps), item.props), layout = _this$defaultProps$it.layout;
-      if (layout === "vertical" && isNumber$1(item.props.height)) {
+      if (layout === "vertical" && isNumber(item.props.height)) {
         return {
           height: item.props.height
         };
@@ -19099,11 +18901,11 @@ var TOOLTIP_HIDDEN = {
 };
 function getTooltipCSSClassName(_ref) {
   var coordinate = _ref.coordinate, translateX = _ref.translateX, translateY = _ref.translateY;
-  return clsx(CSS_CLASS_PREFIX, _defineProperty$I(_defineProperty$I(_defineProperty$I(_defineProperty$I({}, "".concat(CSS_CLASS_PREFIX, "-right"), isNumber$1(translateX) && coordinate && isNumber$1(coordinate.x) && translateX >= coordinate.x), "".concat(CSS_CLASS_PREFIX, "-left"), isNumber$1(translateX) && coordinate && isNumber$1(coordinate.x) && translateX < coordinate.x), "".concat(CSS_CLASS_PREFIX, "-bottom"), isNumber$1(translateY) && coordinate && isNumber$1(coordinate.y) && translateY >= coordinate.y), "".concat(CSS_CLASS_PREFIX, "-top"), isNumber$1(translateY) && coordinate && isNumber$1(coordinate.y) && translateY < coordinate.y));
+  return clsx(CSS_CLASS_PREFIX, _defineProperty$I(_defineProperty$I(_defineProperty$I(_defineProperty$I({}, "".concat(CSS_CLASS_PREFIX, "-right"), isNumber(translateX) && coordinate && isNumber(coordinate.x) && translateX >= coordinate.x), "".concat(CSS_CLASS_PREFIX, "-left"), isNumber(translateX) && coordinate && isNumber(coordinate.x) && translateX < coordinate.x), "".concat(CSS_CLASS_PREFIX, "-bottom"), isNumber(translateY) && coordinate && isNumber(coordinate.y) && translateY >= coordinate.y), "".concat(CSS_CLASS_PREFIX, "-top"), isNumber(translateY) && coordinate && isNumber(coordinate.y) && translateY < coordinate.y));
 }
 function getTooltipTranslateXY(_ref2) {
   var allowEscapeViewBox = _ref2.allowEscapeViewBox, coordinate = _ref2.coordinate, key = _ref2.key, offsetTopLeft = _ref2.offsetTopLeft, position = _ref2.position, reverseDirection = _ref2.reverseDirection, tooltipDimension = _ref2.tooltipDimension, viewBox = _ref2.viewBox, viewBoxDimension = _ref2.viewBoxDimension;
-  if (position && isNumber$1(position[key])) {
+  if (position && isNumber(position[key])) {
     return position[key];
   }
   var negative = coordinate[key] - tooltipDimension - offsetTopLeft;
@@ -20448,7 +20250,7 @@ var calculateWordWidths = function calculateWordWidths2(_ref) {
 };
 var calculateWordsByLines = function calculateWordsByLines2(_ref2, initialWordsWithComputedWith, spaceWidth, lineWidth, scaleToFit) {
   var maxLines = _ref2.maxLines, children = _ref2.children, style = _ref2.style, breakAll = _ref2.breakAll;
-  var shouldLimitLines = isNumber$1(maxLines);
+  var shouldLimitLines = isNumber(maxLines);
   var text = children;
   var calculate = function calculate2() {
     var words = arguments.length > 0 && arguments[0] !== void 0 ? arguments[0] : [];
@@ -20560,8 +20362,8 @@ var Text = function Text2(_ref5) {
   if (!isNumOrStr(propsX) || !isNumOrStr(propsY)) {
     return null;
   }
-  var x2 = propsX + (isNumber$1(dx) ? dx : 0);
-  var y2 = propsY + (isNumber$1(dy) ? dy : 0);
+  var x2 = propsX + (isNumber(dx) ? dx : 0);
+  var y2 = propsY + (isNumber(dy) ? dy : 0);
   var startDy;
   switch (verticalAnchor) {
     case "start":
@@ -20578,7 +20380,7 @@ var Text = function Text2(_ref5) {
   if (scaleToFit) {
     var lineWidth = wordsByLines[0].width;
     var width = props.width;
-    transforms.push("scale(".concat((isNumber$1(width) ? width / lineWidth : 1) / lineWidth, ")"));
+    transforms.push("scale(".concat((isNumber(width) ? width / lineWidth : 1) / lineWidth, ")"));
   }
   if (angle) {
     transforms.push("rotate(".concat(angle, ", ").concat(x2, ", ").concat(y2, ")"));
@@ -25082,7 +24884,7 @@ function getDomainOfDataByKey(data, key, type, filterNil) {
   });
   if (type === "number") {
     var domain = flattenData.filter(function(entry) {
-      return isNumber$1(entry) || parseFloat(entry);
+      return isNumber(entry) || parseFloat(entry);
     });
     return domain.length ? [min$1(domain), max$1(domain)] : [Infinity, -Infinity];
   }
@@ -25291,10 +25093,10 @@ var appendOffsetOfLegend = function appendOffsetOfLegend2(offset, _unused, props
   if (legendProps) {
     var _ref4 = legendBox || {}, boxWidth = _ref4.width, boxHeight = _ref4.height;
     var align = legendProps.align, verticalAlign = legendProps.verticalAlign, layout = legendProps.layout;
-    if ((layout === "vertical" || layout === "horizontal" && verticalAlign === "middle") && align !== "center" && isNumber$1(offset[align])) {
+    if ((layout === "vertical" || layout === "horizontal" && verticalAlign === "middle") && align !== "center" && isNumber(offset[align])) {
       return _objectSpread$x(_objectSpread$x({}, offset), {}, _defineProperty$B({}, align, offset[align] + (boxWidth || 0)));
     }
-    if ((layout === "horizontal" || layout === "vertical" && align === "center") && verticalAlign !== "middle" && isNumber$1(offset[verticalAlign])) {
+    if ((layout === "horizontal" || layout === "vertical" && align === "center") && verticalAlign !== "middle" && isNumber(offset[verticalAlign])) {
       return _objectSpread$x(_objectSpread$x({}, offset), {}, _defineProperty$B({}, verticalAlign, offset[verticalAlign] + (boxHeight || 0)));
     }
   }
@@ -25554,16 +25356,16 @@ var findPositionOfBar = function findPositionOfBar2(barPosition, child) {
   return null;
 };
 var truncateByDomain = function truncateByDomain2(value, domain) {
-  if (!domain || domain.length !== 2 || !isNumber$1(domain[0]) || !isNumber$1(domain[1])) {
+  if (!domain || domain.length !== 2 || !isNumber(domain[0]) || !isNumber(domain[1])) {
     return value;
   }
   var minValue = Math.min(domain[0], domain[1]);
   var maxValue = Math.max(domain[0], domain[1]);
   var result = [value[0], value[1]];
-  if (!isNumber$1(value[0]) || value[0] < minValue) {
+  if (!isNumber(value[0]) || value[0] < minValue) {
     result[0] = minValue;
   }
-  if (!isNumber$1(value[1]) || value[1] > maxValue) {
+  if (!isNumber(value[1]) || value[1] > maxValue) {
     result[1] = maxValue;
   }
   if (result[0] > maxValue) {
@@ -25771,7 +25573,7 @@ var getStackedDataOfItem = function getStackedDataOfItem2(item, stackGroups) {
 };
 var getDomainOfSingle = function getDomainOfSingle2(data) {
   return data.reduce(function(result, entry) {
-    return [min$1(entry.concat([result[0]]).filter(isNumber$1)), max$1(entry.concat([result[1]]).filter(isNumber$1))];
+    return [min$1(entry.concat([result[0]]).filter(isNumber)), max$1(entry.concat([result[1]]).filter(isNumber))];
   }, [Infinity, -Infinity]);
 };
 var getDomainOfStackGroups = function getDomainOfStackGroups2(stackGroups, startIndex, endIndex) {
@@ -25797,7 +25599,7 @@ var parseSpecifiedDomain = function parseSpecifiedDomain2(specifiedDomain, dataD
     return dataDomain;
   }
   var domain = [];
-  if (isNumber$1(specifiedDomain[0])) {
+  if (isNumber(specifiedDomain[0])) {
     domain[0] = allowDataOverflow ? specifiedDomain[0] : Math.min(specifiedDomain[0], dataDomain[0]);
   } else if (MIN_VALUE_REG.test(specifiedDomain[0])) {
     var value = +MIN_VALUE_REG.exec(specifiedDomain[0])[1];
@@ -25807,7 +25609,7 @@ var parseSpecifiedDomain = function parseSpecifiedDomain2(specifiedDomain, dataD
   } else {
     domain[0] = dataDomain[0];
   }
-  if (isNumber$1(specifiedDomain[1])) {
+  if (isNumber(specifiedDomain[1])) {
     domain[1] = allowDataOverflow ? specifiedDomain[1] : Math.max(specifiedDomain[1], dataDomain[1]);
   } else if (MAX_VALUE_REG.test(specifiedDomain[1])) {
     var _value = +MAX_VALUE_REG.exec(specifiedDomain[1])[1];
@@ -26455,7 +26257,7 @@ var getAttrsOfCartesianLabel = function getAttrsOfCartesianLabel2(props) {
       verticalAnchor: verticalEnd
     }, sizeAttrs);
   }
-  if (isObject$9(position) && (isNumber$1(position.x) || isPercent(position.x)) && (isNumber$1(position.y) || isPercent(position.y))) {
+  if (isObject$9(position) && (isNumber(position.x) || isPercent(position.x)) && (isNumber(position.y) || isPercent(position.y))) {
     return _objectSpread$v({
       x: x2 + getPercentValue(position.x, width),
       y: y2 + getPercentValue(position.y, height),
@@ -26471,7 +26273,7 @@ var getAttrsOfCartesianLabel = function getAttrsOfCartesianLabel2(props) {
   }, sizeAttrs);
 };
 var isPolar = function isPolar2(viewBox) {
-  return "cx" in viewBox && isNumber$1(viewBox.cx);
+  return "cx" in viewBox && isNumber(viewBox.cx);
 };
 function Label$3(_ref4) {
   var _ref4$offset = _ref4.offset, offset = _ref4$offset === void 0 ? 5 : _ref4$offset, restProps = _objectWithoutProperties$f(_ref4, _excluded$f);
@@ -26512,8 +26314,8 @@ var parseViewBox = function parseViewBox2(props) {
   if (labelViewBox) {
     return labelViewBox;
   }
-  if (isNumber$1(width) && isNumber$1(height)) {
-    if (isNumber$1(x2) && isNumber$1(y2)) {
+  if (isNumber(width) && isNumber(height)) {
+    if (isNumber(x2) && isNumber(y2)) {
       return {
         x: x2,
         y: y2,
@@ -26521,7 +26323,7 @@ var parseViewBox = function parseViewBox2(props) {
         height
       };
     }
-    if (isNumber$1(top) && isNumber$1(left)) {
+    if (isNumber(top) && isNumber(left)) {
       return {
         x: top,
         y: left,
@@ -26530,7 +26332,7 @@ var parseViewBox = function parseViewBox2(props) {
       };
     }
   }
-  if (isNumber$1(x2) && isNumber$1(y2)) {
+  if (isNumber(x2) && isNumber(y2)) {
     return {
       x: x2,
       y: y2,
@@ -26538,7 +26340,7 @@ var parseViewBox = function parseViewBox2(props) {
       height: 0
     };
   }
-  if (isNumber$1(cx2) && isNumber$1(cy)) {
+  if (isNumber(cx2) && isNumber(cy)) {
     return {
       cx: cx2,
       cy,
@@ -27168,9 +26970,9 @@ var getPath$1 = function getPath(_ref) {
     lineFunction.defined(defined).curve(curveFactory);
     return lineFunction(areaPoints);
   }
-  if (layout === "vertical" && isNumber$1(baseLine)) {
+  if (layout === "vertical" && isNumber(baseLine)) {
     lineFunction = shapeArea().y(getY).x1(getX).x0(baseLine);
-  } else if (isNumber$1(baseLine)) {
+  } else if (isNumber(baseLine)) {
     lineFunction = shapeArea().x(getX).y1(getY).y0(baseLine);
   } else {
     lineFunction = shapeLine().x(getX).y(getY);
@@ -29211,7 +29013,7 @@ var Cross = function Cross2(_ref) {
     width,
     height
   }, rest);
-  if (!isNumber$1(x2) || !isNumber$1(y2) || !isNumber$1(width) || !isNumber$1(height) || !isNumber$1(top) || !isNumber$1(left)) {
+  if (!isNumber(x2) || !isNumber(y2) || !isNumber(width) || !isNumber(height) || !isNumber(top) || !isNumber(left)) {
     return null;
   }
   return /* @__PURE__ */ React$2.createElement("path", _extends$l({}, filterProps(props, true), {
@@ -30640,7 +30442,7 @@ var Pie = /* @__PURE__ */ function(_PureComponent) {
       var _this5 = this;
       var _this$props5 = this.props, hide = _this$props5.hide, sectors = _this$props5.sectors, className = _this$props5.className, label = _this$props5.label, cx2 = _this$props5.cx, cy = _this$props5.cy, innerRadius = _this$props5.innerRadius, outerRadius = _this$props5.outerRadius, isAnimationActive = _this$props5.isAnimationActive;
       var isAnimationFinished = this.state.isAnimationFinished;
-      if (hide || !sectors || !sectors.length || !isNumber$1(cx2) || !isNumber$1(cy) || !isNumber$1(innerRadius) || !isNumber$1(outerRadius)) {
+      if (hide || !sectors || !sectors.length || !isNumber(cx2) || !isNumber(cy) || !isNumber(innerRadius) || !isNumber(outerRadius)) {
         return null;
       }
       var layerClass = clsx("recharts-pie", className);
@@ -30818,7 +30620,7 @@ _defineProperty$m(Pie, "getComposedData", function(_ref4) {
   var realTotalAngle = absDeltaAngle - notZeroItemCount * minAngle - totalPadingAngle;
   var sum = pieData.reduce(function(result, entry) {
     var val = getValueByDataKey(entry, realDataKey, 0);
-    return result + (isNumber$1(val) ? val : 0);
+    return result + (isNumber(val) ? val : 0);
   }, 0);
   var sectors;
   if (sum > 0) {
@@ -30826,7 +30628,7 @@ _defineProperty$m(Pie, "getComposedData", function(_ref4) {
     sectors = pieData.map(function(entry, i2) {
       var val = getValueByDataKey(entry, realDataKey, 0);
       var name = getValueByDataKey(entry, nameKey, i2);
-      var percent = (isNumber$1(val) ? val : 0) / sum;
+      var percent = (isNumber(val) ? val : 0) / sum;
       var tempStartAngle;
       if (i2) {
         tempStartAngle = prev.endAngle + mathSign(deltaAngle) * paddingAngle * (val !== 0 ? 1 : 0);
@@ -32000,7 +31802,7 @@ var Brush = /* @__PURE__ */ function(_PureComponent) {
     value: function render() {
       var _this$props11 = this.props, data = _this$props11.data, className = _this$props11.className, children = _this$props11.children, x2 = _this$props11.x, y2 = _this$props11.y, width = _this$props11.width, height = _this$props11.height, alwaysShowText = _this$props11.alwaysShowText;
       var _this$state5 = this.state, startX = _this$state5.startX, endX = _this$state5.endX, isTextActive = _this$state5.isTextActive, isSlideMoving = _this$state5.isSlideMoving, isTravellerMoving = _this$state5.isTravellerMoving, isTravellerFocused = _this$state5.isTravellerFocused;
-      if (!data || !data.length || !isNumber$1(x2) || !isNumber$1(y2) || !isNumber$1(width) || !isNumber$1(height) || width <= 0 || height <= 0) {
+      if (!data || !data.length || !isNumber(x2) || !isNumber(y2) || !isNumber(width) || !isNumber(height) || width <= 0 || height <= 0) {
         return null;
       }
       var layerClass = clsx("recharts-brush", className);
@@ -32337,7 +32139,7 @@ var minPointSizeCallback = function minPointSizeCallback2(minPointSize) {
   var defaultValue = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : 0;
   return function(value, index) {
     if (typeof minPointSize === "number") return minPointSize;
-    var isValueNumberOrNil = isNumber$1(value) || isNullish(value);
+    var isValueNumberOrNil = isNumber(value) || isNullish(value);
     if (isValueNumberOrNil) {
       return minPointSize(value, index);
     }
@@ -34227,8 +34029,8 @@ function getTicks(props, fontSize, letterSpacing) {
   if (!ticks2 || !ticks2.length || !tick) {
     return [];
   }
-  if (isNumber$1(interval) || Global.isSsr) {
-    return getNumberIntervalTicks(ticks2, typeof interval === "number" && isNumber$1(interval) ? interval : 0);
+  if (isNumber(interval) || Global.isSsr) {
+    return getNumberIntervalTicks(ticks2, typeof interval === "number" && isNumber(interval) ? interval : 0);
   }
   var candidates = [];
   var sizeKey = orientation === "top" || orientation === "bottom" ? "width" : "height";
@@ -34469,7 +34271,7 @@ var CartesianAxis = /* @__PURE__ */ function(_Component) {
       var x1, x22, y1, y22, tx, ty;
       var sign2 = mirror ? -1 : 1;
       var finalTickSize = data.tickSize || tickSize;
-      var tickCoord = isNumber$1(data.tickCoord) ? data.tickCoord : data.coordinate;
+      var tickCoord = isNumber(data.tickCoord) ? data.tickCoord : data.coordinate;
       switch (orientation) {
         case "top":
           x1 = x22 = data.coordinate;
@@ -34989,15 +34791,15 @@ function CartesianGrid(props) {
     horizontalFill: (_props$horizontalFill = props.horizontalFill) !== null && _props$horizontalFill !== void 0 ? _props$horizontalFill : defaultProps.horizontalFill,
     vertical: (_props$vertical3 = props.vertical) !== null && _props$vertical3 !== void 0 ? _props$vertical3 : defaultProps.vertical,
     verticalFill: (_props$verticalFill = props.verticalFill) !== null && _props$verticalFill !== void 0 ? _props$verticalFill : defaultProps.verticalFill,
-    x: isNumber$1(props.x) ? props.x : offset.left,
-    y: isNumber$1(props.y) ? props.y : offset.top,
-    width: isNumber$1(props.width) ? props.width : offset.width,
-    height: isNumber$1(props.height) ? props.height : offset.height
+    x: isNumber(props.x) ? props.x : offset.left,
+    y: isNumber(props.y) ? props.y : offset.top,
+    width: isNumber(props.width) ? props.width : offset.width,
+    height: isNumber(props.height) ? props.height : offset.height
   });
   var x2 = propsIncludingDefaults.x, y2 = propsIncludingDefaults.y, width = propsIncludingDefaults.width, height = propsIncludingDefaults.height, syncWithTicks = propsIncludingDefaults.syncWithTicks, horizontalValues = propsIncludingDefaults.horizontalValues, verticalValues = propsIncludingDefaults.verticalValues;
   var xAxis = useArbitraryXAxis();
   var yAxis = useYAxisWithFiniteDomainOrRandom();
-  if (!isNumber$1(width) || width <= 0 || !isNumber$1(height) || height <= 0 || !isNumber$1(x2) || x2 !== +x2 || !isNumber$1(y2) || y2 !== +y2) {
+  if (!isNumber(width) || width <= 0 || !isNumber(height) || height <= 0 || !isNumber(x2) || x2 !== +x2 || !isNumber(y2) || y2 !== +y2) {
     return null;
   }
   var verticalCoordinatesGenerator = propsIncludingDefaults.verticalCoordinatesGenerator || defaultVerticalCoordinatesGenerator;
@@ -35884,14 +35686,14 @@ var Area = /* @__PURE__ */ function(_PureComponent) {
       var maxY = max$1(points.map(function(entry) {
         return entry.y || 0;
       }));
-      if (isNumber$1(baseLine) && typeof baseLine === "number") {
+      if (isNumber(baseLine) && typeof baseLine === "number") {
         maxY = Math.max(baseLine, maxY);
       } else if (baseLine && Array.isArray(baseLine) && baseLine.length) {
         maxY = Math.max(max$1(baseLine.map(function(entry) {
           return entry.y || 0;
         })), maxY);
       }
-      if (isNumber$1(maxY)) {
+      if (isNumber(maxY)) {
         return /* @__PURE__ */ React$2.createElement("rect", {
           x: startX < endX ? startX : startX - width,
           y: 0,
@@ -35911,14 +35713,14 @@ var Area = /* @__PURE__ */ function(_PureComponent) {
       var maxX = max$1(points.map(function(entry) {
         return entry.x || 0;
       }));
-      if (isNumber$1(baseLine) && typeof baseLine === "number") {
+      if (isNumber(baseLine) && typeof baseLine === "number") {
         maxX = Math.max(baseLine, maxX);
       } else if (baseLine && Array.isArray(baseLine) && baseLine.length) {
         maxX = Math.max(max$1(baseLine.map(function(entry) {
           return entry.x || 0;
         })), maxX);
       }
-      if (isNumber$1(maxX)) {
+      if (isNumber(maxX)) {
         return /* @__PURE__ */ React$2.createElement("rect", {
           x: 0,
           y: startY < endY ? startY : startY - height,
@@ -36007,7 +35809,7 @@ var Area = /* @__PURE__ */ function(_PureComponent) {
             return entry;
           });
           var stepBaseLine;
-          if (isNumber$1(baseLine) && typeof baseLine === "number") {
+          if (isNumber(baseLine) && typeof baseLine === "number") {
             var interpolator = interpolateNumber$2(prevBaseLine, baseLine);
             stepBaseLine = interpolator(t2);
           } else if (isNil$1(baseLine) || isNan(baseLine)) {
@@ -36132,7 +35934,7 @@ _defineProperty$7(Area, "getBaseValue", function(props, item, xAxis, yAxis) {
   var layout = props.layout, chartBaseValue = props.baseValue;
   var itemBaseValue = item.props.baseValue;
   var baseValue = itemBaseValue !== null && itemBaseValue !== void 0 ? itemBaseValue : chartBaseValue;
-  if (isNumber$1(baseValue) && typeof baseValue === "number") {
+  if (isNumber(baseValue) && typeof baseValue === "number") {
     return baseValue;
   }
   var numericAxis = layout === "horizontal" ? yAxis : xAxis;
@@ -37252,7 +37054,7 @@ var detectReferenceElementsDomain = function detectReferenceElementsDomain2(chil
   var finalDomain = domain;
   if (elements.length) {
     finalDomain = elements.reduce(function(result, el) {
-      if (el.props[idKey] === axisId && ifOverflowMatches(el.props, "extendDomain") && isNumber$1(el.props[valueKey])) {
+      if (el.props[idKey] === axisId && ifOverflowMatches(el.props, "extendDomain") && isNumber(el.props[valueKey])) {
         var value = el.props[valueKey];
         return [Math.min(result[0], value), Math.max(result[1], value)];
       }
@@ -37263,7 +37065,7 @@ var detectReferenceElementsDomain = function detectReferenceElementsDomain2(chil
     var key1 = "".concat(valueKey, "1");
     var key2 = "".concat(valueKey, "2");
     finalDomain = areas.reduce(function(result, el) {
-      if (el.props[idKey] === axisId && ifOverflowMatches(el.props, "extendDomain") && isNumber$1(el.props[key1]) && isNumber$1(el.props[key2])) {
+      if (el.props[idKey] === axisId && ifOverflowMatches(el.props, "extendDomain") && isNumber(el.props[key1]) && isNumber(el.props[key2])) {
         var value1 = el.props[key1];
         var value2 = el.props[key2];
         return [Math.min(result[0], value1, value2), Math.max(result[1], value1, value2)];
@@ -37273,7 +37075,7 @@ var detectReferenceElementsDomain = function detectReferenceElementsDomain2(chil
   }
   if (specifiedTicks && specifiedTicks.length) {
     finalDomain = specifiedTicks.reduce(function(result, tick) {
-      if (isNumber$1(tick)) {
+      if (isNumber(tick)) {
         return [Math.min(result[0], tick), Math.max(result[1], tick)];
       }
       return result;
@@ -37573,7 +37375,7 @@ function isDomainSpecifiedByUser(domain, allowDataOverflow, axisType) {
   if (axisType === "number" && allowDataOverflow === true && Array.isArray(domain)) {
     var domainStart = domain === null || domain === void 0 ? void 0 : domain[0];
     var domainEnd = domain === null || domain === void 0 ? void 0 : domain[1];
-    if (!!domainStart && !!domainEnd && isNumber$1(domainStart) && isNumber$1(domainEnd)) {
+    if (!!domainStart && !!domainEnd && isNumber(domainStart) && isNumber(domainEnd)) {
       return true;
     }
   }
@@ -38016,7 +37818,7 @@ var getDisplayedData = function getDisplayedData2(data, _ref) {
   if (itemsData.length > 0) {
     return itemsData;
   }
-  if (data && data.length && isNumber$1(dataStartIndex) && isNumber$1(dataEndIndex)) {
+  if (data && data.length && isNumber(dataStartIndex) && isNumber(dataEndIndex)) {
     return data.slice(dataStartIndex, dataEndIndex + 1);
   }
   return [];
@@ -38857,9 +38659,9 @@ var generateCategoricalChart = function generateCategoricalChart2(_ref6) {
           key: element.key || "_recharts-brush",
           onChange: combineEventHandlers(_this.handleBrushChange, element.props.onChange),
           data,
-          x: isNumber$1(element.props.x) ? element.props.x : offset.left,
-          y: isNumber$1(element.props.y) ? element.props.y : offset.top + offset.height + offset.brushBottom - (margin.bottom || 0),
-          width: isNumber$1(element.props.width) ? element.props.width : offset.width,
+          x: isNumber(element.props.x) ? element.props.x : offset.left,
+          y: isNumber(element.props.y) ? element.props.y : offset.top + offset.height + offset.brushBottom - (margin.bottom || 0),
+          width: isNumber(element.props.width) ? element.props.width : offset.width,
           startIndex: dataStartIndex,
           endIndex: dataEndIndex,
           updateId: "brush-".concat(updateId)
@@ -40832,15 +40634,15 @@ function useResizeObserver(element, onResize) {
     }
   }, [element, handleResize]);
 }
-var Root$4 = ScrollArea$1;
+var Root$3 = ScrollArea$1;
 var Viewport$1 = ScrollAreaViewport;
 var Corner = ScrollAreaCorner;
-const ScrollArea = reactExports.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsxs(Root$4, { ref, className: cn("relative overflow-hidden", className), ...props, children: [
+const ScrollArea = reactExports.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsxs(Root$3, { ref, className: cn("relative overflow-hidden", className), ...props, children: [
   /* @__PURE__ */ jsxRuntimeExports.jsx(Viewport$1, { className: "h-full w-full rounded-[inherit]", children }),
   /* @__PURE__ */ jsxRuntimeExports.jsx(ScrollBar, {}),
   /* @__PURE__ */ jsxRuntimeExports.jsx(Corner, {})
 ] }));
-ScrollArea.displayName = Root$4.displayName;
+ScrollArea.displayName = Root$3.displayName;
 const ScrollBar = reactExports.forwardRef(({ className, orientation = "vertical", ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx(
   ScrollAreaScrollbar,
   {
@@ -42112,10 +41914,10 @@ var Label$1 = reactExports.forwardRef((props, forwardedRef) => {
   );
 });
 Label$1.displayName = NAME;
-var Root$3 = Label$1;
+var Root$2 = Label$1;
 const labelVariants = cva("text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70");
-const Label = reactExports.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx(Root$3, { ref, className: cn(labelVariants(), className), ...props }));
-Label.displayName = Root$3.displayName;
+const Label = reactExports.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx(Root$2, { ref, className: cn(labelVariants(), className), ...props }));
+Label.displayName = Root$2.displayName;
 const DropdownMenu = Root2$5;
 const DropdownMenuTrigger = Trigger$5;
 const DropdownMenuSubTrigger = reactExports.forwardRef(({ className, inset, children, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -44595,11 +44397,11 @@ var Checkbox$1 = reactExports.forwardRef(
   }
 );
 Checkbox$1.displayName = CHECKBOX_NAME;
-var INDICATOR_NAME$1 = "CheckboxIndicator";
+var INDICATOR_NAME = "CheckboxIndicator";
 var CheckboxIndicator = reactExports.forwardRef(
   (props, forwardedRef) => {
     const { __scopeCheckbox, forceMount, ...indicatorProps } = props;
-    const context = useCheckboxContext(INDICATOR_NAME$1, __scopeCheckbox);
+    const context = useCheckboxContext(INDICATOR_NAME, __scopeCheckbox);
     return /* @__PURE__ */ jsxRuntimeExports.jsx(
       Presence,
       {
@@ -44618,7 +44420,7 @@ var CheckboxIndicator = reactExports.forwardRef(
     );
   }
 );
-CheckboxIndicator.displayName = INDICATOR_NAME$1;
+CheckboxIndicator.displayName = INDICATOR_NAME;
 var BUBBLE_INPUT_NAME$2 = "CheckboxBubbleInput";
 var CheckboxBubbleInput = reactExports.forwardRef(
   ({ __scopeCheckbox, ...props }, forwardedRef) => {
@@ -50859,12 +50661,12 @@ function roundValue(value, decimalCount) {
   const rounder = Math.pow(10, decimalCount);
   return Math.round(value * rounder) / rounder;
 }
-var Root$2 = Slider$1;
+var Root$1 = Slider$1;
 var Track = SliderTrack;
 var Range = SliderRange;
 var Thumb$1 = SliderThumb;
 const Slider = reactExports.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-  Root$2,
+  Root$1,
   {
     ref,
     className: cn("relative flex w-full touch-none select-none items-center", className),
@@ -50875,7 +50677,7 @@ const Slider = reactExports.forwardRef(({ className, ...props }, ref) => /* @__P
     ]
   }
 ));
-Slider.displayName = Root$2.displayName;
+Slider.displayName = Root$1.displayName;
 const opportunitySchema = objectType({
   place_name: stringType().min(1, "Nome é obrigatório"),
   place_address: stringType().optional(),
@@ -51959,10 +51761,10 @@ SwitchBubbleInput.displayName = BUBBLE_INPUT_NAME;
 function getState(checked) {
   return checked ? "checked" : "unchecked";
 }
-var Root$1 = Switch$1;
+var Root = Switch$1;
 var Thumb = SwitchThumb;
 const Switch = reactExports.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-  Root$1,
+  Root,
   {
     className: cn(
       "peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors data-[state=checked]:bg-primary data-[state=unchecked]:bg-input focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50",
@@ -51980,7 +51782,7 @@ const Switch = reactExports.forwardRef(({ className, ...props }, ref) => /* @__P
     )
   }
 ));
-Switch.displayName = Root$1.displayName;
+Switch.displayName = Root.displayName;
 function CampaignFlowEditor({
   campaignName,
   channelType,
@@ -61387,107 +61189,60 @@ function Integrations() {
     )
   ] });
 }
-const authSchema = objectType({
-  email: stringType().email("Email inválido").max(255),
-  password: stringType().min(6, "Senha deve ter no mínimo 6 caracteres").max(100),
-  fullName: stringType().min(2, "Nome deve ter no mínimo 2 caracteres").max(100).optional()
+const signUpSchema = objectType({
+  fullName: stringType().min(2, "Nome deve ter no mínimo 2 caracteres"),
+  companyName: stringType().min(2, "Nome da empresa deve ter no mínimo 2 caracteres"),
+  email: stringType().email("Email inválido"),
+  password: stringType().min(6, "Senha deve ter no mínimo 6 caracteres")
+});
+const signInSchema = objectType({
+  email: stringType().email("Email inválido"),
+  password: stringType().min(1, "Senha é obrigatória")
 });
 function Auth() {
-  const [email, setEmail] = reactExports.useState("");
-  const [password, setPassword] = reactExports.useState("");
-  const [fullName, setFullName] = reactExports.useState("");
   const [isLoading, setIsLoading] = reactExports.useState(false);
-  const [rememberMe, setRememberMe] = reactExports.useState(false);
   const navigate = useNavigate();
-  const { toast: toast2 } = useToast();
-  reactExports.useEffect(() => {
-    const savedRememberMe = localStorage.getItem("rememberMe");
-    const savedEmail = localStorage.getItem("userEmail");
-    if (savedRememberMe === "true" && savedEmail) {
-      setRememberMe(true);
-      setEmail(savedEmail);
-    }
-  }, []);
+  const [signUpFullName, setSignUpFullName] = reactExports.useState("");
+  const [signUpCompanyName, setSignUpCompanyName] = reactExports.useState("");
+  const [signUpEmail, setSignUpEmail] = reactExports.useState("");
+  const [signUpPassword, setSignUpPassword] = reactExports.useState("");
+  const [signInEmail, setSignInEmail] = reactExports.useState("");
+  const [signInPassword, setSignInPassword] = reactExports.useState("");
   const handleSignUp = async (e3) => {
     e3.preventDefault();
     setIsLoading(true);
     try {
-      const validated2 = authSchema.parse({ email, password, fullName });
-      console.log("🔍 Tentando cadastrar usuário:", validated2.email);
-      console.log("📋 Dados validados:", { email: validated2.email, fullName: validated2.fullName });
-      console.log("🚀 Iniciando chamada supabase.auth.signUp...");
-      const signUpPromise = supabase.auth.signUp({
-        email: validated2.email,
-        password: validated2.password,
+      const validated = signUpSchema.parse({
+        fullName: signUpFullName,
+        companyName: signUpCompanyName,
+        email: signUpEmail,
+        password: signUpPassword
+      });
+      const { data, error } = await supabase.auth.signUp({
+        email: validated.email,
+        password: validated.password,
         options: {
           data: {
-            full_name: validated2.fullName
+            full_name: validated.fullName,
+            company_name: validated.companyName
           }
         }
       });
-      const timeoutPromise = new Promise(
-        (_, reject) => setTimeout(() => reject(new Error("Timeout: Chamada demorou mais de 60 segundos")), 6e4)
-      );
-      const { data, error } = await Promise.race([signUpPromise, timeoutPromise]);
-      console.log("✅ Chamada supabase.auth.signUp concluída");
-      console.log("📊 Resposta do Supabase:", { data, error });
       if (error) {
-        console.error("❌ Erro no cadastro:", error);
-        toast2({
-          title: "Erro no cadastro",
-          description: `Erro: ${error.message}`,
-          variant: "destructive"
-        });
-      } else {
-        console.log("✅ Cadastro realizado com sucesso!");
-        toast2({
-          title: "Cadastro realizado!",
-          description: "Usuário criado com sucesso. Redirecionando..."
-        });
-        setTimeout(() => {
-          navigate("/");
-        }, 1500);
+        console.error("Erro ao cadastrar:", error);
+        ue$1.error(error.message || "Erro ao criar conta");
+        return;
+      }
+      if (data.user) {
+        ue$1.success("Conta criada com sucesso! Redirecionando...");
+        setTimeout(() => navigate("/"), 1e3);
       }
     } catch (error) {
-      console.error("❌ Erro no processo de cadastro:", error);
       if (error instanceof ZodError) {
-        toast2({
-          title: "Dados inválidos",
-          description: error.errors[0].message,
-          variant: "destructive"
-        });
-      } else if (error instanceof Error && error.message.includes("Timeout")) {
-        console.log("⏱️ Timeout detectado, verificando se usuário foi criado...");
-        try {
-          const { data: checkData, error: checkError } = await supabase.auth.signInWithPassword({
-            email: validated.email,
-            password: validated.password
-          });
-          if (checkData.user && !checkError) {
-            console.log("✅ Usuário foi criado com sucesso (verificado via login)");
-            toast2({
-              title: "Cadastro realizado!",
-              description: "Usuário criado com sucesso. Redirecionando..."
-            });
-            setTimeout(() => {
-              navigate("/");
-            }, 1500);
-            return;
-          }
-        } catch (checkErr) {
-          console.log("❌ Usuário não foi criado:", checkErr);
-        }
-        toast2({
-          title: "Timeout",
-          description: "A operação demorou muito para responder. Tente novamente.",
-          variant: "destructive"
-        });
+        ue$1.error(error.errors[0].message);
       } else {
-        toast2({
-          title: "Erro inesperado",
-          description: error instanceof Error ? error.message : "Erro desconhecido",
-          variant: "destructive"
-        });
+        console.error("Erro ao cadastrar:", error);
+        ue$1.error("Erro ao criar conta");
       }
     } finally {
       setIsLoading(false);
@@ -61497,157 +61252,135 @@ function Auth() {
     e3.preventDefault();
     setIsLoading(true);
     try {
-      const validated2 = authSchema.parse({ email, password });
-      const { error } = await supabase.auth.signInWithPassword({
-        email: validated2.email,
-        password: validated2.password
+      const validated = signInSchema.parse({
+        email: signInEmail,
+        password: signInPassword
+      });
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: validated.email,
+        password: validated.password
       });
       if (error) {
-        toast2({
-          title: "Erro no login",
-          description: error.message,
-          variant: "destructive"
-        });
-      } else {
-        if (rememberMe) {
-          localStorage.setItem("rememberMe", "true");
-          localStorage.setItem("userEmail", validated2.email);
-        } else {
-          localStorage.removeItem("rememberMe");
-          localStorage.removeItem("userEmail");
-        }
-        toast2({
-          title: "Login realizado!",
-          description: rememberMe ? "Você permanecerá logado neste dispositivo." : "Login realizado com sucesso."
-        });
+        console.error("Erro ao fazer login:", error);
+        ue$1.error(error.message || "Email ou senha incorretos");
+        return;
+      }
+      if (data.user) {
+        ue$1.success("Login realizado com sucesso!");
         navigate("/");
       }
     } catch (error) {
       if (error instanceof ZodError) {
-        toast2({
-          title: "Dados inválidos",
-          description: error.errors[0].message,
-          variant: "destructive"
-        });
+        ue$1.error(error.errors[0].message);
+      } else {
+        console.error("Erro ao fazer login:", error);
+        ue$1.error("Erro ao fazer login");
       }
     } finally {
       setIsLoading(false);
     }
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "w-full max-w-md mx-4", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-2xl", children: "Omnichat IA" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: "Entre ou crie sua conta para continuar" })
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "w-full max-w-md", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { className: "space-y-1", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-2xl font-bold text-center", children: "Connect IA" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { className: "text-center", children: "Sistema de CRM com Inteligência Artificial" })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(Tabs, { defaultValue: "signin", className: "w-full", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(TabsList, { className: "grid w-full grid-cols-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "signin", children: "Entrar" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "signup", children: "Cadastrar" })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "signin", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("form", { onSubmit: handleSignIn, className: "space-y-4", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "signin-email", children: "Email" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Input,
-              {
-                id: "signin-email",
-                type: "email",
-                placeholder: "seu@email.com",
-                value: email,
-                onChange: (e3) => setEmail(e3.target.value),
-                required: true
-              }
-            )
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "signin-password", children: "Senha" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Input,
-              {
-                id: "signin-password",
-                type: "password",
-                placeholder: "••••••",
-                value: password,
-                onChange: (e3) => setPassword(e3.target.value),
-                required: true
-              }
-            )
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center space-x-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Checkbox,
-              {
-                id: "remember-me",
-                checked: rememberMe,
-                onCheckedChange: (checked) => setRememberMe(checked)
-              }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "remember-me", className: "text-sm font-normal", children: "Permanecer logado" })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "submit", className: "w-full", disabled: isLoading, children: isLoading ? "Entrando..." : "Entrar" })
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "signup", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("form", { onSubmit: handleSignUp, className: "space-y-4", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "signup-name", children: "Nome completo" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Input,
-              {
-                id: "signup-name",
-                type: "text",
-                placeholder: "Seu nome",
-                value: fullName,
-                onChange: (e3) => setFullName(e3.target.value),
-                required: true
-              }
-            )
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "signup-email", children: "Email" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Input,
-              {
-                id: "signup-email",
-                type: "email",
-                placeholder: "seu@email.com",
-                value: email,
-                onChange: (e3) => setEmail(e3.target.value),
-                required: true
-              }
-            )
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "signup-password", children: "Senha" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Input,
-              {
-                id: "signup-password",
-                type: "password",
-                placeholder: "••••••",
-                value: password,
-                onChange: (e3) => setPassword(e3.target.value),
-                required: true
-              }
-            )
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "submit", className: "w-full", disabled: isLoading, children: isLoading ? "Cadastrando..." : "Cadastrar" })
-        ] }) })
+    /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Tabs, { defaultValue: "login", className: "w-full", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(TabsList, { className: "grid w-full grid-cols-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "login", children: "Entrar" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TabsTrigger, { value: "signup", children: "Cadastrar" })
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-6 pt-4 border-t text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-muted-foreground", children: [
-        "Ao continuar, você concorda com nossa",
-        " ",
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "a",
-          {
-            href: "/privacy-policy",
-            className: "text-primary hover:underline",
-            target: "_blank",
-            rel: "noopener noreferrer",
-            children: "Política de Privacidade"
-          }
-        )
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "login", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("form", { onSubmit: handleSignIn, className: "space-y-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "signin-email", children: "Email" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Input,
+            {
+              id: "signin-email",
+              type: "email",
+              placeholder: "seu@email.com",
+              value: signInEmail,
+              onChange: (e3) => setSignInEmail(e3.target.value),
+              required: true
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "signin-password", children: "Senha" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Input,
+            {
+              id: "signin-password",
+              type: "password",
+              placeholder: "••••••••",
+              value: signInPassword,
+              onChange: (e3) => setSignInPassword(e3.target.value),
+              required: true
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "submit", className: "w-full", disabled: isLoading, children: isLoading ? "Entrando..." : "Entrar" })
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TabsContent, { value: "signup", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("form", { onSubmit: handleSignUp, className: "space-y-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "signup-fullname", children: "Nome Completo" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Input,
+            {
+              id: "signup-fullname",
+              type: "text",
+              placeholder: "João Silva",
+              value: signUpFullName,
+              onChange: (e3) => setSignUpFullName(e3.target.value),
+              required: true
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "signup-company", children: "Nome da Empresa" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Input,
+            {
+              id: "signup-company",
+              type: "text",
+              placeholder: "Minha Empresa Ltda",
+              value: signUpCompanyName,
+              onChange: (e3) => setSignUpCompanyName(e3.target.value),
+              required: true
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "signup-email", children: "Email" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Input,
+            {
+              id: "signup-email",
+              type: "email",
+              placeholder: "seu@email.com",
+              value: signUpEmail,
+              onChange: (e3) => setSignUpEmail(e3.target.value),
+              required: true
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "signup-password", children: "Senha" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Input,
+            {
+              id: "signup-password",
+              type: "password",
+              placeholder: "••••••••",
+              value: signUpPassword,
+              onChange: (e3) => setSignUpPassword(e3.target.value),
+              required: true
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "submit", className: "w-full", disabled: isLoading, children: isLoading ? "Criando conta..." : "Criar Conta" })
       ] }) })
-    ] })
+    ] }) })
   ] }) });
 }
 function Logout() {
@@ -61688,7 +61421,7 @@ function PrivacyPolicy() {
     /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-6", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-2xl font-semibold mb-4", children: "1. Informações Gerais" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground leading-relaxed", children: 'Esta Política de Privacidade descreve como o Omnichat IA ("nós", "nosso" ou "a empresa") coleta, usa, armazena e protege suas informações pessoais quando você utiliza nossos serviços.' })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground leading-relaxed", children: 'Esta Política de Privacidade descreve como o Connect IA ("nós", "nosso" ou "a empresa") coleta, usa, armazena e protege suas informações pessoais quando você utiliza nossos serviços.' })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(Separator$1, {}),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { children: [
@@ -61824,144 +61557,407 @@ function PrivacyPolicy() {
         /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-2xl font-semibold mb-4", children: "10. Contato" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground leading-relaxed", children: "Se você tiver dúvidas sobre esta Política de Privacidade ou sobre como tratamos suas informações pessoais, entre em contato conosco:" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-4 p-4 bg-muted rounded-lg", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium", children: "Omnichat IA" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "E-mail: privacidade@omnichat-ia.com" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "Suporte: suporte@omnichat-ia.com" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium", children: "Connect IA - Agência Pixel" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "E-mail: ricardo@agenciapixel.digital" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "Encarregado de Dados (DPO): Ricardo da Silva" })
         ] })
       ] })
     ] })
   ] }) });
 }
-function usePlanLimits() {
-  const { currentOrg } = useOrganization();
-  const [planUsage, setPlanUsage] = reactExports.useState(null);
-  const [isLoading, setIsLoading] = reactExports.useState(true);
-  const [error, setError] = reactExports.useState(null);
-  const fetchPlanUsage = async () => {
-    if (!currentOrg) {
-      setIsLoading(false);
-      return;
-    }
-    try {
-      setIsLoading(true);
-      setError(null);
-      const { data: orgData, error: orgError } = await supabase.from("orgs").select(`
-          plan_id,
-          trial_ends_at,
-          subscription_status
-        `).eq("id", currentOrg.id).single();
-      if (orgError) throw orgError;
-      const { data: planData, error: planError } = await supabase.from("plans").select("*").eq("id", orgData.plan_id).single();
-      if (planError) throw planError;
-      const currentMonth = /* @__PURE__ */ new Date();
-      const periodStart = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
-      const periodEnd = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
-      const { data: usageData, error: usageError } = await supabase.from("usage_tracking").select("*").eq("org_id", currentOrg.id).gte("period_start", periodStart.toISOString().split("T")[0]).lte("period_end", periodEnd.toISOString().split("T")[0]);
-      if (usageError) throw usageError;
-      const { data: trialData, error: trialError } = await supabase.rpc("is_trial_valid", { p_org_id: currentOrg.id });
-      if (trialError) throw trialError;
-      setPlanUsage({
-        plan: planData,
-        usage: usageData || [],
-        isTrialValid: trialData,
-        trialEndsAt: orgData.trial_ends_at,
-        subscriptionStatus: orgData.subscription_status
-      });
-    } catch (err) {
-      console.error("Erro ao buscar dados do plano:", err);
-      setError(err instanceof Error ? err.message : "Erro desconhecido");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  const checkLimit = async (metricType, requestedCount = 1) => {
-    if (!currentOrg) return false;
-    try {
-      const { data, error: error2 } = await supabase.rpc("check_plan_limit", {
-        p_org_id: currentOrg.id,
-        p_metric_type: metricType,
-        p_requested_count: requestedCount
-      });
-      if (error2) throw error2;
-      return data;
-    } catch (err) {
-      console.error("Erro ao verificar limite:", err);
-      return false;
-    }
-  };
-  const recordUsage = async (metricType, count2 = 1) => {
-    if (!currentOrg) return;
-    try {
-      const { error: error2 } = await supabase.rpc("record_usage", {
-        p_org_id: currentOrg.id,
-        p_metric_type: metricType,
-        p_count: count2
-      });
-      if (error2) throw error2;
-      await fetchPlanUsage();
-    } catch (err) {
-      console.error("Erro ao registrar uso:", err);
-      throw err;
-    }
-  };
-  const getCurrentUsage = (metricType) => {
-    if (!planUsage) return 0;
-    const usage = planUsage.usage.find((u2) => u2.metric_type === metricType);
-    return usage ? usage.count : 0;
-  };
-  const getLimit = (metricType) => {
-    if (!planUsage) return 0;
-    return planUsage.plan.limits[metricType] || 0;
-  };
-  const getUsagePercentage = (metricType) => {
-    const current = getCurrentUsage(metricType);
-    const limit = getLimit(metricType);
-    if (limit === -1) return 0;
-    if (limit === 0) return 100;
-    return Math.min(current / limit * 100, 100);
-  };
-  const isNearLimit = (metricType, threshold2 = 80) => {
-    return getUsagePercentage(metricType) > threshold2;
-  };
-  const canUseFeature = (metricType, requestedCount = 1) => {
-    const limit = getLimit(metricType);
-    if (limit === -1) return true;
-    const current = getCurrentUsage(metricType);
-    return current + requestedCount <= limit;
-  };
-  const getUpgradeMessage = (metricType) => {
-    const limit = getLimit(metricType);
-    const current = getCurrentUsage(metricType);
-    if (limit === -1) return "";
-    const remaining = limit - current;
-    if (remaining <= 0) {
-      return `Limite de ${metricType} atingido. Faça upgrade para continuar usando.`;
-    }
-    if (remaining <= 10) {
-      return `Restam apenas ${remaining} ${metricType}. Considere fazer upgrade.`;
-    }
-    return "";
-  };
-  reactExports.useEffect(() => {
-    fetchPlanUsage();
-  }, [currentOrg == null ? void 0 : currentOrg.id]);
-  return {
-    planUsage,
-    isLoading,
-    error,
-    fetchPlanUsage,
-    checkLimit,
-    recordUsage,
-    getCurrentUsage,
-    getLimit,
-    getUsagePercentage,
-    isNearLimit,
-    canUseFeature,
-    getUpgradeMessage
-  };
+function TermsOfService() {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "container mx-auto px-4 py-8 max-w-4xl", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-3xl font-bold", children: "Termos de Serviço" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(CardDescription, { children: [
+        "Última atualização: ",
+        (/* @__PURE__ */ new Date()).toLocaleDateString("pt-BR")
+      ] })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-6", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-2xl font-semibold mb-4", children: "1. Aceitação dos Termos" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground leading-relaxed", children: "Ao acessar e usar o Connect IA, você concorda em cumprir e estar vinculado a estes Termos de Serviço. Se você não concordar com qualquer parte destes termos, não deve usar nossos serviços." })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Separator$1, {}),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-2xl font-semibold mb-4", children: "2. Descrição do Serviço" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground leading-relaxed mb-4", children: "O Connect IA é uma plataforma de CRM (Customer Relationship Management) que oferece:" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside text-muted-foreground space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Gestão unificada de conversas de WhatsApp, Instagram e Messenger" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Automação de mensagens com inteligência artificial" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Gerenciamento de contatos e campanhas" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Pipeline de vendas e prospecção" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Dashboard com métricas em tempo real" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Integrações com plataformas Meta (Facebook, WhatsApp, Instagram)" })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Separator$1, {}),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-2xl font-semibold mb-4", children: "3. Cadastro e Conta" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-medium mb-2", children: "3.1 Criação de Conta" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground", children: "Para usar o Connect IA, você deve criar uma conta fornecendo informações precisas e completas. Você é responsável por manter a confidencialidade de suas credenciais de acesso." })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-medium mb-2", children: "3.2 Elegibilidade" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground", children: "Você deve ter pelo menos 18 anos de idade e capacidade legal para celebrar contratos para usar nossos serviços." })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-medium mb-2", children: "3.3 Segurança da Conta" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground", children: "Você é responsável por todas as atividades que ocorrem em sua conta. Notifique-nos imediatamente sobre qualquer uso não autorizado." })
+          ] })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Separator$1, {}),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-2xl font-semibold mb-4", children: "4. Uso Aceitável" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground leading-relaxed mb-4", children: "Você concorda em NÃO usar o Connect IA para:" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside text-muted-foreground space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Enviar spam ou mensagens não solicitadas em massa" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Violar direitos de propriedade intelectual de terceiros" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Transmitir conteúdo ilegal, ofensivo, ameaçador ou fraudulento" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Interferir ou interromper a operação da plataforma" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Coletar dados de outros usuários sem consentimento" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Violar leis aplicáveis ou regulamentos" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Usar para fins que violem as políticas das plataformas Meta" })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Separator$1, {}),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-2xl font-semibold mb-4", children: "5. Integrações com Terceiros" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-medium mb-2", children: "5.1 WhatsApp Business API" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-muted-foreground", children: [
+              "Ao conectar sua conta WhatsApp Business, você concorda em cumprir os",
+              /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "https://www.whatsapp.com/legal/business-policy", target: "_blank", rel: "noopener noreferrer", className: "text-primary hover:underline mx-1", children: "Termos de Serviço do WhatsApp Business" }),
+              "e as políticas da Meta."
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-medium mb-2", children: "5.2 Instagram e Messenger" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-muted-foreground", children: [
+              "O uso de Instagram e Messenger está sujeito aos",
+              /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "https://www.facebook.com/terms.php", target: "_blank", rel: "noopener noreferrer", className: "text-primary hover:underline mx-1", children: "Termos de Serviço do Meta" }),
+              "e suas políticas de plataforma."
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-medium mb-2", children: "5.3 Responsabilidade" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground", children: "Não somos responsáveis por interrupções, mudanças ou descontinuação de serviços de terceiros. Você é responsável por manter tokens de acesso e credenciais válidas." })
+          ] })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Separator$1, {}),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-2xl font-semibold mb-4", children: "6. Propriedade Intelectual" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground leading-relaxed mb-4", children: "Todo o conteúdo, recursos, código-fonte, design e funcionalidades do Connect IA são de propriedade da Agência Pixel e protegidos por leis de propriedade intelectual." }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground leading-relaxed", children: "Você mantém a propriedade de todos os dados e conteúdos que enviar através da plataforma. Ao usar nossos serviços, você nos concede uma licença para processar e exibir esse conteúdo conforme necessário para fornecer os serviços." })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Separator$1, {}),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-2xl font-semibold mb-4", children: "7. Privacidade e Dados" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-muted-foreground leading-relaxed", children: [
+          "O tratamento de dados pessoais está descrito em nossa",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "/politica-privacidade", className: "text-primary hover:underline mx-1", children: "Política de Privacidade" }),
+          "e segue as diretrizes da Lei Geral de Proteção de Dados (LGPD)."
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Separator$1, {}),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-2xl font-semibold mb-4", children: "8. Limitações de Responsabilidade" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground leading-relaxed", children: 'O Connect IA é fornecido "como está" e "conforme disponível". Não garantimos que:' }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside text-muted-foreground space-y-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "O serviço estará disponível ininterruptamente ou livre de erros" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Defeitos serão corrigidos imediatamente" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "O serviço atenderá suas expectativas específicas" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Resultados específicos serão alcançados" })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground leading-relaxed mt-4", children: "Em nenhuma circunstância seremos responsáveis por danos indiretos, incidentais, especiais ou consequenciais resultantes do uso ou incapacidade de usar nossos serviços." })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Separator$1, {}),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-2xl font-semibold mb-4", children: "9. Cancelamento e Suspensão" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-medium mb-2", children: "9.1 Cancelamento pelo Usuário" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground", children: "Você pode cancelar sua conta a qualquer momento através das configurações ou entrando em contato conosco. O cancelamento entrará em vigor ao final do período de cobrança atual." })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-medium mb-2", children: "9.2 Suspensão por Violação" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground", children: "Reservamos o direito de suspender ou encerrar sua conta se você violar estes termos, sem aviso prévio e sem reembolso." })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-medium mb-2", children: "9.3 Efeitos do Cancelamento" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-muted-foreground", children: [
+              "Após o cancelamento, seus dados serão mantidos por 30 dias para possível recuperação. Depois desse período, todos os dados serão permanentemente excluídos, conforme nossa",
+              /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "/exclusao-dados", className: "text-primary hover:underline mx-1", children: "Política de Exclusão de Dados" }),
+              "."
+            ] })
+          ] })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Separator$1, {}),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-2xl font-semibold mb-4", children: "10. Modificações dos Termos" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground leading-relaxed", children: "Podemos modificar estes termos a qualquer momento. Notificaremos sobre mudanças significativas por e-mail ou através da plataforma. O uso continuado após as alterações constitui aceitação dos novos termos." })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Separator$1, {}),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-2xl font-semibold mb-4", children: "11. Lei Aplicável e Jurisdição" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground leading-relaxed", children: "Estes termos são regidos pelas leis do Brasil. Quaisquer disputas serão resolvidas nos tribunais do Brasil, renunciando a qualquer outro foro, por mais privilegiado que seja." })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Separator$1, {}),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-2xl font-semibold mb-4", children: "12. Contato" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground leading-relaxed mb-4", children: "Para questões sobre estes Termos de Serviço:" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 bg-muted rounded-lg", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium", children: "Connect IA - Agência Pixel" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "E-mail: ricardo@agenciapixel.digital" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "Suporte: ricardo@agenciapixel.digital" })
+        ] })
+      ] })
+    ] })
+  ] }) });
+}
+function DataDeletion() {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "container mx-auto px-4 py-8 max-w-4xl", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-3xl font-bold flex items-center gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "h-8 w-8 text-red-600" }),
+        "Exclusão de Dados"
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: "Como solicitar a exclusão completa de seus dados do Connect IA" })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-6", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-2xl font-semibold mb-4", children: "1. Seus Direitos sob a LGPD" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground leading-relaxed mb-4", children: "De acordo com a Lei Geral de Proteção de Dados (LGPD), você tem o direito de solicitar a exclusão de todos os seus dados pessoais de nossos sistemas a qualquer momento." }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-blue-900 dark:text-blue-100", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Importante:" }),
+          " A exclusão de dados é permanente e irreversível. Certifique-se de fazer backup de qualquer informação importante antes de solicitar."
+        ] }) })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Separator$1, {}),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-2xl font-semibold mb-4", children: "2. Como Solicitar a Exclusão" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-lg font-medium mb-3 flex items-center gap-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "h-5 w-5 text-primary" }),
+              "Passo 1: Entre em Contato"
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground mb-3", children: "Envie um e-mail para nosso Encarregado de Dados (DPO):" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-muted p-4 rounded-lg", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-mono", children: "Para: ricardo@agenciapixel.digital" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-mono", children: "Assunto: Solicitação de Exclusão de Dados - Connect IA" })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-lg font-medium mb-3 flex items-center gap-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(CircleCheckBig, { className: "h-5 w-5 text-green-600" }),
+              "Passo 2: Informações Necessárias"
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground mb-3", children: "Inclua as seguintes informações no e-mail:" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside text-muted-foreground space-y-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "E-mail cadastrado na plataforma" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Nome completo" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Nome da empresa/organização (se aplicável)" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Confirmação de que deseja excluir TODOS os dados" })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-medium mb-3", children: "Passo 3: Aguarde Confirmação" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-muted-foreground", children: [
+              "Nossa equipe responderá sua solicitação em até ",
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "48 horas úteis" }),
+              " para confirmar o recebimento e validar sua identidade."
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-medium mb-3", children: "Passo 4: Processamento" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-muted-foreground", children: [
+              "Após a confirmação, seus dados serão permanentemente excluídos em até",
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: " 30 dias corridos" }),
+              ". Você receberá um e-mail de confirmação quando o processo for concluído."
+            ] })
+          ] })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Separator$1, {}),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-2xl font-semibold mb-4", children: "3. O Que Será Excluído" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground mb-4", children: "Os seguintes dados serão permanentemente removidos:" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg p-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-semibold mb-2 text-red-900 dark:text-red-100", children: "Dados da Conta" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "text-sm text-red-800 dark:text-red-200 space-y-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "• Nome e e-mail" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "• Credenciais de acesso" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "• Informações de perfil" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "• Configurações pessoais" })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg p-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-semibold mb-2 text-red-900 dark:text-red-100", children: "Dados de CRM" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "text-sm text-red-800 dark:text-red-200 space-y-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "• Todos os contatos cadastrados" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "• Histórico de conversas" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "• Mensagens enviadas e recebidas" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "• Campanhas criadas" })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg p-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-semibold mb-2 text-red-900 dark:text-red-100", children: "Dados de Vendas" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "text-sm text-red-800 dark:text-red-200 space-y-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "• Pipeline de vendas" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "• Prospects e leads" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "• Métricas e relatórios" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "• Histórico de atividades" })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg p-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-semibold mb-2 text-red-900 dark:text-red-100", children: "Integrações" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "text-sm text-red-800 dark:text-red-200 space-y-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "• Tokens de acesso" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "• Configurações de canais" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "• Conexões WhatsApp/Instagram" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "• Webhooks configurados" })
+            ] })
+          ] })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Separator$1, {}),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-2xl font-semibold mb-4", children: "4. Dados que Podem Ser Mantidos" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TriangleAlert, { className: "h-5 w-5 text-yellow-600 dark:text-yellow-400 mt-1" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-semibold mb-2 text-yellow-900 dark:text-yellow-100", children: "Retenção Legal Obrigatória" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-yellow-800 dark:text-yellow-200 mb-3", children: "Por obrigações legais, fiscais e regulatórias, podemos ser obrigados a manter algumas informações por períodos específicos:" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "text-sm text-yellow-800 dark:text-yellow-200 space-y-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                "• ",
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Logs de auditoria:" }),
+                " até 5 anos (segurança e compliance)"
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                "• ",
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Dados fiscais:" }),
+                " conforme legislação tributária brasileira"
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                "• ",
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Registros de transações:" }),
+                " conforme Código Civil"
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                "• ",
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Informações para processos legais:" }),
+                " até resolução do processo"
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-yellow-800 dark:text-yellow-200 mt-3", children: "Estes dados são armazenados de forma segura e acessados apenas quando estritamente necessário para cumprir obrigações legais." })
+          ] })
+        ] }) })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Separator$1, {}),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-2xl font-semibold mb-4", children: "5. Dados em Plataformas Terceiras" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground mb-4", children: "Importante: A exclusão de dados do Connect IA NÃO afeta automaticamente:" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside text-muted-foreground space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Mensagens no WhatsApp:" }),
+            " Mensagens enviadas permanecem nos servidores do WhatsApp conforme suas políticas"
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Conversas no Instagram/Messenger:" }),
+            " Histórico mantido pela Meta conforme seus termos"
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Dados de terceiros:" }),
+            " Informações em sistemas de parceiros devem ser solicitadas diretamente a eles"
+          ] })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Separator$1, {}),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-2xl font-semibold mb-4", children: "6. Alternativas à Exclusão Total" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground mb-4", children: "Antes de solicitar a exclusão completa, considere estas alternativas:" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border rounded-lg p-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-semibold mb-2", children: "Desativar Conta" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-muted-foreground", children: "Mantenha seus dados mas desative temporariamente o acesso. Você pode reativar quando quiser." })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border rounded-lg p-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-semibold mb-2", children: "Exportar Dados" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-muted-foreground", children: "Solicite uma cópia de todos os seus dados antes da exclusão. Enviamos em formato JSON ou CSV." })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border rounded-lg p-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-semibold mb-2", children: "Excluir Dados Específicos" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-muted-foreground", children: "Exclua apenas contatos, campanhas ou conversas específicas, mantendo a conta ativa." })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border rounded-lg p-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-semibold mb-2", children: "Cancelar Assinatura" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-muted-foreground", children: "Cancele o plano pago mas mantenha acesso gratuito limitado aos seus dados." })
+          ] })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Separator$1, {}),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-2xl font-semibold mb-4", children: "7. Prazo de Processamento" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-muted p-6 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-12 h-12 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold", children: "48h" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-semibold", children: "Resposta Inicial" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-muted-foreground", children: "Confirmação do recebimento e validação de identidade" })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-12 h-12 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold", children: "30d" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-semibold", children: "Exclusão Completa" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-muted-foreground", children: "Remoção permanente de todos os dados elegíveis" })
+            ] })
+          ] })
+        ] }) })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Separator$1, {}),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-2xl font-semibold mb-4", children: "8. Contato" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground mb-4", children: "Para solicitar a exclusão de dados ou esclarecer dúvidas:" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-primary/10 p-6 rounded-lg", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-semibold text-lg", children: "Encarregado de Dados (DPO)" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Nome:" }),
+              " Ricardo da Silva"
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "E-mail:" }),
+              " ",
+              /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "mailto:ricardo@agenciapixel.digital", className: "text-primary hover:underline", children: "ricardo@agenciapixel.digital" })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Empresa:" }),
+              " Connect IA - Agência Pixel"
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { className: "mt-4", asChild: true, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { href: "mailto:ricardo@agenciapixel.digital?subject=Solicitação de Exclusão de Dados - Connect IA", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "h-4 w-4 mr-2" }),
+            "Enviar Solicitação por E-mail"
+          ] }) })
+        ] })
+      ] })
+    ] })
+  ] }) });
 }
 function PlanSelector({ onPlanSelect, className }) {
-  const { planUsage, isLoading } = usePlanLimits();
   const [selectedPlan, setSelectedPlan] = reactExports.useState("basic");
   const plans = [
     {
@@ -62078,36 +62074,20 @@ function PlanSelector({ onPlanSelect, className }) {
       ue$1.error("Erro ao processar assinatura");
     }
   };
-  if (isLoading) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 ${className}`, children: [1, 2, 3, 4].map((i2) => /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "animate-pulse", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-6 bg-gray-200 rounded w-3/4 mb-2" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 rounded w-1/2" })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 rounded" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 rounded" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 rounded" })
-      ] }) })
-    ] }, i2)) });
-  }
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 ${className}`, children: plans.map((plan) => {
     const Icon2 = plan.icon;
     const isSelected = selectedPlan === plan.id;
-    const isCurrentPlan = (planUsage == null ? void 0 : planUsage.plan.id) === plan.id;
+    const isCurrentPlan = false;
     return /* @__PURE__ */ jsxRuntimeExports.jsxs(
       Card,
       {
-        className: `relative transition-all duration-200 ${plan.popular ? "ring-2 ring-yellow-400 shadow-lg scale-105" : isSelected ? "ring-2 ring-blue-400 shadow-md" : "hover:shadow-md"} ${isCurrentPlan ? "bg-green-50 border-green-200" : ""}`,
+        className: `relative transition-all duration-200 ${plan.popular ? "ring-2 ring-yellow-400 shadow-lg scale-105" : isSelected ? "ring-2 ring-blue-400 shadow-md" : "hover:shadow-md"} ${""}`,
         children: [
           plan.popular && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute -top-3 left-1/2 transform -translate-x-1/2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { className: "bg-yellow-500 text-white px-3 py-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(Crown, { className: "h-3 w-3 mr-1" }),
             "Mais Popular"
           ] }) }),
-          isCurrentPlan && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute -top-3 right-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "secondary", className: "bg-green-500 text-white", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Check, { className: "h-3 w-3 mr-1" }),
-            "Atual"
-          ] }) }),
+          isCurrentPlan,
           /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { className: "text-center pb-4", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex justify-center mb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 rounded-full bg-blue-100", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Icon2, { className: "h-6 w-6 text-blue-600" }) }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-xl", children: plan.name }),
@@ -62163,7 +62143,7 @@ function PlanSelector({ onPlanSelect, className }) {
                 variant: plan.popular ? "default" : "outline",
                 onClick: () => handleSubscribe(plan.id),
                 disabled: isCurrentPlan,
-                children: isCurrentPlan ? "Plano Atual" : plan.cta
+                children: plan.cta
               }
             )
           ] })
@@ -62173,108 +62153,6 @@ function PlanSelector({ onPlanSelect, className }) {
     );
   }) });
 }
-var PROGRESS_NAME = "Progress";
-var DEFAULT_MAX = 100;
-var [createProgressContext] = createContextScope(PROGRESS_NAME);
-var [ProgressProvider, useProgressContext] = createProgressContext(PROGRESS_NAME);
-var Progress$1 = reactExports.forwardRef(
-  (props, forwardedRef) => {
-    const {
-      __scopeProgress,
-      value: valueProp = null,
-      max: maxProp,
-      getValueLabel = defaultGetValueLabel,
-      ...progressProps
-    } = props;
-    if ((maxProp || maxProp === 0) && !isValidMaxNumber(maxProp)) {
-      console.error(getInvalidMaxError(`${maxProp}`, "Progress"));
-    }
-    const max2 = isValidMaxNumber(maxProp) ? maxProp : DEFAULT_MAX;
-    if (valueProp !== null && !isValidValueNumber(valueProp, max2)) {
-      console.error(getInvalidValueError(`${valueProp}`, "Progress"));
-    }
-    const value = isValidValueNumber(valueProp, max2) ? valueProp : null;
-    const valueLabel = isNumber2(value) ? getValueLabel(value, max2) : void 0;
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(ProgressProvider, { scope: __scopeProgress, value, max: max2, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-      Primitive.div,
-      {
-        "aria-valuemax": max2,
-        "aria-valuemin": 0,
-        "aria-valuenow": isNumber2(value) ? value : void 0,
-        "aria-valuetext": valueLabel,
-        role: "progressbar",
-        "data-state": getProgressState(value, max2),
-        "data-value": value ?? void 0,
-        "data-max": max2,
-        ...progressProps,
-        ref: forwardedRef
-      }
-    ) });
-  }
-);
-Progress$1.displayName = PROGRESS_NAME;
-var INDICATOR_NAME = "ProgressIndicator";
-var ProgressIndicator = reactExports.forwardRef(
-  (props, forwardedRef) => {
-    const { __scopeProgress, ...indicatorProps } = props;
-    const context = useProgressContext(INDICATOR_NAME, __scopeProgress);
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(
-      Primitive.div,
-      {
-        "data-state": getProgressState(context.value, context.max),
-        "data-value": context.value ?? void 0,
-        "data-max": context.max,
-        ...indicatorProps,
-        ref: forwardedRef
-      }
-    );
-  }
-);
-ProgressIndicator.displayName = INDICATOR_NAME;
-function defaultGetValueLabel(value, max2) {
-  return `${Math.round(value / max2 * 100)}%`;
-}
-function getProgressState(value, maxValue) {
-  return value == null ? "indeterminate" : value === maxValue ? "complete" : "loading";
-}
-function isNumber2(value) {
-  return typeof value === "number";
-}
-function isValidMaxNumber(max2) {
-  return isNumber2(max2) && !isNaN(max2) && max2 > 0;
-}
-function isValidValueNumber(value, max2) {
-  return isNumber2(value) && !isNaN(value) && value <= max2 && value >= 0;
-}
-function getInvalidMaxError(propValue, componentName) {
-  return `Invalid prop \`max\` of value \`${propValue}\` supplied to \`${componentName}\`. Only numbers greater than 0 are valid max values. Defaulting to \`${DEFAULT_MAX}\`.`;
-}
-function getInvalidValueError(propValue, componentName) {
-  return `Invalid prop \`value\` of value \`${propValue}\` supplied to \`${componentName}\`. The \`value\` prop must be:
-  - a positive number
-  - less than the value passed to \`max\` (or ${DEFAULT_MAX} if no \`max\` prop is set)
-  - \`null\` or \`undefined\` if the progress is indeterminate.
-
-Defaulting to \`null\`.`;
-}
-var Root = Progress$1;
-var Indicator = ProgressIndicator;
-const Progress = reactExports.forwardRef(({ className, value, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-  Root,
-  {
-    ref,
-    className: cn("relative h-4 w-full overflow-hidden rounded-full bg-secondary", className),
-    ...props,
-    children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-      Indicator,
-      {
-        className: "h-full w-full flex-1 bg-primary transition-all",
-        style: { transform: `translateX(-${100 - (value || 0)}%)` }
-      }
-    )
-  }
-));
-Progress.displayName = Root.displayName;
 function PricingPage() {
   const planUsage = null;
   const features = [
@@ -62376,6 +62254,8 @@ const App = () => {
       /* @__PURE__ */ jsxRuntimeExports.jsx(Route, { path: "/autenticacao", element: /* @__PURE__ */ jsxRuntimeExports.jsx(Auth, {}) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(Route, { path: "/logout", element: /* @__PURE__ */ jsxRuntimeExports.jsx(Logout, {}) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(Route, { path: "/politica-privacidade", element: /* @__PURE__ */ jsxRuntimeExports.jsx(PrivacyPolicy, {}) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Route, { path: "/termos-de-servico", element: /* @__PURE__ */ jsxRuntimeExports.jsx(TermsOfService, {}) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Route, { path: "/exclusao-dados", element: /* @__PURE__ */ jsxRuntimeExports.jsx(DataDeletion, {}) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(Route, { path: "/planos", element: /* @__PURE__ */ jsxRuntimeExports.jsx(PricingPage, {}) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         Route,

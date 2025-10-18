@@ -20,6 +20,8 @@ import Integrations from "./pages/Integrations";
 import Auth from "./pages/Auth";
 import Logout from "./pages/Logout";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import DataDeletion from "./pages/DataDeletion";
 import Pricing from "./pages/Pricing";
 import NotFound from "./pages/NotFound";
 
@@ -42,6 +44,8 @@ const App = () => {
               <Route path="/autenticacao" element={<Auth />} />
               <Route path="/logout" element={<Logout />} />
               <Route path="/politica-privacidade" element={<PrivacyPolicy />} />
+              <Route path="/termos-de-servico" element={<TermsOfService />} />
+              <Route path="/exclusao-dados" element={<DataDeletion />} />
               <Route path="/planos" element={<Pricing />} />
             <Route
               path="/"
