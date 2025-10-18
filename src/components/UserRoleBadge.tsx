@@ -1,9 +1,9 @@
 import { Badge } from "@/components/ui/badge";
 import { usePermissions } from "@/hooks/usePermissions";
-import { Crown, Shield, User, Eye } from "lucide-react";
+import { Crown, Shield, User, Eye, Loader2 } from "lucide-react";
 
 export function UserRoleBadge() {
-  const { userRole } = usePermissions();
+  const { userRole, isLoading } = usePermissions();
 
   const roleConfig = {
     admin: {
@@ -32,11 +32,24 @@ export function UserRoleBadge() {
     }
   };
 
+  // 🔄 Mostrar loading enquanto carrega organização
+  if (isLoading) {
+    return (
+      <Badge
+        variant="outline"
+        className="border-gray-300 text-gray-600 flex items-center gap-1"
+      >
+        <Loader2 className="h-3 w-3 animate-spin" />
+        Carregando...
+      </Badge>
+    );
+  }
+
   const config = roleConfig[userRole];
   const Icon = config.icon;
 
   return (
-    <Badge 
+    <Badge
       variant={config.variant}
       className={`${config.className} flex items-center gap-1`}
     >

@@ -275,13 +275,16 @@ const ROLE_PERMISSIONS: Record<UserRole, Permissions> = {
 };
 
 export function usePermissions() {
-  const { currentOrg } = useOrganization();
+  const { currentOrg, isLoading } = useOrganization();
 
-  const userRole: UserRole = currentOrg?.role || "viewer";
+  // 🔄 CORREÇÃO: Esperar carregar antes de determinar role
+  // Se ainda está carregando, não definir role (evita mostrar "viewer" incorretamente)
+  const userRole: UserRole = isLoading ? "viewer" : (currentOrg?.role || "viewer");
   const permissions = ROLE_PERMISSIONS[userRole];
 
   // Debug: Log para identificar problema de role
   console.log('🔐 usePermissions:', {
+    isLoading,
     currentOrg: currentOrg ? {
       id: currentOrg.id,
       name: currentOrg.name,
@@ -298,6 +301,7 @@ export function usePermissions() {
     isManager: userRole === "manager",
     isAgent: userRole === "agent",
     isViewer: userRole === "viewer",
+    isLoading, // Exportar isLoading para componentes poderem mostrar loading
 
     // Helper functions for common permission checks
     canAccess: (permission: keyof Permissions) => permissions[permission],
