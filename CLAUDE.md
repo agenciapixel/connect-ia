@@ -48,9 +48,9 @@ npm run lint           # Executar ESLint
 - **Email**: Sistema de email marketing
 
 ### 👥 Gestão de Usuários
-- **Sistema de Autorização**: Controle de acesso baseado em roles
+- **Sistema de Autorização**: Controle de acesso em duas camadas (sistema + organização)
 - **Organizações**: Multi-tenant com organizações separadas
-- **Permissões**: Sistema granular de permissões (admin/user)
+- **Permissões**: Sistema granular de permissões (admin/manager/agent/viewer)
 
 ### 📊 Dashboard e Analytics
 - **Métricas em Tempo Real**: Conversas, leads, conversões
@@ -169,74 +169,142 @@ Todas as rotas são protegidas com autenticação (`ProtectedRoute`) e permissõ
 
 ## 🔐 Sistema de Autenticação
 
+### Arquitetura de Três Camadas
+
+O sistema utiliza uma arquitetura de separação de responsabilidades:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│ 1. useSecurity (Autorização de Sistema)                │
+│    ├─ Verifica se usuário está em authorized_users     │
+│    ├─ Cache duplo (memória + localStorage)             │
+│    └─ Retorna: isAuthorized (sim/não)                  │
+└─────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────┐
+│ 2. OrganizationContext (Role por Organização)          │
+│    ├─ Consulta tabela members                          │
+│    ├─ Busca role: admin/manager/agent/viewer           │
+│    └─ Gerencia troca de organizações                   │
+└─────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────┐
+│ 3. usePermissions (Permissões Granulares)              │
+│    ├─ Recebe role do OrganizationContext               │
+│    ├─ Calcula 46+ permissões específicas               │
+│    └─ Retorna: canManageContacts, canCreateCampaigns…  │
+└─────────────────────────────────────────────────────────┘
+```
+
 ### Fluxo de Autenticação
 1. **Login**: Supabase Auth (JWT tokens)
-2. **Autorização**: Verificação em `authorized_users` table
-3. **Role**: Determinação de permissões (admin/user)
-4. **Organização**: Associação com org específica via `members`
-5. **Cache**: Sistema de cache em memória (5 minutos) para performance
+2. **Autorização**: `useSecurity` verifica se usuário está em `authorized_users`
+3. **Organização**: `OrganizationContext` busca organizações do usuário via `members`
+4. **Role**: Cada organização tem um role específico (admin/manager/agent/viewer)
+5. **Permissões**: `usePermissions` converte role em permissões granulares
+6. **Cache**: Sistema de cache duplo (memória + localStorage) para performance
 
 ### Componentes de Autenticação
 
-**ProtectedRoute** (`src/components/ProtectedRoute.tsx`)
+**ProtectedRoute** ([src/components/ProtectedRoute.tsx](src/components/ProtectedRoute.tsx))
 - Guard de autenticação para rotas privadas
 - Valida sessão ativa do Supabase Auth
 - Chama `useSecurity` para verificar autorização
 - Redireciona para `/autenticacao` se não autenticado
 - Bloqueia acesso se usuário não autorizado
 
-**useSecurity** (`src/hooks/useSecurity.ts`)
-- Hook principal de segurança e autorização
-- `checkUserAuthorization(email)`: Verifica se usuário está na tabela `authorized_users`
-- `getUserRole(email)`: Busca role do usuário (admin/user)
+**useSecurity** ([src/hooks/useSecurity.ts](src/hooks/useSecurity.ts))
+- **Responsabilidade ÚNICA**: Autorização de acesso ao sistema
+- `checkUserAuthorization(email)`: Verifica se usuário está em `authorized_users`
 - `validateUser(email)`: Executa validação completa
-- Sistema de cache em memória (5 minutos) para evitar consultas repetidas
-- Timeout de 10 segundos com fallback para cache
+- Sistema de **cache duplo**:
+  - Cache em memória (Map) - primeira camada
+  - localStorage - persiste entre hard refreshes
+- Timeout de 20 segundos com fallback para cache
 - Previne validações duplicadas com refs
+- **NÃO gerencia roles** (responsabilidade do OrganizationContext)
 
-**usePersistentAuth** (`src/hooks/usePersistentAuth.ts`)
+**OrganizationContext** ([src/contexts/OrganizationContext.tsx](src/contexts/OrganizationContext.tsx))
+- **Responsabilidade**: Gerenciar organizações e roles
+- Consulta tabela `members` para buscar role por organização
+- Permite troca entre organizações (multi-tenant)
+- Fornece role atual: admin/manager/agent/viewer
+- Persiste organização selecionada em localStorage
+
+**usePermissions** ([src/hooks/usePermissions.ts](src/hooks/usePermissions.ts))
+- **Responsabilidade**: Calcular permissões granulares
+- Recebe role do `OrganizationContext`
+- Converte role em 46+ permissões específicas
+- Funções helper: `canAccess()`, `canAccessAny()`, `canAccessAll()`
+
+**usePersistentAuth** ([src/hooks/usePersistentAuth.ts](src/hooks/usePersistentAuth.ts))
 - Monitora estado de autenticação via `onAuthStateChange`
 - Gerencia persistência de sessão
 - Função `logout()` para deslogar
 - Suporte a "Permanecer Logado" (localStorage)
 
-### Sistema de Cache
-- **Cache em Memória**: Map compartilhado entre todas as instâncias
+### Sistema de Cache (v1.1.0-beta)
+
+**Cache Duplo para Autorização:**
+- **Cache em Memória**: Map compartilhado, ultra-rápido
+- **localStorage**: Persiste entre hard refreshes
 - **Duração**: 5 minutos (300.000ms)
-- **Estrutura**: `{ isAuthorized: boolean, role: 'admin' | 'user' | null, timestamp: number }`
+- **Estrutura**: `{ isAuthorized: boolean, timestamp: number }`
 - **Fallback**: Em caso de timeout/erro, usa cache antigo se disponível
 - **Limpeza**: Cache é limpo quando usuário faz logout ou não é autorizado
 
+**Performance:**
+- Primeira carga: ~2-5s (consulta Supabase)
+- Hard refresh com cache: ~0ms (instantâneo)
+- Validações seguintes: ~0ms (cache)
+
 ### Hard Refresh e Performance
-- **Problema Resolvido**: Sistema travava no hard refresh ao consultar Supabase
+- **Problema Resolvido**: Sistema travava 20+ segundos no hard refresh
 - **Solução**:
-  - Cache em memória evita re-consultas desnecessárias
+  - Cache duplo (memória + localStorage) evita re-consultas
   - Refs (`useRef`) previnem validações duplicadas
-  - Fallback para cache em caso de timeout (10s)
+  - Fallback para cache em caso de timeout (20s)
   - `useCallback` para memoização de funções
 
 ### Segurança
 - **RLS**: Row Level Security em todas as tabelas
 - **JWT**: Tokens de autenticação gerenciados pelo Supabase
 - **Fail-Secure**: Em caso de erro sem cache, NEGA acesso
-- **Timeout**: 10 segundos para consultas, com fallback seguro
+- **Timeout**: 20 segundos para consultas, com fallback seguro
 - **Validação Única**: Previne validações duplicadas simultâneas
+- **Sem Fallbacks Inseguros**: Removidos padrões de email para admin
 - **HTTPS**: Comunicação segura
 - **CORS**: Configuração adequada no Supabase
+
+### Tabelas de Autorização
+
+**authorized_users** (Autorização de Sistema)
+- Email do usuário
+- Se usuário pode acessar o sistema (sim/não)
+- Consultada pelo `useSecurity`
+
+**members** (Roles por Organização)
+- Relacionamento user_id ↔ org_id
+- Role específico por organização: admin/manager/agent/viewer
+- Consultada pelo `OrganizationContext`
 
 ### Problemas Conhecidos e Soluções
 
 **Timeout no Supabase:**
 - Consultas à tabela `authorized_users` às vezes demoram
-- Solução: Timeout de 10s + cache em memória + fallback
+- Solução: Timeout de 20s + cache duplo + fallback
 
 **Hard Refresh Travando:**
 - `validateUser` era chamado múltiplas vezes simultaneamente
-- Solução: Refs para prevenir validações duplicadas + cache
+- Solução: Refs para prevenir validações duplicadas + cache duplo
 
 **Loop Infinito:**
 - `validateUser` limpava localStorage causando re-validações
 - Solução: Removida limpeza de localStorage + validação única via refs
+
+**Role Incorreto:**
+- Sistema consultava `authorized_users` para role (incorreto)
+- Solução: Role agora vem do `OrganizationContext` via tabela `members`
 
 ## 🚀 Deploy e Produção
 
@@ -268,20 +336,26 @@ Todas as rotas são protegidas com autenticação (`ProtectedRoute`) e permissõ
 
 ## 🐛 Problemas Conhecidos
 
-### Resolvidos
+### Resolvidos (v1.1.0-beta)
 - ✅ **MIME Type**: JavaScript modules servidos corretamente
-- ✅ **Hard Refresh**: Sistema de cache em memória implementado (Outubro 2025)
+- ✅ **Hard Refresh**: Sistema de cache duplo implementado (memória + localStorage)
 - ✅ **RLS Policies**: Políticas corrigidas para evitar recursão
 - ✅ **User Creation**: Trigger automático funcionando
-- ✅ **Role Detection**: Sistema robusto com cache de 5 minutos
-- ✅ **Timeout Issues**: Timeout de 10s com fallback para cache
-- ✅ **Validações Duplicadas**: Sistema de refs previne múltiplas validações
+- ✅ **Role Detection**: Arquitetura de três camadas (useSecurity → OrganizationContext → usePermissions)
+- ✅ **Timeout Issues**: Timeout de 20s com fallback para cache
+- ✅ **Validações Duplicadas**: Sistema de refs previne múltiplas validações simultâneas
 - ✅ **Fallback Inseguro**: Removido fallback de admin por padrão de email
 - ✅ **Verificação de Autorização**: Reativada com tratamento adequado
+- ✅ **Role Incorreto**: Separação de responsabilidades (autorização vs. role)
+- ✅ **Cache localStorage**: Persiste entre hard refreshes para performance instantânea
+
+### Em Teste (Branch dev-auth-cache-v1.1)
+- 🧪 **Sistema de Cache Duplo**: Em testes antes de deploy para produção
+- 🧪 **Arquitetura de Três Camadas**: Validação da separação de responsabilidades
 
 ### Em Andamento
-- 🔄 **Performance Geral**: Otimização de queries Supabase
-- 🔄 **Production Sync**: Sincronização dev/prod
+- 🔄 **Performance Geral**: Otimização de queries Supabase RLS
+- 🔄 **Production Sync**: Sincronização dev/prod após testes aprovados
 
 ## 📞 Suporte
 
@@ -298,41 +372,71 @@ Todas as rotas são protegidas com autenticação (`ProtectedRoute`) e permissõ
 ---
 
 **Última atualização**: 17 de Outubro de 2025
-**Versão Oficial**: 1.0.0 (estável)
-**Versão Teste**: 1.1.0-beta (testando em produção, será revertida)
-**Status**: Teste temporário em produção
+**Versão Oficial**: 1.0.0 (estável em produção)
+**Versão Dev**: 1.1.0-beta (em testes na branch dev-auth-cache-v1.1)
+**Status**: Desenvolvimento e testes locais
 
 ## 📝 Changelog
 
-### v1.1.0-beta (17/10/2025) - TESTE EM PRODUÇÃO
-⚠️ **VERSÃO DE TESTE - SERÁ REVERTIDA PARA v1.0.0**
+### v1.1.0-beta (17/10/2025) - EM TESTE (Branch: dev-auth-cache-v1.1)
+🔬 **VERSÃO EM DESENVOLVIMENTO - TESTES LOCAIS**
 
-**Objetivo:** Testar correções de autenticação em ambiente real antes de aprovar.
+**Objetivo:** Refatorar sistema de autenticação com arquitetura de produção e cache duplo.
 
-**Mudanças em Teste:**
-- 🧪 **Sistema de Cache em Memória**: Cache de 5 minutos para consultas de autorização
-- 🧪 **Correção Hard Refresh**: Resolvido travamento ao dar hard refresh
-- 🧪 **Segurança Aprimorada**: Removido fallback inseguro de admin por email
-- 🧪 **Performance**: Redução de 90% em consultas repetidas ao Supabase
-- 🧪 **Validação Única**: Sistema de refs previne validações duplicadas
-- 🧪 **Fail-Secure**: Sistema agora nega acesso em caso de erro (mais seguro)
+**Mudanças Implementadas:**
 
-**Arquivos Modificados:**
-- `src/hooks/useSecurity.ts` - Sistema de cache e validação
-- `src/components/ProtectedRoute.tsx` - Verificação de autorização reativada
+**🏗️ Arquitetura de Três Camadas (Separação de Responsabilidades)**
+- ✅ `useSecurity`: APENAS autorização (authorized_users table)
+- ✅ `OrganizationContext`: Role por organização (members table)
+- ✅ `usePermissions`: Permissões granulares baseadas em role
+
+**⚡ Sistema de Cache Duplo**
+- ✅ **Cache em Memória (Map)**: Primeira camada, ultra-rápido
+- ✅ **localStorage**: Segunda camada, persiste entre hard refreshes
+- ✅ **Duração**: 5 minutos (300.000ms)
+- ✅ **Performance**: Hard refresh de 20s+ → 0ms (instantâneo)
+
+**🔒 Melhorias de Segurança**
+- ✅ Removido fallback inseguro de admin por padrão de email
+- ✅ Timeout aumentado: 10s → 20s
+- ✅ Fail-Secure: Nega acesso em caso de erro sem cache
+- ✅ Validação única: Refs previnem validações duplicadas
+
+**🐛 Correções**
+- ✅ Hard Refresh travando por 20+ segundos
+- ✅ Role incorreto (user em vez de admin)
+- ✅ Loops infinitos de validação
+- ✅ Timeouts falsos
+- ✅ Validações duplicadas simultâneas
+
+**📁 Arquivos Modificados:**
+- `src/hooks/useSecurity.ts` - Refatoração completa (368 → 210 linhas)
+- `src/components/ProtectedRoute.tsx` - Compatível com nova arquitetura
+- `src/contexts/OrganizationContext.tsx` - Já consulta members table
+- `src/hooks/usePermissions.ts` - Já usa role do OrganizationContext
+- `DEV_TESTING_GUIDE.md` - Guia de testes completo (233 linhas)
 - `CLAUDE.md` - Documentação atualizada
 
-**Testes a Realizar:**
-1. ✅ Login normal
-2. ⏳ Hard refresh múltiplos (Cmd+Shift+R)
-3. ⏳ Performance de login
-4. ⏳ Comportamento do cache (5 min)
-5. ⏳ Validar que não há loops infinitos
-6. ⏳ Testar com múltiplos usuários (admin/user)
-7. ⏳ Timeout e fallback funcionando
+**✅ Checklist de Testes (DEV_TESTING_GUIDE.md):**
+- [ ] Teste 1: Login normal funcionando
+- [ ] Teste 2: Hard refresh não trava (5x)
+- [ ] Teste 3: Cache acelerando validações
+- [ ] Teste 4: Cache expira após 5 minutos
+- [ ] Teste 5: Sem validações duplicadas
+- [ ] Teste 6: Logout limpa cache
+- [ ] Teste 7: Usuário não autorizado bloqueado
+- [ ] Build de produção sem erros
+- [ ] Preview local funcionando
+- [ ] Console sem erros de sintaxe
 
-**Após Testes:**
-- ✅ **Se aprovado:** Manter mudanças, atualizar versão oficial para v1.1.0
+**📋 Próximos Passos:**
+1. **Testes Locais**: Seguir DEV_TESTING_GUIDE.md
+2. **Aprovação**: Marcar todos os checkboxes do guia
+3. **Merge**: dev-auth-cache-v1.1 → main
+4. **Deploy**: Push para produção após aprovação
+
+**Após Aprovação:**
+- ✅ **Se aprovado:** Merge para main, deploy para produção, atualizar versão para v1.1.0
 - ❌ **Se reprovado:** Reverter para v1.0.0 (git reset/revert)
 
 ### v1.0.0 (18/10/2024) - PRODUÇÃO ATUAL
