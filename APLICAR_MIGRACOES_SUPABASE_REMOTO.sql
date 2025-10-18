@@ -43,10 +43,35 @@ CREATE TABLE IF NOT EXISTS public.orgs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   slug TEXT UNIQUE NOT NULL,
-  owner_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Remover coluna plan se existir (sistema antigo)
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public'
+    AND table_name = 'orgs'
+    AND column_name = 'plan'
+  ) THEN
+    ALTER TABLE public.orgs DROP COLUMN plan;
+  END IF;
+END $$;
+
+-- Adicionar coluna owner_id se não existir
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public'
+    AND table_name = 'orgs'
+    AND column_name = 'owner_id'
+  ) THEN
+    ALTER TABLE public.orgs ADD COLUMN owner_id UUID REFERENCES auth.users(id) ON DELETE CASCADE;
+  END IF;
+END $$;
 
 -- Tabela de membros (usuários nas organizações)
 CREATE TABLE IF NOT EXISTS public.members (
