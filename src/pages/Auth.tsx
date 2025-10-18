@@ -67,8 +67,13 @@ export default function Auth() {
         console.log('✅ Cadastro realizado com sucesso!');
         toast({
           title: "Cadastro realizado!",
-          description: "Usuário criado com sucesso. Você pode fazer login agora.",
+          description: "Usuário criado com sucesso. Redirecionando...",
         });
+        
+        // Redirecionar para o dashboard após cadastro bem-sucedido
+        setTimeout(() => {
+          navigate("/");
+        }, 1500);
       }
     } catch (error) {
       console.error('❌ Erro de validação:', error);

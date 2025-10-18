@@ -60,7 +60,6 @@ export function useSecurity() {
         .from('authorized_users')
         .select('role')
         .eq('email', userEmail)
-        .eq('is_active', true)
         .single();
 
       if (error || !data) {
