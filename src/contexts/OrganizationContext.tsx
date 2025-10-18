@@ -26,35 +26,46 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchOrganizations = async () => {
+    console.log('🔄 fetchOrganizations: INICIANDO...');
+
     try {
-      // Verificação tripla para garantir que há usuário
+      // Verificação 1: Buscar usuário
+      console.log('🔄 fetchOrganizations: Buscando usuário...');
       const { data: { user } } = await supabase.auth.getUser();
-      
+      console.log('🔄 fetchOrganizations: getUser retornou:', user ? user.email : 'null');
+
       if (!user) {
+        console.log('❌ fetchOrganizations: Sem usuário, abortando');
         setOrganizations([]);
         setCurrentOrg(null);
         setIsLoading(false);
         return;
       }
 
-      // Verificação adicional da sessão
+      // Verificação 2: Buscar sessão
+      console.log('🔄 fetchOrganizations: Buscando sessão...');
       const { data: { session } } = await supabase.auth.getSession();
+      console.log('🔄 fetchOrganizations: getSession retornou:', session?.user ? session.user.email : 'null');
+
       if (!session?.user) {
+        console.log('❌ fetchOrganizations: Sem sessão, abortando');
         setOrganizations([]);
         setCurrentOrg(null);
         setIsLoading(false);
         return;
       }
 
-      // Verificação final - garantir que o usuário da sessão é o mesmo
+      // Verificação 3: IDs compatíveis
+      console.log('🔄 fetchOrganizations: Verificando IDs...', { userId: user.id, sessionUserId: session.user.id });
       if (session.user.id !== user.id) {
+        console.log('❌ fetchOrganizations: IDs incompatíveis, abortando');
         setOrganizations([]);
         setCurrentOrg(null);
         setIsLoading(false);
         return;
       }
 
-      console.log('✅ fetchOrganizations: Usuário encontrado:', user.email);
+      console.log('✅ fetchOrganizations: Todas verificações OK, usuário:', user.email);
 
       // Buscar todas as organizações do usuário através da tabela members
       const { data: memberships, error } = await supabase
