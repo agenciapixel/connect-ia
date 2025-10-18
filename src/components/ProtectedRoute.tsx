@@ -19,7 +19,14 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     // Isso causava limpeza de cache durante refresh
   }, [user?.email]); // Removido validateUser e clearSecurity das dependências para evitar loop
 
-  if (loading || isLoading) {
+  // CORREÇÃO: Verificar user PRIMEIRO, antes de mostrar loading
+  // Se não há usuário E não está carregando auth, redirecionar imediatamente
+  if (!loading && !user) {
+    return <Navigate to="/autenticacao" replace />;
+  }
+
+  // Mostrar loading apenas se está verificando auth OU se tem usuário e está verificando autorização
+  if (loading || (user && isLoading)) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -28,10 +35,6 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
         </div>
       </div>
     );
-  }
-
-  if (!user) {
-    return <Navigate to="/autenticacao" replace />;
   }
 
   // Verificação de autorização reativada com tratamento melhorado
