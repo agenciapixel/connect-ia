@@ -185,14 +185,21 @@ WHATSAPP_ACCESS_TOKEN=seu_token_permanente_aqui
 
 ### 4.6 Configurar Webhook do WhatsApp
 
+**IMPORTANTE:** Os webhooks devem apontar para **Supabase Edge Functions**, não para o frontend!
+
 1. Vá para **WhatsApp** → **Configuration**
 2. Na seção **"Webhook"**, clique em **"Edit"**
 3. Preencha:
 
 ```
-Callback URL: https://connectia.agenciapixel.digital/api/webhooks/whatsapp
+Callback URL: https://bjsuujkbrhjhuyzydxbr.supabase.co/functions/v1/whatsapp-webhook
 Verify Token: connect_ia_webhook_2025
 ```
+
+**Explicação:**
+- `bjsuujkbrhjhuyzydxbr` = Seu Project ID do Supabase
+- `/functions/v1/` = Caminho padrão das Edge Functions
+- `whatsapp-webhook` = Nome da Edge Function
 
 4. Adicione ao `.env`:
 
@@ -259,14 +266,18 @@ INSTAGRAM_ACCESS_TOKEN=seu_token_instagram_aqui
 
 ### 6.3 Configurar Webhook do Messenger
 
+**IMPORTANTE:** Webhook deve apontar para Supabase Edge Function!
+
 1. Vá para **Messenger** → **Settings**
 2. Na seção **"Webhooks"**, clique em **"Add Callback URL"**
 3. Preencha:
 
 ```
-Callback URL: https://connectia.agenciapixel.digital/api/webhooks/messenger
+Callback URL: https://bjsuujkbrhjhuyzydxbr.supabase.co/functions/v1/messenger-webhook
 Verify Token: connect_ia_webhook_2025
 ```
+
+**Nota:** Se você não tiver criado a Edge Function `messenger-webhook` ainda, precisará criá-la seguindo o mesmo padrão da `whatsapp-webhook`.
 
 4. Subscribe to webhook fields:
    - ✅ `messages`

@@ -38,12 +38,17 @@
 | **Phone Number ID** | `[ID_DO_NUMERO]` | WhatsApp → API Setup |
 | **Business Account ID** | `[ID_DA_CONTA]` | WhatsApp → API Setup |
 
-### Webhook
+### Webhook (Supabase Edge Function)
 
 | Item | Valor |
 |------|-------|
-| **Callback URL** | `https://connectia.agenciapixel.digital/api/webhooks/whatsapp` |
+| **Callback URL** | `https://bjsuujkbrhjhuyzydxbr.supabase.co/functions/v1/whatsapp-webhook` |
 | **Verify Token** | `connect_ia_webhook_2025` |
+
+**Formato da URL:**
+```
+https://[PROJECT_ID].supabase.co/functions/v1/[FUNCTION_NAME]
+```
 
 ### Webhook Fields (Marcar)
 
@@ -86,12 +91,14 @@
 | **Page ID** | `[ID_DA_PAGINA]` | Messenger → Settings |
 | **Verify Token** | `connect_ia_webhook_2025` | Você define isso |
 
-### Webhook
+### Webhook (Supabase Edge Function)
 
 | Item | Valor |
 |------|-------|
-| **Callback URL** | `https://connectia.agenciapixel.digital/api/webhooks/messenger` |
+| **Callback URL** | `https://bjsuujkbrhjhuyzydxbr.supabase.co/functions/v1/messenger-webhook` |
 | **Verify Token** | `connect_ia_webhook_2025` |
+
+**Nota:** Edge Function `messenger-webhook` precisa ser criada se ainda não existir.
 
 ### Webhook Fields (Marcar)
 
