@@ -5,7 +5,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # Build outputs
-# dist/ - commented out to allow GitHub Actions to commit built files
+dist/ # Pasta dist/ local - arquivos de produção ficam na raiz
 build/
 
 # Environment variables
@@ -105,4 +105,4 @@ composer.lock
 public_html/
 
 # Local development
-.env.exampledist/
+.env.example.local
