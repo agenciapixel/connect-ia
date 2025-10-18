@@ -10,8 +10,10 @@
 
 1. Acesse: https://supabase.com/dashboard
 2. Login com sua conta
-3. Selecione o projeto: **bjsuujkbrhjhuyzydxbr**
+3. Selecione o projeto: **Sistema de Chat** (bjsuujkbrhjhuyzydxbr)
 4. No menu lateral, clique em **SQL Editor**
+
+**Link direto:** https://supabase.com/dashboard/project/bjsuujkbrhjhuyzydxbr/sql
 
 ---
 

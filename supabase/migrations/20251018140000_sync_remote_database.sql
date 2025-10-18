@@ -1,41 +1,11 @@
 -- =====================================================
--- APLICAR MIGRAÇÕES NO SUPABASE REMOTO
+-- SINCRONIZAR BANCO REMOTO COM LOCAL
 -- Data: 18/10/2025
--- Objetivo: Sincronizar banco remoto com local
+-- Objetivo: Aplicar estrutura completa via Supabase CLI
 -- =====================================================
 
--- IMPORTANTE: Execute este script no SQL Editor do Supabase Dashboard
--- URL: https://supabase.com/dashboard/project/bjsuujkbrhjhuyzydxbr/sql
-
 -- =====================================================
--- ETAPA 1: LIMPAR SISTEMA ANTIGO (SE NECESSÁRIO)
--- =====================================================
-
--- Comentário: Descomente apenas se quiser resetar TUDO
--- ATENÇÃO: Isso irá DELETAR TODOS OS DADOS!
-
-/*
--- Deletar todos os usuários (cascata para tudo)
-DELETE FROM auth.users;
-
--- Dropar tabelas antigas
-DROP TABLE IF EXISTS public.usage_tracking CASCADE;
-DROP TABLE IF EXISTS public.plans CASCADE;
-DROP TABLE IF EXISTS public.authorized_users CASCADE;
-*/
-
--- =====================================================
--- ETAPA 2: VERIFICAR ESTRUTURA ATUAL
--- =====================================================
-
--- Ver tabelas existentes
-SELECT tablename
-FROM pg_tables
-WHERE schemaname = 'public'
-ORDER BY tablename;
-
--- =====================================================
--- ETAPA 3: CRIAR/ATUALIZAR TABELAS ESSENCIAIS
+-- ETAPA 1: CRIAR/ATUALIZAR TABELA ORGS
 -- =====================================================
 
 -- Tabela de organizações (sem coluna plan)
@@ -73,6 +43,10 @@ BEGIN
   END IF;
 END $$;
 
+-- =====================================================
+-- ETAPA 2: CRIAR TABELA MEMBERS
+-- =====================================================
+
 -- Tabela de membros (usuários nas organizações)
 CREATE TABLE IF NOT EXISTS public.members (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -85,7 +59,7 @@ CREATE TABLE IF NOT EXISTS public.members (
 );
 
 -- =====================================================
--- ETAPA 4: CRIAR TABELAS CRM
+-- ETAPA 3: CRIAR TABELAS CRM
 -- =====================================================
 
 -- Contatos
@@ -170,7 +144,7 @@ CREATE TABLE IF NOT EXISTS public.prospects (
 );
 
 -- =====================================================
--- ETAPA 5: CRIAR ÍNDICES PARA PERFORMANCE
+-- ETAPA 4: CRIAR ÍNDICES PARA PERFORMANCE
 -- =====================================================
 
 -- Índices em orgs
@@ -205,7 +179,7 @@ CREATE INDEX IF NOT EXISTS idx_prospects_contact_id ON public.prospects(contact_
 CREATE INDEX IF NOT EXISTS idx_prospects_pipeline_stage ON public.prospects(pipeline_stage);
 
 -- =====================================================
--- ETAPA 6: CRIAR/ATUALIZAR RLS POLICIES
+-- ETAPA 5: CRIAR/ATUALIZAR RLS POLICIES
 -- =====================================================
 
 -- Habilitar RLS em todas as tabelas
@@ -279,9 +253,7 @@ CREATE POLICY "Users can delete contacts in their org"
     )
   );
 
--- Policies similares para conversations, messages, campaigns, prospects
--- (Copiando o mesmo padrão)
-
+-- Policies para CONVERSATIONS
 DROP POLICY IF EXISTS "Users can view conversations of their org" ON public.conversations;
 CREATE POLICY "Users can view conversations of their org"
   ON public.conversations FOR SELECT
@@ -296,6 +268,7 @@ CREATE POLICY "Users can manage conversations in their org"
     org_id IN (SELECT org_id FROM public.members WHERE user_id = auth.uid())
   );
 
+-- Policies para MESSAGES
 DROP POLICY IF EXISTS "Users can view messages of their org" ON public.messages;
 CREATE POLICY "Users can view messages of their org"
   ON public.messages FOR SELECT
@@ -316,6 +289,7 @@ CREATE POLICY "Users can manage messages in their org"
     )
   );
 
+-- Policies para CAMPAIGNS
 DROP POLICY IF EXISTS "Users can manage campaigns in their org" ON public.campaigns;
 CREATE POLICY "Users can manage campaigns in their org"
   ON public.campaigns FOR ALL
@@ -323,6 +297,7 @@ CREATE POLICY "Users can manage campaigns in their org"
     org_id IN (SELECT org_id FROM public.members WHERE user_id = auth.uid())
   );
 
+-- Policies para PROSPECTS
 DROP POLICY IF EXISTS "Users can manage prospects in their org" ON public.prospects;
 CREATE POLICY "Users can manage prospects in their org"
   ON public.prospects FOR ALL
@@ -331,7 +306,7 @@ CREATE POLICY "Users can manage prospects in their org"
   );
 
 -- =====================================================
--- ETAPA 7: CRIAR TRIGGER DE AUTO-CRIAÇÃO DE ORG
+-- ETAPA 6: CRIAR TRIGGER DE AUTO-CRIAÇÃO DE ORG
 -- =====================================================
 
 CREATE OR REPLACE FUNCTION public.handle_new_user()
@@ -379,7 +354,7 @@ CREATE TRIGGER on_auth_user_created
   EXECUTE FUNCTION public.handle_new_user();
 
 -- =====================================================
--- ETAPA 8: CRIAR TRIGGERS DE UPDATED_AT
+-- ETAPA 7: CRIAR TRIGGERS DE UPDATED_AT
 -- =====================================================
 
 CREATE OR REPLACE FUNCTION public.handle_updated_at()
@@ -426,41 +401,3 @@ CREATE TRIGGER set_updated_at
   BEFORE UPDATE ON public.prospects
   FOR EACH ROW
   EXECUTE FUNCTION public.handle_updated_at();
-
--- =====================================================
--- ETAPA 9: VERIFICAÇÃO FINAL
--- =====================================================
-
--- Ver todas as tabelas criadas
-SELECT
-  tablename,
-  schemaname
-FROM pg_tables
-WHERE schemaname = 'public'
-ORDER BY tablename;
-
--- Ver todas as policies
-SELECT
-  tablename,
-  policyname,
-  cmd
-FROM pg_policies
-WHERE schemaname = 'public'
-ORDER BY tablename, policyname;
-
--- Ver todos os triggers
-SELECT
-  event_object_table AS tabela,
-  trigger_name,
-  event_manipulation AS evento
-FROM information_schema.triggers
-WHERE trigger_schema = 'public'
-ORDER BY event_object_table;
-
--- =====================================================
--- FIM DO SCRIPT
--- =====================================================
-
--- Mensagem de sucesso
-SELECT '✅ Migrações aplicadas com sucesso!' as status;
-SELECT 'Próximo passo: Inserir dados de exemplo (se necessário)' as proxima_acao;
