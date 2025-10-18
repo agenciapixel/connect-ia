@@ -37,6 +37,8 @@ export function useSecurity() {
 
   const checkUserAuthorization = async (userEmail: string): Promise<boolean> => {
     try {
+      console.log('🔍 checkUserAuthorization: Iniciando para:', userEmail);
+      
       // Verificar diretamente na tabela authorized_users em vez de usar RPC
       const { data, error } = await supabase
         .from('authorized_users')
@@ -44,33 +46,44 @@ export function useSecurity() {
         .eq('email', userEmail)
         .single();
 
+      console.log('🔍 checkUserAuthorization: Resposta:', { data, error });
+
       if (error) {
-        console.error('Erro ao verificar autorização:', error);
+        console.error('❌ checkUserAuthorization: Erro:', error);
         return false;
       }
 
-      return !!data;
+      const result = !!data;
+      console.log('🔍 checkUserAuthorization: Resultado:', result);
+      return result;
     } catch (err) {
-      console.error('Erro ao verificar autorização:', err);
+      console.error('❌ checkUserAuthorization: Exception:', err);
       return false;
     }
   };
 
   const getUserRole = async (userEmail: string): Promise<'admin' | 'user' | null> => {
     try {
+      console.log('🔍 getUserRole: Iniciando para:', userEmail);
+      
       const { data, error } = await supabase
         .from('authorized_users')
         .select('role')
         .eq('email', userEmail)
         .single();
 
+      console.log('🔍 getUserRole: Resposta:', { data, error });
+
       if (error || !data) {
+        console.log('❌ getUserRole: Erro ou sem dados:', error);
         return null;
       }
 
-      return data.role as 'admin' | 'user';
+      const result = data.role as 'admin' | 'user';
+      console.log('🔍 getUserRole: Resultado:', result);
+      return result;
     } catch (err) {
-      console.error('Erro ao obter role do usuário:', err);
+      console.error('❌ getUserRole: Exception:', err);
       return null;
     }
   };

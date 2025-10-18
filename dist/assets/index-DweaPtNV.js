@@ -11757,14 +11757,12 @@ function useSecurity() {
   });
   const checkUserAuthorization = async (userEmail) => {
     try {
-      const { data, error } = await supabase.rpc("is_user_authorized", {
-        user_email: userEmail
-      });
+      const { data, error } = await supabase.from("authorized_users").select("email").eq("email", userEmail).single();
       if (error) {
         console.error("Erro ao verificar autorização:", error);
         return false;
       }
-      return data || false;
+      return !!data;
     } catch (err) {
       console.error("Erro ao verificar autorização:", err);
       return false;
@@ -11819,12 +11817,15 @@ function useSecurity() {
     }
   };
   const validateUser = async (userEmail) => {
+    console.log("🔍 useSecurity: Iniciando validação para:", userEmail);
     setSecurity((prev) => ({ ...prev, isLoading: true }));
     try {
-      const [isAuthorized, userRole] = await Promise.all([
-        checkUserAuthorization(userEmail),
-        getUserRole(userEmail)
-      ]);
+      console.log("🔍 useSecurity: Verificando autorização...");
+      const isAuthorized = await checkUserAuthorization(userEmail);
+      console.log("🔍 useSecurity: Autorização:", isAuthorized);
+      console.log("🔍 useSecurity: Obtendo role...");
+      const userRole = await getUserRole(userEmail);
+      console.log("🔍 useSecurity: Role:", userRole);
       const permissions = getPermissions(userRole);
       setSecurity({
         isAuthorized,
@@ -11832,12 +11833,14 @@ function useSecurity() {
         userRole,
         permissions
       });
+      console.log("🔍 useSecurity: Validação concluída:", { isAuthorized, userRole });
       if (!isAuthorized) {
+        console.log("❌ useSecurity: Usuário não autorizado, fazendo logout");
         ue$1.error("Usuário não autorizado. Entre em contato com o administrador.");
         await supabase.auth.signOut();
       }
     } catch (error) {
-      console.error("Erro na validação de segurança:", error);
+      console.error("❌ useSecurity: Erro na validação:", error);
       setSecurity((prev) => ({
         ...prev,
         isAuthorized: false,
@@ -61379,21 +61382,21 @@ function Auth() {
     e3.preventDefault();
     setIsLoading(true);
     try {
-      const validated = authSchema.parse({ email, password, fullName });
-      console.log("🔍 Tentando cadastrar usuário:", validated.email);
-      console.log("📋 Dados validados:", { email: validated.email, fullName: validated.fullName });
+      const validated2 = authSchema.parse({ email, password, fullName });
+      console.log("🔍 Tentando cadastrar usuário:", validated2.email);
+      console.log("📋 Dados validados:", { email: validated2.email, fullName: validated2.fullName });
       console.log("🚀 Iniciando chamada supabase.auth.signUp...");
       const signUpPromise = supabase.auth.signUp({
-        email: validated.email,
-        password: validated.password,
+        email: validated2.email,
+        password: validated2.password,
         options: {
           data: {
-            full_name: validated.fullName
+            full_name: validated2.fullName
           }
         }
       });
       const timeoutPromise = new Promise(
-        (_, reject) => setTimeout(() => reject(new Error("Timeout: Chamada demorou mais de 30 segundos")), 3e4)
+        (_, reject) => setTimeout(() => reject(new Error("Timeout: Chamada demorou mais de 60 segundos")), 6e4)
       );
       const { data, error } = await Promise.race([signUpPromise, timeoutPromise]);
       console.log("✅ Chamada supabase.auth.signUp concluída");
@@ -61424,6 +61427,26 @@ function Auth() {
           variant: "destructive"
         });
       } else if (error instanceof Error && error.message.includes("Timeout")) {
+        console.log("⏱️ Timeout detectado, verificando se usuário foi criado...");
+        try {
+          const { data: checkData, error: checkError } = await supabase.auth.signInWithPassword({
+            email: validated.email,
+            password: validated.password
+          });
+          if (checkData.user && !checkError) {
+            console.log("✅ Usuário foi criado com sucesso (verificado via login)");
+            toast2({
+              title: "Cadastro realizado!",
+              description: "Usuário criado com sucesso. Redirecionando..."
+            });
+            setTimeout(() => {
+              navigate("/");
+            }, 1500);
+            return;
+          }
+        } catch (checkErr) {
+          console.log("❌ Usuário não foi criado:", checkErr);
+        }
         toast2({
           title: "Timeout",
           description: "A operação demorou muito para responder. Tente novamente.",
@@ -61444,10 +61467,10 @@ function Auth() {
     e3.preventDefault();
     setIsLoading(true);
     try {
-      const validated = authSchema.parse({ email, password });
+      const validated2 = authSchema.parse({ email, password });
       const { error } = await supabase.auth.signInWithPassword({
-        email: validated.email,
-        password: validated.password
+        email: validated2.email,
+        password: validated2.password
       });
       if (error) {
         toast2({
@@ -61458,7 +61481,7 @@ function Auth() {
       } else {
         if (rememberMe) {
           localStorage.setItem("rememberMe", "true");
-          localStorage.setItem("userEmail", validated.email);
+          localStorage.setItem("userEmail", validated2.email);
         } else {
           localStorage.removeItem("rememberMe");
           localStorage.removeItem("userEmail");
