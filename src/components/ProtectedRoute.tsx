@@ -9,14 +9,14 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { user, loading } = usePersistentAuth();
-  const { isAuthorized, isLoading, validateUser, clearSecurity } = useSecurity();
+  const { isAuthorized, isLoading, validateUser } = useSecurity();
 
   useEffect(() => {
     if (user?.email) {
       validateUser(user.email);
-    } else {
-      clearSecurity();
     }
+    // NÃO chamar clearSecurity quando user é null
+    // Isso causava limpeza de cache durante refresh
   }, [user?.email]); // Removido validateUser e clearSecurity das dependências para evitar loop
 
   if (loading || isLoading) {
