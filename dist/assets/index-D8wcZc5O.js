@@ -11772,7 +11772,7 @@ function useSecurity() {
   };
   const getUserRole = async (userEmail) => {
     try {
-      const { data, error } = await supabase.from("authorized_users").select("role").eq("email", userEmail).eq("is_active", true).single();
+      const { data, error } = await supabase.from("authorized_users").select("role").eq("email", userEmail).single();
       if (error || !data) {
         return null;
       }
@@ -61402,8 +61402,11 @@ function Auth() {
         console.log("✅ Cadastro realizado com sucesso!");
         toast2({
           title: "Cadastro realizado!",
-          description: "Usuário criado com sucesso. Você pode fazer login agora."
+          description: "Usuário criado com sucesso. Redirecionando..."
         });
+        setTimeout(() => {
+          navigate("/");
+        }, 1500);
       }
     } catch (error) {
       console.error("❌ Erro de validação:", error);
