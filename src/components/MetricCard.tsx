@@ -43,27 +43,27 @@ export function MetricCard({
   return (
     <Card className={cn("relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-lg group", className)}>
       <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/5 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform" />
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
-        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+        <CardTitle className="text-sm font-medium text-muted-foreground whitespace-nowrap">{title}</CardTitle>
+        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors flex-shrink-0">
           {icon}
         </div>
       </CardHeader>
-      <CardContent>
-        <div className={cn("text-3xl font-bold tracking-tight", valueClassName)}>
+      <CardContent className="pt-0">
+        <div className={cn("text-2xl sm:text-3xl font-bold tracking-tight mb-1", valueClassName)}>
           {formattedValue}
         </div>
         {showChange && change !== undefined && (
-          <div className="flex items-center gap-2 mt-2">
-            <Badge variant="default" className={cn("flex items-center gap-1", getChangeColor(change))}>
+          <div className="flex items-center gap-2 mt-3 flex-wrap">
+            <Badge variant="default" className={cn("flex items-center gap-1 text-xs", getChangeColor(change))}>
               {getChangeIcon(change)}
               {Math.abs(change)}%
             </Badge>
-            <span className="text-xs text-muted-foreground">vs. período anterior</span>
+            <span className="text-xs text-muted-foreground whitespace-nowrap">vs. período anterior</span>
           </div>
         )}
         {description && (
-          <p className="text-xs text-muted-foreground mt-1">{description}</p>
+          <p className="text-xs text-muted-foreground mt-2">{description}</p>
         )}
       </CardContent>
     </Card>
