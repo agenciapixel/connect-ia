@@ -37,17 +37,19 @@ export function useSecurity() {
 
   const checkUserAuthorization = async (userEmail: string): Promise<boolean> => {
     try {
+      // Verificar diretamente na tabela authorized_users em vez de usar RPC
       const { data, error } = await supabase
-        .rpc('is_user_authorized', {
-          user_email: userEmail
-        });
+        .from('authorized_users')
+        .select('email')
+        .eq('email', userEmail)
+        .single();
 
       if (error) {
         console.error('Erro ao verificar autorização:', error);
         return false;
       }
 
-      return data || false;
+      return !!data;
     } catch (err) {
       console.error('Erro ao verificar autorização:', err);
       return false;
@@ -111,13 +113,17 @@ export function useSecurity() {
   };
 
   const validateUser = async (userEmail: string) => {
+    console.log('🔍 useSecurity: Iniciando validação para:', userEmail);
     setSecurity(prev => ({ ...prev, isLoading: true }));
 
     try {
-      const [isAuthorized, userRole] = await Promise.all([
-        checkUserAuthorization(userEmail),
-        getUserRole(userEmail)
-      ]);
+      console.log('🔍 useSecurity: Verificando autorização...');
+      const isAuthorized = await checkUserAuthorization(userEmail);
+      console.log('🔍 useSecurity: Autorização:', isAuthorized);
+      
+      console.log('🔍 useSecurity: Obtendo role...');
+      const userRole = await getUserRole(userEmail);
+      console.log('🔍 useSecurity: Role:', userRole);
 
       const permissions = getPermissions(userRole);
 
@@ -128,13 +134,16 @@ export function useSecurity() {
         permissions
       });
 
+      console.log('🔍 useSecurity: Validação concluída:', { isAuthorized, userRole });
+
       if (!isAuthorized) {
+        console.log('❌ useSecurity: Usuário não autorizado, fazendo logout');
         toast.error('Usuário não autorizado. Entre em contato com o administrador.');
         await supabase.auth.signOut();
       }
 
     } catch (error) {
-      console.error('Erro na validação de segurança:', error);
+      console.error('❌ useSecurity: Erro na validação:', error);
       setSecurity(prev => ({
         ...prev,
         isAuthorized: false,
