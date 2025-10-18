@@ -29,23 +29,18 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
     console.log('🔄 fetchOrganizations: INICIANDO...');
 
     try {
-      // Verificação 1: Buscar usuário
-      console.log('🔄 fetchOrganizations: Buscando usuário...');
-      const { data: { user } } = await supabase.auth.getUser();
-      console.log('🔄 fetchOrganizations: getUser retornou:', user ? user.email : 'null');
+      // Buscar sessão (mais rápido e confiável que getUser)
+      console.log('🔄 fetchOrganizations: Buscando sessão...');
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      console.log('🔄 fetchOrganizations: getSession retornou:', session?.user ? session.user.email : 'null');
 
-      if (!user) {
-        console.log('❌ fetchOrganizations: Sem usuário, abortando');
+      if (sessionError) {
+        console.error('❌ fetchOrganizations: Erro ao buscar sessão:', sessionError);
         setOrganizations([]);
         setCurrentOrg(null);
         setIsLoading(false);
         return;
       }
-
-      // Verificação 2: Buscar sessão
-      console.log('🔄 fetchOrganizations: Buscando sessão...');
-      const { data: { session } } = await supabase.auth.getSession();
-      console.log('🔄 fetchOrganizations: getSession retornou:', session?.user ? session.user.email : 'null');
 
       if (!session?.user) {
         console.log('❌ fetchOrganizations: Sem sessão, abortando');
@@ -55,17 +50,8 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      // Verificação 3: IDs compatíveis
-      console.log('🔄 fetchOrganizations: Verificando IDs...', { userId: user.id, sessionUserId: session.user.id });
-      if (session.user.id !== user.id) {
-        console.log('❌ fetchOrganizations: IDs incompatíveis, abortando');
-        setOrganizations([]);
-        setCurrentOrg(null);
-        setIsLoading(false);
-        return;
-      }
-
-      console.log('✅ fetchOrganizations: Todas verificações OK, usuário:', user.email);
+      const user = session.user;
+      console.log('✅ fetchOrganizations: Sessão válida, usuário:', user.email);
 
       // Buscar todas as organizações do usuário através da tabela members
       const { data: memberships, error } = await supabase
